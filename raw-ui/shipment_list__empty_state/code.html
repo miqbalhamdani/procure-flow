@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ProcureFlow - Purchase Order Details</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary": "#ffffff",
+              "surface-dim": "#d2d9f4",
+              "on-secondary-fixed": "#0d1c2e",
+              "surface-container-low": "#f2f3ff",
+              "surface-container-highest": "#dae2fd",
+              "tertiary-fixed-dim": "#ffb783",
+              "on-surface": "#131b2e",
+              "on-background": "#131b2e",
+              "outline-variant": "#c7c4d7",
+              "inverse-surface": "#283044",
+              "on-tertiary": "#ffffff",
+              "primary-fixed": "#eaddff",
+              "on-primary-fixed-variant": "#5a00c6",
+              "inverse-primary": "#d2bbff",
+              "tertiary-container": "#b55d00",
+              "secondary-container": "#d5e3fc",
+              "tertiary": "#904900",
+              "on-tertiary-fixed": "#301400",
+              "error-container": "#ffdad6",
+              "surface-container-lowest": "#ffffff",
+              "outline": "#767586",
+              "surface-container-high": "#e2e7ff",
+              "surface": "#faf8ff",
+              "primary-fixed-dim": "#d2bbff",
+              "on-tertiary-fixed-variant": "#703700",
+              "secondary-fixed": "#d5e3fc",
+              "surface-container": "#eaedff",
+              "secondary": "#515f74",
+              "tertiary-fixed": "#ffdcc5",
+              "on-secondary-fixed-variant": "#3a485b",
+              "on-error": "#ffffff",
+              "on-secondary-container": "#57657a",
+              "on-primary": "#ffffff",
+              "on-error-container": "#93000a",
+              "on-primary-container": "#fffbff",
+              "surface-variant": "#dae2fd",
+              "on-primary-fixed": "#25005a",
+              "on-tertiary-container": "#fffbff",
+              "primary-container": "#8a4cfc",
+              "on-surface-variant": "#464554",
+              "background": "#faf8ff",
+              "surface-tint": "#732ee4",
+              "primary": "#6366F1",
+              "inverse-on-surface": "#eef0ff",
+              "surface-bright": "#faf8ff",
+              "secondary-fixed-dim": "#b9c7df",
+              "error": "#ba1a1a"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+        .editorial-gradient { background: linear-gradient(135deg, #712ae2 0%, #8a4cfc 100%); }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex">
+<!-- Sidebar Navigation -->
+<aside class="h-screen w-64 flex flex-col bg-[#f2f3ff] dark:bg-slate-900 flex-shrink-0 relative z-50">
+<div class="flex flex-col justify-between py-8 h-full">
+<div class="space-y-8 flex-1">
+<!-- Header/Logo Area -->
+<div class="px-6 flex items-center gap-3">
+<div class="w-10 h-10 editorial-gradient rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dataset</span>
+</div>
+<div>
+<h1 class="text-2xl font-black tracking-tighter text-[#131b2e] dark:text-white font-manrope leading-none">ProcureFlow</h1>
+<p class="text-[10px] font-medium text-on-surface-variant uppercase tracking-[0.2em] mt-0.5">Editorial</p>
+</div>
+</div>
+<!-- Main Navigation -->
+<nav class="flex flex-col gap-1 pr-4">
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] dark:text-slate-400 font-medium hover:bg-[#eaedff] dark:hover:bg-slate-800 transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-manrope text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] dark:text-slate-400 font-medium hover:bg-[#eaedff] dark:hover:bg-slate-800 transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-manrope text-sm">Suppliers</span>
+</a>
+<!-- Active Tab: Purchase Order -->
+<a class="flex items-center gap-3 px-6 py-3 text-[#712ae2] dark:text-[#8a4cfc] font-bold bg-[#eaedff] dark:bg-slate-800 rounded-r-full active:scale-95 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+<span class="font-manrope text-sm">Purchase Order</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] dark:text-slate-400 font-medium hover:bg-[#eaedff] dark:hover:bg-slate-800 transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-manrope text-sm">Billing</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] dark:text-slate-400 font-medium hover:bg-[#eaedff] dark:hover:bg-slate-800 transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-manrope text-sm">Companies</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] dark:text-slate-400 font-medium hover:bg-[#eaedff] dark:hover:bg-slate-800 transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-manrope text-sm">Users</span>
+</a>
+</nav>
+</div>
+<!-- Footer Section (User Profile) -->
+<div class="flex flex-col gap-6">
+<div class="px-6 py-4 flex items-center gap-3 border-t border-outline-variant/10">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high ring-2 ring-primary/10">
+<img alt="Marcus Chen" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF36FFtcuR7MMoQMxZu-yrxOiI-d-sUYjOgEtoaQraeXMpmFIFTJrlGWUFhlalvt6LZDw5PtV77xdUErYussPm5adqfySaTOtBue5RAGFVXrsAiro1NDiGrD_WNIuhpynu_XSNoV6SCQ84I4iOa3smZdMylOWX4i-Ig05EdGW448PVCcS2SBRGCojW1tLPxnxA1QMwQt9tBO9yY2DwIYggniykdaWMkZtM2ta_Edk7vsE6ZAi89i3ZIn9xJ9STU65OjLijBbLBrB5b"/>
+</div>
+<div class="flex flex-col min-w-0">
+<p class="text-sm font-bold text-on-surface truncate font-manrope">Marcus Chen</p>
+<p class="text-xs text-on-surface-variant truncate font-inter">Global Procurement Lead</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="flex-1 min-h-screen flex flex-col min-w-0">
+<!-- Topbar Header -->
+<header class="h-16 bg-background/80 dark:bg-slate-950/80 backdrop-blur-xl z-40 flex items-center justify-end px-8 gap-6 w-full">
+<div class="flex items-center gap-6"><button class="flex items-center gap-2 px-4 py-2 bg-surface-container-low hover:bg-surface-container transition-colors rounded-lg text-sm font-semibold text-primary">
+<span class="material-symbols-outlined text-[18px]">business_center</span>
+<span>Switch Company</span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+<div class="h-6 w-px bg-outline-variant/30"></div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[22px]">help</span>
+</button>
+<div class="relative">
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+<span class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-error rounded-full ring-2 ring-background"></span>
+</button>
+</div></div>
+</header>
+<!-- Content Area -->
+<section class="flex-1 overflow-y-auto p-8 max-w-7xl w-full mx-auto">
+<!-- Page Title & Status -->
+<div class="flex items-start justify-between mb-8">
+<div class="flex items-center gap-4">
+<a class="p-2 hover:bg-surface-container-low rounded-full transition-colors group" href="#">
+<span class="material-symbols-outlined text-secondary group-active:scale-95 transition-transform" data-icon="arrow_back">arrow_back</span>
+</a>
+<div class="flex flex-col">
+<h2 class="font-manrope text-3xl font-extrabold tracking-tight text-on-surface">Purchase Order Details</h2>
+<span class="text-sm font-medium text-on-surface-variant flex items-center gap-1 mt-1">
+                        PO-88291 • Last updated 2 hours ago
+                    </span>
+</div>
+</div>
+<!-- Status Badge -->
+<div class="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-1.5 rounded-full border border-emerald-100 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="text-xs font-bold uppercase tracking-wider">Approved</span>
+</div>
+</div>
+<!-- Breadcrumbs / Meta Navigation -->
+<div class="flex gap-8 mb-10 border-b border-outline-variant/10">
+<button class="font-inter text-sm font-medium text-on-surface-variant pb-3 border-b-2 border-transparent hover:text-on-surface transition-all">Details</button>
+<button class="font-inter text-sm font-bold text-primary pb-3 border-b-2 border-primary transition-all">Shipments</button>
+</div>
+<!-- Full Width Layout Content -->
+<div class="flex flex-col gap-6">
+<!-- Primary Action & Hero Empty State -->
+<div class="bg-surface-container-lowest rounded-2xl p-16 text-center border border-outline-variant/10 shadow-sm flex flex-col items-center justify-center min-h-[440px]">
+<div class="w-24 h-24 bg-surface-container-low rounded-full flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-4xl text-primary/40" data-icon="package_2">package_2</span>
+</div>
+<h3 class="font-manrope text-2xl font-bold text-on-surface mb-2">No active shipments yet</h3>
+<p class="text-on-surface-variant max-w-md mb-8 leading-relaxed">
+                    Manage logistics and track delivery progress for this order. You can begin organizing transport now that the order has been <span class="text-emerald-600 font-semibold">Approved</span>.
+                </p>
+<!-- Main CTA: Gradient Jeweled Button -->
+<button class="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-br from-primary to-primary-container text-white font-bold rounded-xl shadow-[0_10px_20px_-10px_rgba(113,42,226,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-xl" data-icon="add_circle">add_circle</span>
+                    Create Shipment
+                </button>
+</div>
+<!-- Auxiliary Information (Grid Expansion) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-container-low rounded-2xl p-6 flex flex-col justify-between border border-outline-variant/5">
+<span class="material-symbols-outlined text-primary mb-4" data-icon="hub">hub</span>
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Origin Port</p>
+<p class="font-manrope font-bold text-on-surface">Shenzhen (CNSZP)</p>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-6 flex flex-col justify-between border border-outline-variant/5">
+<span class="material-symbols-outlined text-primary mb-4" data-icon="location_on">location_on</span>
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Destination</p>
+<p class="font-manrope font-bold text-on-surface">Chicago Hub (ORD)</p>
+</div>
+</div>
+<div class="bg-surface-container-low/50 rounded-2xl p-6 flex items-center justify-center border-2 border-dashed border-outline-variant/20 group hover:bg-surface-container-high/50 transition-colors cursor-pointer">
+<div class="text-center">
+<span class="material-symbols-outlined text-on-surface-variant mb-2 group-hover:text-primary transition-colors" data-icon="attachment">attachment</span>
+<p class="text-xs font-bold text-on-surface-variant">Attach Logistics Docs</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Action -->
+<footer class="mt-16 flex items-center justify-between py-8 border-t border-outline-variant/10">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors font-semibold text-sm">
+<span class="material-symbols-outlined text-sm" data-icon="arrow_left_alt">arrow_left_alt</span>
+                Back to List
+            </button>
+<div class="flex gap-4">
+<button class="px-6 py-2.5 text-sm font-bold text-secondary hover:bg-surface-container-low rounded-xl transition-colors">Export PDF</button>
+<button class="px-6 py-2.5 text-sm font-bold text-secondary hover:bg-surface-container-low rounded-xl transition-colors">Duplicate Order</button>
+</div>
+</footer>
+</section>
+</main>
+</body></html>

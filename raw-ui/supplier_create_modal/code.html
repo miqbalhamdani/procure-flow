@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ProcureFlow - New Supplier</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#712ae2",
+                        "surface-container-highest": "#dae2fd",
+                        "background": "#faf8ff",
+                        "tertiary-container": "#b55d00",
+                        "primary-fixed-dim": "#d2bbff",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "primary-container": "#8a4cfc",
+                        "on-secondary-container": "#57657a",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ffdcc5",
+                        "secondary": "#515f74",
+                        "on-tertiary-fixed": "#301400",
+                        "on-background": "#131b2e",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "inverse-surface": "#283044",
+                        "inverse-primary": "#d2bbff",
+                        "inverse-on-surface": "#eef0ff",
+                        "primary-fixed": "#eaddff",
+                        "surface-tint": "#732ee4",
+                        "on-tertiary-container": "#fffbff",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "tertiary": "#904900",
+                        "secondary-fixed": "#d5e3fc",
+                        "outline": "#767586",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#703700",
+                        "on-primary-fixed": "#25005a",
+                        "surface-container": "#eaedff",
+                        "surface-container-low": "#f2f3ff",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#d2d9f4",
+                        "surface": "#faf8ff",
+                        "outline-variant": "#c7c4d7",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#faf8ff",
+                        "tertiary-fixed-dim": "#ffb783",
+                        "surface-container-high": "#e2e7ff",
+                        "secondary-container": "#d5e3fc",
+                        "on-surface": "#131b2e",
+                        "on-primary-container": "#fffbff",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "surface-variant": "#dae2fd",
+                        "on-surface-variant": "#464554"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .editorial-gradient { 
+            background: linear-gradient(135deg, #712ae2 0%, #8a4cfc 100%); 
+        }
+        .primary-gradient-btn {
+            background: linear-gradient(135deg, #712ae2 0%, #8a4cfc 100%);
+        }
+        .glass-header {
+            background: rgba(250, 248, 255, 0.8);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface antialiased">
+<!-- SideNavBar: From SCREEN_84 -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-[#f2f3ff] z-50">
+<div class="flex flex-col justify-between py-8 h-full">
+<div class="space-y-8 flex-1">
+<!-- Header/Logo Area -->
+<div class="px-6 flex items-center gap-3">
+<div class="w-10 h-10 editorial-gradient rounded-xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dataset</span>
+</div>
+<div>
+<h1 class="text-2xl font-black tracking-tighter text-on-background font-headline">ProcureFlow</h1>
+<p class="text-xs font-medium text-on-surface-variant uppercase tracking-widest">Editorial</p>
+</div>
+</div>
+<!-- Main Navigation -->
+<nav class="flex flex-col gap-1 pr-4">
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant font-medium hover:bg-surface-container transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-headline text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-primary font-bold bg-surface-container rounded-r-full active:scale-95 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-headline text-sm">Suppliers</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant font-medium hover:bg-surface-container transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-headline text-sm">Purchase Order</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant font-medium hover:bg-surface-container transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-headline text-sm">Billing</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant font-medium hover:bg-surface-container transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-headline text-sm">Companies</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant font-medium hover:bg-surface-container transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-headline text-sm">Users</span>
+</a>
+</nav>
+</div>
+<!-- Footer Section: User Profile -->
+<div class="px-6 py-4 flex items-center gap-3 border-t border-outline-variant/10">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high ring-2 ring-primary/10">
+<img class="w-full h-full object-cover" data-alt="Close-up professional portrait of a senior logistics manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF36FFtcuR7MMoQMxZu-yrxOiI-d-sUYjOgEtoaQraeXMpmFIFTJrlGWUFhlalvt6LZDw5PtV77xdUErYussPm5adqfySaTOtBue5RAGFVXrsAiro1NDiGrD_WNIuhpynu_XSNoV6SCQ84I4iOa3smZdMylOWX4i-Ig05EdGW448PVCcS2SBRGCojW1tLPxnxA1QMwQt9tBO9yY2DwIYggniykdaWMkZtM2ta_Edk7vsE6ZAi89i3ZIn9xJ9STU65OjLijBbLBrB5b"/>
+</div>
+<div class="flex flex-col min-w-0">
+<p class="text-sm font-bold text-on-surface truncate font-headline">Marcus Chen</p>
+<p class="text-xs text-on-surface-variant truncate font-body">Global Procurement Lead</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 right-0 left-64 h-16 bg-background/80 backdrop-blur-xl z-40">
+<div class="flex items-center justify-end px-8 gap-6 w-full h-full">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-low hover:bg-surface-container transition-colors rounded-lg text-sm font-semibold text-primary">
+<span class="material-symbols-outlined text-[18px]">business_center</span>
+<span>Switch Company</span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+<div class="h-6 w-px bg-outline-variant/30"></div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="relative">
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full ring-2 ring-background"></span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pl-64 pt-16 min-h-screen bg-background relative overflow-hidden">
+<!-- Modal Overlay -->
+<div class="fixed inset-0 bg-on-background/10 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+<!-- Modal Container -->
+<div class="bg-surface-container-lowest w-full max-w-lg rounded-xl shadow-[0_20px_50px_-12px_rgba(19,27,46,0.08)] overflow-hidden">
+<!-- Modal Header -->
+<div class="px-8 pt-8 pb-4 flex justify-between items-start">
+<div>
+<h2 class="font-headline text-2xl font-extrabold text-on-background tracking-tight">Add New Supplier</h2>
+<p class="font-label text-sm text-secondary mt-1">Enter details for the new editorial partner.</p>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Content: Form -->
+<div class="px-8 py-4">
+<form class="space-y-6">
+<!-- Supplier Name -->
+<div class="space-y-2">
+<label class="font-headline text-sm font-bold text-on-surface-variant" for="supplier-name">Supplier Name</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg p-3 text-on-surface font-body placeholder:text-outline focus:ring-1 focus:ring-primary focus:bg-surface-bright transition-all" id="supplier-name" placeholder="e.g. Acme Creative Agency" type="text"/>
+</div>
+<!-- Company & Note -->
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="font-headline text-sm font-bold text-on-surface-variant" for="company">Company</label>
+<span class="font-label text-[10px] text-tertiary bg-tertiary-fixed/30 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">Visible to parent workspace</span>
+</div>
+<div class="relative">
+<select class="w-full bg-surface-container-low border-none rounded-lg p-3 text-on-surface font-body appearance-none focus:ring-1 focus:ring-primary focus:bg-surface-bright transition-all" id="company">
+<option disabled="" selected="" value="">Select a legal entity</option>
+<option value="acme_corp">Acme Corp International</option>
+<option value="globex">Globex Corporation</option>
+<option value="soylent">Soylent Corp</option>
+<option value="initech">Initech Inc.</option>
+</select>
+<div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Address -->
+<div class="space-y-2">
+<label class="font-headline text-sm font-bold text-on-surface-variant" for="address">Address</label>
+<textarea class="w-full bg-surface-container-low border-none rounded-lg p-3 text-on-surface font-body placeholder:text-outline focus:ring-1 focus:ring-primary focus:bg-surface-bright transition-all resize-none" id="address" placeholder="Full postal address" rows="3"></textarea>
+</div>
+<!-- Country Dropdown -->
+<div class="space-y-2">
+<label class="font-headline text-sm font-bold text-on-surface-variant" for="country">Country</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low border-none rounded-lg p-3 text-on-surface font-body appearance-none focus:ring-1 focus:ring-primary focus:bg-surface-bright transition-all" id="country">
+<option disabled="" selected="" value="">Select a country</option>
+<option value="us">United States</option>
+<option value="uk">United Kingdom</option>
+<option value="ca">Canada</option>
+<option value="de">Germany</option>
+<option value="fr">France</option>
+</select>
+<div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</div>
+</form>
+</div>
+<!-- Modal Footer: Actions -->
+<div class="px-8 py-8 flex items-center justify-end gap-3">
+<button class="px-6 py-2.5 rounded-lg font-headline text-sm font-bold text-primary bg-surface-container-highest hover:bg-surface-container-high transition-all active:scale-95">
+                    Cancel
+                </button>
+<button class="primary-gradient-btn px-8 py-2.5 rounded-lg font-headline text-sm font-bold text-on-primary shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-95">
+                    Save Supplier
+                </button>
+</div>
+</div>
+</div>
+<!-- Background Content: Dashboard Preview -->
+<div class="max-w-[1600px] mx-auto p-8 lg:p-12 space-y-12 opacity-50 pointer-events-none">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="space-y-2">
+<p class="text-primary font-bold tracking-[0.2em] uppercase text-xs">Overview Dashboard</p>
+<h2 class="text-4xl lg:text-5xl font-extrabold font-headline text-on-background tracking-tight">Suppliers.</h2>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-3 rounded-xl bg-surface-container text-primary font-bold">Export Report</button>
+<button class="px-6 py-3 rounded-xl editorial-gradient text-white font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                    New Supplier
+                </button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-surface-container-lowest p-8 rounded-[2rem] border border-outline-variant/5">
+<div class="flex justify-between items-start mb-6">
+<div class="p-3 bg-surface-container rounded-2xl text-primary">
+<span class="material-symbols-outlined">inventory_2</span>
+</div>
+<span class="text-xs font-bold text-tertiary px-2 py-1 bg-tertiary/10 rounded-full">+12.5%</span>
+</div>
+<p class="text-secondary font-medium text-sm mb-1 uppercase tracking-wider">Active Suppliers</p>
+<h3 class="text-4xl font-extrabold font-headline text-on-background">124</h3>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-[2rem] border border-outline-variant/5">
+<div class="flex justify-between items-start mb-6">
+<div class="p-3 bg-primary/10 rounded-2xl text-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<span class="text-xs font-bold text-primary px-2 py-1 bg-primary/10 rounded-full">$1.2M YTD</span>
+</div>
+<p class="text-secondary font-medium text-sm mb-1 uppercase tracking-wider">Total Spend</p>
+<h3 class="text-4xl font-extrabold font-headline text-on-background">1,850</h3>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-[2rem] border border-outline-variant/5">
+<div class="flex justify-between items-start mb-6">
+<div class="p-3 bg-secondary/10 rounded-2xl text-secondary">
+<span class="material-symbols-outlined">insights</span>
+</div>
+<span class="text-xs font-bold text-on-surface-variant px-2 py-1 bg-surface-container rounded-full">94%</span>
+</div>
+<p class="text-secondary font-medium text-sm mb-1 uppercase tracking-wider">Performance</p>
+<h3 class="text-4xl font-extrabold font-headline text-on-background">A+</h3>
+</div>
+</div>
+</div>
+</main>
+</body></html>

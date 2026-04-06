@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add New Entity | ProcureFlow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-on-surface": "#eef0ff",
+                        "primary": "#712ae2",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#dae2fd",
+                        "on-primary-fixed": "#25005a",
+                        "tertiary": "#904900",
+                        "surface-container-high": "#e2e7ff",
+                        "surface-tint": "#732ee4",
+                        "outline": "#767586",
+                        "tertiary-container": "#b55d00",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "surface": "#faf8ff",
+                        "on-tertiary-fixed": "#301400",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "primary-fixed": "#eaddff",
+                        "on-primary-container": "#fffbff",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "inverse-primary": "#d2bbff",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#8a4cfc",
+                        "surface-container-low": "#f2f3ff",
+                        "surface-container-highest": "#dae2fd",
+                        "background": "#faf8ff",
+                        "on-surface-variant": "#464554",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#131b2e",
+                        "secondary-container": "#d5e3fc",
+                        "on-tertiary-container": "#fffbff",
+                        "on-tertiary": "#ffffff",
+                        "inverse-surface": "#283044",
+                        "secondary-fixed": "#d5e3fc",
+                        "on-tertiary-fixed-variant": "#703700",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#faf8ff",
+                        "surface-dim": "#d2d9f4",
+                        "on-surface": "#131b2e",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "secondary": "#515f74",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#eaedff",
+                        "primary-fixed-dim": "#d2bbff",
+                        "outline-variant": "#c7c4d7",
+                        "tertiary-fixed-dim": "#ffb783",
+                        "tertiary-fixed": "#ffdcc5",
+                        "on-secondary-container": "#57657a",
+                        "on-error": "#ffffff"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased overflow-hidden">
+<!-- Back Navigation Shell (Simplified Tree Page) -->
+<div class="fixed inset-0 overflow-hidden flex grayscale opacity-40 scale-105 transition-all duration-700 pointer-events-none blur-md">
+<!-- SideNavBar Anchor -->
+<aside class="h-screen w-64 bg-[#f2f3ff] flex flex-col pt-20 p-4 gap-y-1">
+<div class="px-4 mb-8">
+<div class="h-10 w-10 bg-primary rounded-lg mb-2"></div>
+<div class="font-manrope font-extrabold text-[#131b2e]">Enterprise Hub</div>
+</div>
+<nav class="flex flex-col gap-y-1">
+<div class="flex items-center gap-3 px-4 py-3 text-[#515f74] hover:bg-[#eaedff] rounded-lg">
+<span class="material-symbols-outlined">domain</span>
+<span class="text-sm font-medium">Directory</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 bg-[#ffffff] text-[#712ae2] rounded-lg shadow-sm">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="text-sm font-medium">Hierarchy</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 text-[#515f74]">
+<span class="material-symbols-outlined">verified</span>
+<span class="text-sm font-medium">Compliance</span>
+</div>
+</nav>
+</aside>
+<!-- Main Content Canvas Anchor -->
+<main class="flex-1 bg-surface-container p-12">
+<header class="mb-12 flex justify-between items-end">
+<div>
+<h1 class="text-4xl font-extrabold tracking-tight mb-2">Company Management</h1>
+<p class="text-on-surface-variant">Manage your organizational structure and entities.</p>
+</div>
+<button class="bg-primary text-white px-6 py-3 rounded-lg font-semibold">Add Entity</button>
+</header>
+<div class="grid grid-cols-3 gap-8">
+<div class="col-span-2 space-y-4">
+<div class="bg-surface-container-lowest p-6 rounded-xl">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">corporate_fare</span>
+<span class="font-bold">Global Logistics Corp</span>
+</div>
+<div class="ml-10 mt-4 border-l-2 border-primary-fixed pl-6 space-y-4">
+<div class="bg-surface p-4 rounded-lg flex justify-between items-center">
+<span>North America Region</span>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+<div class="bg-surface p-4 rounded-lg flex justify-between items-center">
+<span>EMEA Operations</span>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-6 h-fit">
+<h3 class="font-bold mb-4">Quick Stats</h3>
+<div class="space-y-4">
+<div class="flex justify-between border-b border-outline-variant/10 pb-2">
+<span class="text-sm text-on-surface-variant">Total Entities</span>
+<span class="font-bold">24</span>
+</div>
+<div class="flex justify-between">
+<span class="text-sm text-on-surface-variant">Compliance Rate</span>
+<span class="font-bold text-primary">98%</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-12">
+<!-- Backdrop Dimmer (Extra Layer for focus) -->
+<div class="absolute inset-0 bg-[#131b2e]/40 backdrop-blur-sm"></div>
+<!-- The Modal Container -->
+<div class="relative w-full max-w-xl bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden border border-outline-variant/20 animate-in fade-in zoom-in duration-300">
+<!-- Modal Header -->
+<div class="px-8 pt-8 pb-6 flex items-center justify-between">
+<div>
+<h2 class="text-2xl font-extrabold text-on-background tracking-tight">Add New Entity</h2>
+<p class="text-on-surface-variant text-sm mt-1">Configure details for your new procurement node.</p>
+</div>
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+<!-- Form Body -->
+<form class="px-8 pb-8 space-y-6">
+<!-- Company Name -->
+<div class="space-y-1.5">
+<label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant/80 ml-1">Company Name</label>
+<div class="relative">
+<input class="w-full h-12 bg-surface px-4 rounded-xl border-0 ring-1 ring-outline-variant/30 focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-outline/50" placeholder="e.g. Acme Procurement Ltd" type="text"/>
+</div>
+</div>
+<!-- Address -->
+<div class="space-y-1.5">
+<label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant/80 ml-1">Address</label>
+<div class="relative">
+<input class="w-full h-12 bg-surface px-4 rounded-xl border-0 ring-1 ring-outline-variant/30 focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-outline/50" placeholder="Street, Building, Suite" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<!-- Country -->
+<div class="space-y-1.5">
+<label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant/80 ml-1">Country</label>
+<div class="relative">
+<select class="w-full h-12 bg-surface px-4 pr-10 rounded-xl border-0 ring-1 ring-outline-variant/30 focus:ring-2 focus:ring-primary outline-none appearance-none transition-all">
+<option disabled="" selected="" value="">Select country</option>
+<option>United Kingdom</option>
+<option>United States</option>
+<option>Germany</option>
+<option>Singapore</option>
+<option>France</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<!-- Parent Company -->
+<div class="space-y-1.5">
+<label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant/80 ml-1">Parent Company</label>
+<div class="relative">
+<select class="w-full h-12 bg-surface px-4 pr-10 rounded-xl border-0 ring-1 ring-outline-variant/30 focus:ring-2 focus:ring-primary outline-none appearance-none transition-all">
+<option>None / Parent Entity</option>
+<option>Global Logistics Corp</option>
+<option>North America Region</option>
+<option>EMEA Operations</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">account_tree</span>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="pt-6 flex items-center justify-end gap-4 border-t border-outline-variant/10">
+<button class="px-6 py-3 text-sm font-semibold text-secondary hover:bg-surface-container-low rounded-xl transition-all" type="button">
+                        Cancel
+                    </button>
+<button class="relative group overflow-hidden px-8 py-3 bg-gradient-to-br from-primary to-primary-container text-white rounded-xl font-bold shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95" type="submit">
+<span class="relative z-10">Create Entity</span>
+<div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</button>
+</div>
+</form>
+<!-- Decorative Element -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+<div class="absolute bottom-0 left-0 w-24 h-24 bg-secondary/5 rounded-full -ml-12 -mb-12 blur-xl"></div>
+</div>
+</div>
+</body></html>

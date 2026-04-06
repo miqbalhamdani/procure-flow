@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ProcureFlow - Update Shipment Status</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "surface-bright": "#faf8ff",
+                "on-primary-container": "#fffbff",
+                "inverse-primary": "#d2bbff",
+                "surface-container-high": "#e2e7ff",
+                "on-primary": "#ffffff",
+                "tertiary-fixed": "#ffdcc5",
+                "surface-container-highest": "#dae2fd",
+                "on-primary-fixed-variant": "#5a00c6",
+                "primary": "#712ae2",
+                "error": "#ba1a1a",
+                "background": "#faf8ff",
+                "on-secondary-fixed": "#0d1c2e",
+                "surface-container-low": "#f2f3ff",
+                "tertiary-container": "#b55d00",
+                "on-error": "#ffffff",
+                "on-tertiary-fixed": "#301400",
+                "tertiary": "#904900",
+                "surface-container-lowest": "#ffffff",
+                "outline": "#767586",
+                "surface-tint": "#732ee4",
+                "surface-container": "#eaedff",
+                "secondary": "#515f74",
+                "surface": "#faf8ff",
+                "on-tertiary": "#ffffff",
+                "on-error-container": "#93000a",
+                "error-container": "#ffdad6",
+                "primary-container": "#8a4cfc",
+                "inverse-on-surface": "#eef0ff",
+                "secondary-container": "#d5e3fc",
+                "surface-variant": "#dae2fd",
+                "on-tertiary-fixed-variant": "#703700",
+                "on-secondary-fixed-variant": "#3a485b",
+                "tertiary-fixed-dim": "#ffb783",
+                "on-tertiary-container": "#fffbff",
+                "on-surface": "#131b2e",
+                "on-secondary": "#ffffff",
+                "surface-dim": "#d2d9f4",
+                "secondary-fixed-dim": "#b9c7df",
+                "primary-fixed": "#eaddff",
+                "on-surface-variant": "#464554",
+                "on-secondary-container": "#57657a",
+                "on-background": "#131b2e",
+                "inverse-surface": "#283044",
+                "primary-fixed-dim": "#d2bbff",
+                "outline-variant": "#c7c4d7",
+                "secondary-fixed": "#d5e3fc",
+                "on-primary-fixed": "#25005a"
+              },
+              fontFamily: {
+                "headline": ["Manrope"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-header {
+            background: rgba(250, 248, 255, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .btn-primary-gradient {
+            background: linear-gradient(135deg, #712ae2 0%, #8a4cfc 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased overflow-hidden">
+<!-- Background: Unified Shipment Management (Blurred) -->
+<div class="fixed inset-0 z-0 flex blur-md brightness-90 scale-[1.02]">
+<!-- SideNavBar Anchor -->
+<aside class="h-screen w-64 bg-[#f2f3ff] dark:bg-[#1e293b] flex flex-col p-4 gap-y-2">
+<div class="flex items-center gap-3 px-2 mb-8">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<div>
+<h1 class="font-headline font-extrabold text-[#131b2e] dark:text-[#faf8ff] text-lg leading-none">ProcureFlow</h1>
+<p class="text-[10px] text-secondary font-medium tracking-widest uppercase">Editorial Procurement</p>
+</div>
+</div>
+<nav class="space-y-1">
+<div class="flex items-center gap-3 p-3 text-[#464554] rounded-lg">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-medium">Overview</span>
+</div>
+<div class="flex items-center gap-3 p-3 bg-white text-primary font-bold rounded-lg shadow-sm">
+<span class="material-symbols-outlined" data-icon="local_shipping">local_shipping</span>
+<span class="font-medium">Active Shipments</span>
+</div>
+<div class="flex items-center gap-3 p-3 text-[#464554] rounded-lg">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-medium">Purchase Orders</span>
+</div>
+</nav>
+</aside>
+<!-- Main Content Area Mock -->
+<main class="flex-1 p-10 bg-surface">
+<header class="flex justify-between items-end mb-12">
+<div class="space-y-1">
+<h2 class="font-headline font-bold text-4xl text-on-surface tracking-tight">Active Shipments</h2>
+<p class="text-secondary font-medium">Managing 24 global freight routes</p>
+</div>
+<button class="px-6 py-3 rounded-lg btn-primary-gradient text-white font-semibold shadow-xl flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                    New Shipment
+                </button>
+</header>
+<!-- Bento Grid Mock -->
+<div class="grid grid-cols-12 gap-6">
+<div class="col-span-8 h-64 bg-surface-container-lowest rounded-xl p-6 shadow-sm"></div>
+<div class="col-span-4 h-64 bg-surface-container rounded-xl p-6"></div>
+<div class="col-span-4 h-96 bg-surface-container-low rounded-xl p-6"></div>
+<div class="col-span-8 h-96 bg-surface-container-lowest rounded-xl p-6 shadow-sm"></div>
+</div>
+</main>
+</div>
+<!-- Modal Backdrop Overlay -->
+<div class="fixed inset-0 z-40 bg-on-surface/10 backdrop-blur-[2px] flex items-center justify-center p-4">
+<!-- Modal Dialog -->
+<div class="bg-surface-container-lowest w-full max-w-lg rounded-xl shadow-[0_20px_50px_-12px_rgba(19,27,46,0.15)] overflow-hidden flex flex-col">
+<!-- Modal Header -->
+<div class="p-8 pb-0 space-y-1">
+<div class="flex justify-between items-start">
+<h3 class="font-headline font-bold text-2xl text-on-surface tracking-tight">Mark as In Transit</h3>
+<button class="text-secondary hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<p class="text-on-surface-variant font-body body-md pr-8">
+                    Update the shipment status by providing the current location and any relevant notes.
+                </p>
+</div>
+<!-- Modal Form -->
+<form class="p-8 space-y-6">
+<!-- Field 1: Current Location -->
+<div class="space-y-2">
+<label class="block font-headline font-bold text-sm text-on-surface" for="location">
+                        Current Location
+                    </label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="location_on">location_on</span>
+</div>
+<input class="block w-full pl-11 pr-4 py-3 bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-lg text-on-surface placeholder:text-outline-variant transition-all font-body text-sm" id="location" placeholder="e.g., Warehouse A, Los Angeles, CA" type="text"/>
+</div>
+</div>
+<!-- Field 2: Status Note -->
+<div class="space-y-2">
+<label class="block font-headline font-bold text-sm text-on-surface" for="notes">
+                        Status Note
+                    </label>
+<textarea class="block w-full p-4 bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-lg text-on-surface placeholder:text-outline-variant transition-all font-body text-sm resize-none" id="notes" placeholder="e.g., Shipment picked up by carrier. Expected delivery in 3 days." rows="4"></textarea>
+</div>
+</form>
+<!-- Modal Footer -->
+<div class="p-8 pt-0 flex items-center justify-end gap-3">
+<button class="px-6 py-2.5 rounded-lg text-primary font-bold hover:bg-surface-container transition-colors text-sm">
+                    Cancel
+                </button>
+<button class="px-8 py-2.5 rounded-lg btn-primary-gradient text-white font-bold shadow-lg shadow-primary/20 text-sm active:scale-95 transition-transform">
+                    Update Status
+                </button>
+</div>
+<!-- Contextual Information (Editorial Touch) -->
+<div class="bg-surface-container-low px-8 py-4 flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-lowest flex items-center justify-center overflow-hidden">
+<img alt="Dispatcher" class="w-full h-full object-cover" data-alt="Portrait of a logistics dispatcher professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXnl5JJs5TpJ4vjzgwp5fOO_Dh1hipAT5Q4cy4MpWM9CIw0-7oDkqDJiUPZmtgWQXZBWJ1MBeYgALTnUnI3zcYqVPA6ppkFltSsR2J52jqjb7QUsLZKgl2QPpetw-pD6j1LoaRFXSaJceG8m1lcVLo9LNIZCIdo3ru7K6eJPksTfvxhn07b8foDjvBvDtFVmSB8bfNSsc2hCJuskAtYFH6v7Ookhrr6gqeXRbLyTqIYy7dgaslC1K88UYCyXgWPWr7Ei06h84ENyQo"/>
+</div>
+<div class="text-[11px] leading-tight">
+<p class="text-on-surface-variant font-bold uppercase tracking-wider">Assigned Dispatcher</p>
+<p class="text-on-surface font-medium">Sarah Jenkins • Global Logistics Team</p>
+</div>
+</div>
+</div>
+</div>
+</body></html>

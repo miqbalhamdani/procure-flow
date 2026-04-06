@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create Shipment - ProcureFlow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-surface": "#283044",
+                        "background": "#faf8ff",
+                        "primary-container": "#8a4cfc",
+                        "on-tertiary-fixed": "#301400",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#d5e3fc",
+                        "tertiary-container": "#b55d00",
+                        "surface-container-high": "#e2e7ff",
+                        "surface-variant": "#dae2fd",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#d2bbff",
+                        "outline": "#767586",
+                        "on-tertiary-fixed-variant": "#703700",
+                        "surface": "#faf8ff",
+                        "secondary": "#515f74",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#d2bbff",
+                        "tertiary": "#904900",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "on-surface": "#131b2e",
+                        "outline-variant": "#c7c4d7",
+                        "on-secondary-container": "#57657a",
+                        "surface-dim": "#d2d9f4",
+                        "surface-container-low": "#f2f3ff",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "surface-container-highest": "#dae2fd",
+                        "surface-bright": "#faf8ff",
+                        "surface-container": "#eaedff",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#25005a",
+                        "on-surface-variant": "#464554",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#d5e3fc",
+                        "tertiary-fixed": "#ffdcc5",
+                        "on-primary-container": "#fffbff",
+                        "tertiary-fixed-dim": "#ffb783",
+                        "on-tertiary-container": "#fffbff",
+                        "inverse-on-surface": "#eef0ff",
+                        "surface-tint": "#732ee4",
+                        "primary-fixed": "#eaddff",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "on-background": "#131b2e",
+                        "error-container": "#ffdad6",
+                        "primary": "#6366F1"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"],
+                        "manrope": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .headline-font { font-family: 'Manrope', sans-serif; }
+        .editorial-gradient { background: linear-gradient(135deg, #712ae2 0%, #8a4cfc 100%); }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex overflow-hidden">
+<!-- SideNavBar Component - Based on SCREEN_48 -->
+<aside class="h-screen w-64 flex flex-col bg-[#f2f3ff] dark:bg-slate-900 flex-shrink-0 relative z-50">
+<div class="flex flex-col justify-between py-8 h-full">
+<div class="space-y-8 flex-1">
+<!-- Header/Logo Area -->
+<div class="px-6 flex items-center gap-3">
+<div class="w-10 h-10 editorial-gradient rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dataset</span>
+</div>
+<div>
+<h1 class="text-2xl font-black tracking-tighter text-[#131b2e] dark:text-white font-manrope">ProcureFlow</h1>
+<p class="text-xs font-medium text-on-surface-variant uppercase tracking-widest">Editorial</p>
+</div>
+</div>
+<!-- Main Navigation -->
+<nav class="flex flex-col gap-1 pr-4">
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] dark:text-slate-400 font-medium hover:bg-[#eaedff] dark:hover:bg-slate-800 transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-manrope text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] dark:text-slate-400 font-medium hover:bg-[#eaedff] dark:hover:bg-slate-800 transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-manrope text-sm">Suppliers</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#712ae2] dark:text-[#8a4cfc] font-bold bg-[#eaedff] dark:bg-slate-800 rounded-r-full active:scale-95 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+<span class="font-manrope text-sm">Shipments</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] dark:text-slate-400 font-medium hover:bg-[#eaedff] dark:hover:bg-slate-800 transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-manrope text-sm">Billing</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] dark:text-slate-400 font-medium hover:bg-[#eaedff] dark:hover:bg-slate-800 transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-manrope text-sm">Companies</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] dark:text-slate-400 font-medium hover:bg-[#eaedff] dark:hover:bg-slate-800 transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-manrope text-sm">Users</span>
+</a>
+</nav>
+</div>
+<!-- Footer Section (User Profile) -->
+<div class="flex flex-col gap-6">
+<div class="px-6 py-4 flex items-center gap-3 border-t border-outline-variant/10">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high ring-2 ring-primary/10">
+<img alt="Marcus Chen" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF36FFtcuR7MMoQMxZu-yrxOiI-d-sUYjOgEtoaQraeXMpmFIFTJrlGWUFhlalvt6LZDw5PtV77xdUErYussPm5adqfySaTOtBue5RAGFVXrsAiro1NDiGrD_WNIuhpynu_XSNoV6SCQ84I4iOa3smZdMylOWX4i-Ig05EdGW448PVCcS2SBRGCojW1tLPxnxA1QMwQt9tBO9yY2DwIYggniykdaWMkZtM2ta_Edk7vsE6ZAi89i3ZIn9xJ9STU65OjLijBbLBrB5b"/>
+</div>
+<div class="flex flex-col min-w-0">
+<p class="text-sm font-bold text-on-surface truncate font-manrope">Marcus Chen</p>
+<p class="text-xs text-on-surface-variant truncate font-inter">Global Procurement Lead</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<!-- TopAppBar Component - Based on SCREEN_48 -->
+<header class="h-16 bg-[#faf8ff]/80 dark:bg-slate-950/80 backdrop-blur-xl z-40 flex items-center justify-end px-8 gap-6 w-full border-none"><button class="flex items-center gap-2 px-4 py-2 bg-surface-container-low hover:bg-surface-container transition-colors rounded-lg text-sm font-semibold text-primary">
+<span class="material-symbols-outlined text-[18px]">business_center</span>
+<span>Switch Company</span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button><div class="h-6 w-px bg-outline-variant/30"></div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="relative">
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full ring-2 ring-background"></span>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<div class="flex-1 overflow-y-auto p-8 space-y-8">
+<!-- Breadcrumbs & Page Action Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<nav class="flex items-center gap-2 text-xs font-bold text-secondary uppercase tracking-widest mb-2">
+<a class="hover:text-primary transition-colors" href="#">Shipments</a>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-on-surface">Create Shipment</span>
+</nav>
+<h2 class="text-3xl font-extrabold text-on-surface tracking-tight font-headline">Create Shipment</h2>
+<p class="text-secondary mt-1">Configure and submit a new shipment for processing.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-5 py-2.5 rounded-xl text-on-surface-variant font-semibold text-sm hover:bg-surface-container-high transition-colors">Cancel</button>
+<button class="bg-gradient-to-br from-primary to-primary-container px-6 py-2.5 rounded-xl text-white font-bold text-sm shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all">Submit Shipment</button>
+</div>
+</div>
+<!-- Form Layout -->
+<div class="max-w-6xl w-full space-y-8">
+<!-- Section 1: General Info -->
+<section class="bg-surface-container-lowest rounded-2xl p-8 shadow-sm border border-outline-variant/10">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-8 h-8 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-sm">info</span>
+</div>
+<h3 class="font-['Manrope'] font-bold text-lg text-on-surface">General Information</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-2">
+<label class="block text-xs font-bold text-secondary uppercase tracking-wider">Delivery/Shipment Number</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all py-3 px-4 text-on-surface" placeholder="e.g. PF-2023-00451" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="block text-xs font-bold text-secondary uppercase tracking-wider">Shipment Date</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-none rounded-xl focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all py-3 px-4 text-on-surface" type="date"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline pointer-events-none">calendar_today</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Shipment Items Table -->
+<section class="bg-surface-container rounded-3xl overflow-hidden shadow-sm border border-outline-variant/10">
+<div class="p-8 flex justify-between items-center bg-surface-container-lowest">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-tertiary-fixed flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-sm">package_2</span>
+</div>
+<h3 class="font-['Manrope'] font-bold text-lg text-on-surface">Shipment Items</h3>
+</div>
+<button class="flex items-center gap-2 bg-surface-container-low text-primary px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-lg">add</span>
+                        Add Shipment Item
+                    </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead>
+<tr class="text-left bg-surface-container-high/50">
+<th class="px-8 py-4 text-[10px] font-extrabold text-secondary uppercase tracking-widest">SKU</th>
+<th class="px-8 py-4 text-[10px] font-extrabold text-secondary uppercase tracking-widest">Item Name</th>
+<th class="px-8 py-4 text-[10px] font-extrabold text-secondary uppercase tracking-widest text-center">Quantity</th>
+<th class="px-8 py-4 text-[10px] font-extrabold text-secondary uppercase tracking-widest text-right">Price (USD)</th>
+<th class="px-8 py-4 text-[10px] font-extrabold text-secondary uppercase tracking-widest text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="group hover:bg-surface-container-lowest transition-colors">
+<td class="px-8 py-5 font-mono text-sm text-on-surface-variant">ITM-77291</td>
+<td class="px-8 py-5 font-semibold text-on-surface">Steel Reinforced Concrete Beams</td>
+<td class="px-8 py-5 text-center">
+<span class="bg-surface-container-high px-3 py-1 rounded-full text-sm font-bold">120</span>
+</td>
+<td class="px-8 py-5 text-right font-medium">$1,450.00</td>
+<td class="px-8 py-5 text-right">
+<button class="text-outline hover:text-primary">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-surface-container-lowest transition-colors">
+<td class="px-8 py-5 font-mono text-sm text-on-surface-variant">ITM-88302</td>
+<td class="px-8 py-5 font-semibold text-on-surface">Industrial Grade Sealant (Gallons)</td>
+<td class="px-8 py-5 text-center">
+<span class="bg-surface-container-high px-3 py-1 rounded-full text-sm font-bold">45</span>
+</td>
+<td class="px-8 py-5 text-right font-medium">$89.50</td>
+<td class="px-8 py-5 text-right">
+<button class="text-outline hover:text-primary">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-surface-container-lowest transition-colors">
+<td class="px-8 py-5 font-mono text-sm text-on-surface-variant">ITM-12044</td>
+<td class="px-8 py-5 font-semibold text-on-surface">Architectural Blueprint Tubes</td>
+<td class="px-8 py-5 text-center">
+<span class="bg-surface-container-high px-3 py-1 rounded-full text-sm font-bold">10</span>
+</td>
+<td class="px-8 py-5 text-right font-medium">$12.00</td>
+<td class="px-8 py-5 text-right">
+<button class="text-outline hover:text-primary">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-6 text-center border-t border-dashed border-outline-variant/30">
+<p class="text-sm text-secondary italic">Add more items to complete the shipment ledger</p>
+</div>
+</section>
+<!-- Section 3: Shipment Summary -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/10 border-l-4 border-primary">
+<p class="text-[10px] font-extrabold text-secondary uppercase tracking-widest mb-1">Total Units</p>
+<p class="font-['Manrope'] text-3xl font-extrabold text-on-surface">175</p>
+</div>
+<div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-outline-variant/10 border-l-4 border-surface-variant">
+<p class="text-[10px] font-extrabold text-secondary uppercase tracking-widest mb-1">Line Items</p>
+<p class="font-['Manrope'] text-3xl font-extrabold text-on-surface">3</p>
+</div>
+<div class="bg-gradient-to-br from-primary to-primary-container rounded-2xl p-6 shadow-xl text-white">
+<p class="text-[10px] font-extrabold text-white/80 uppercase tracking-widest mb-1">Estimated Value</p>
+<p class="font-['Manrope'] text-3xl font-extrabold">$178,147.50</p>
+</div>
+</section>
+</div>
+<!-- Footer -->
+<footer class="mt-auto py-8 text-center border-t border-outline-variant/10">
+<p class="text-xs text-secondary">© 2023 ProcureFlow Logistics Solutions. All rights reserved.</p>
+</footer>
+</div>
+</main>
+<!-- Modal Mockup (Visual Only) - Maintained but updated rounding -->
+<div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-on-surface/40 backdrop-blur-sm pointer-events-none opacity-0 transition-opacity">
+<div class="bg-surface-container-lowest w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+<div class="p-6 border-b border-outline-variant/10 flex justify-between items-center">
+<h4 class="font-bold text-lg">Add Shipment Item</h4>
+<button class="text-outline hover:text-error"><span class="material-symbols-outlined">close</span></button>
+</div>
+<div class="p-6 space-y-4">
+<div class="space-y-1">
+<label class="text-[10px] font-bold text-secondary uppercase">Select Product</label>
+<select class="w-full bg-surface-container-low border-none rounded-xl py-3">
+<option>Search inventory...</option>
+</select>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-1">
+<label class="text-[10px] font-bold text-secondary uppercase">Quantity</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl py-3" type="number"/>
+</div>
+<div class="space-y-1">
+<label class="text-[10px] font-bold text-secondary uppercase">Custom Price</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl py-3" placeholder="$ 0.00" type="text"/>
+</div>
+</div>
+</div>
+<div class="p-6 bg-surface-container-low flex justify-end gap-3">
+<button class="px-4 py-2 text-sm font-bold text-secondary">Cancel</button>
+<button class="px-6 py-2 bg-primary text-white text-sm font-bold rounded-xl shadow-lg">Add to Shipment</button>
+</div>
+</div>
+</div>
+</body></html>

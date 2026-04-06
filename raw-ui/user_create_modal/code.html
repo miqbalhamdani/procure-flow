@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ProcureFlow - Add User</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-lowest": "#ffffff",
+              "secondary-container": "#d5e3fc",
+              "on-primary-container": "#fffbff",
+              "tertiary-fixed": "#ffdcc5",
+              "tertiary-fixed-dim": "#ffb783",
+              "on-tertiary-container": "#fffbff",
+              "surface-container-highest": "#dae2fd",
+              "surface-bright": "#faf8ff",
+              "surface-dim": "#d2d9f4",
+              "surface-container-low": "#f2f3ff",
+              "on-secondary-fixed": "#0d1c2e",
+              "on-primary": "#ffffff",
+              "surface-container": "#eaedff",
+              "on-surface-variant": "#464554",
+              "on-primary-fixed": "#25005a",
+              "on-secondary": "#ffffff",
+              "on-primary-fixed-variant": "#5a00c6",
+              "error-container": "#ffdad6",
+              "on-background": "#131b2e",
+              "primary": "#712ae2",
+              "inverse-on-surface": "#eef0ff",
+              "surface-tint": "#732ee4",
+              "primary-fixed": "#eaddff",
+              "on-secondary-fixed-variant": "#3a485b",
+              "on-error-container": "#93000a",
+              "surface-variant": "#dae2fd",
+              "error": "#ba1a1a",
+              "inverse-surface": "#283044",
+              "background": "#faf8ff",
+              "primary-container": "#8a4cfc",
+              "on-tertiary-fixed": "#301400",
+              "on-error": "#ffffff",
+              "tertiary-container": "#b55d00",
+              "surface-container-high": "#e2e7ff",
+              "secondary-fixed": "#d5e3fc",
+              "inverse-primary": "#d2bbff",
+              "tertiary": "#904900",
+              "secondary-fixed-dim": "#b9c7df",
+              "on-surface": "#131b2e",
+              "outline-variant": "#c7c4d7",
+              "on-secondary-container": "#57657a",
+              "primary-fixed-dim": "#d2bbff",
+              "outline": "#767586",
+              "on-tertiary-fixed-variant": "#703700",
+              "surface": "#faf8ff",
+              "secondary": "#515f74",
+              "on-tertiary": "#ffffff"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopNavBar -->
+<nav class="bg-[#faf8ff]/80 dark:bg-slate-950/80 backdrop-blur-md fixed top-0 w-full z-50 flex justify-between items-center px-8 h-16 w-full no-border-tonal-shift">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black text-[#131b2e] dark:text-slate-100">ProcureFlow</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-[#464554] dark:text-slate-400 hover:text-[#131b2e] font-['Manrope'] font-bold headline-sm" href="#">Dashboard</a>
+<a class="text-[#712ae2] dark:text-[#8a4cfc] border-b-2 border-[#712ae2] pb-1 font-['Manrope'] font-bold headline-sm" href="#">Users</a>
+<a class="text-[#464554] dark:text-slate-400 hover:text-[#131b2e] font-['Manrope'] font-bold headline-sm" href="#">Inventory</a>
+<a class="text-[#464554] dark:text-slate-400 hover:text-[#131b2e] font-['Manrope'] font-bold headline-sm" href="#">Reports</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-[#f2f3ff] rounded-full transition-colors duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<button class="p-2 hover:bg-[#f2f3ff] rounded-full transition-colors duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary-fixed flex items-center justify-center overflow-hidden">
+<img alt="User Profile" class="h-full w-full object-cover" data-alt="Close-up professional portrait of a business person" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN0Tgb9EJKzhhc8ZEzRBSo1GMGGQCRHwA0LsLCI47NLoH5L2whHvT3PK6nEyBs5R3DEq83dFzThoB1_bbfQALwE869nGwfDr-Hpzuw37HNtrP_j__13uv1wKVdB3f3npYVmDW3PTaVp5M2zJ6MGr-UoHSnUl1rMD_BtBaDsSrcvVsXPgc9o03i2SdUqyqFEg4TYOuFtG9GJb-YfPQrDZEdkyrsCTJK-gyYmbgwlGvQmIPCNhetgKSM-FLCz-h7q0TT1tpvbVQnWTiP"/>
+</div>
+</div>
+</nav>
+<!-- Sidebar (Suppressed for focused modal view, but part of the base page) -->
+<aside class="hidden lg:flex flex-col p-4 gap-2 h-screen w-64 fixed left-0 top-0 bg-[#f2f3ff] dark:bg-slate-900 pt-20 tonal-layering-no-border">
+<div class="px-4 mb-4">
+<h3 class="text-lg font-bold text-[#131b2e] dark:text-slate-100">Admin Console</h3>
+<p class="text-xs text-on-surface-variant">Enterprise Management</p>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="bg-[#ffffff] dark:bg-slate-800 text-[#712ae2] dark:text-[#8a4cfc] font-semibold rounded-lg p-3 flex items-center gap-3 transition-transform translate-x-1" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>User Directory</span>
+</a>
+<a class="text-[#464554] dark:text-slate-400 p-3 flex items-center gap-3 hover:bg-[#eaedff] rounded-lg" href="#">
+<span class="material-symbols-outlined">verified_user</span>
+<span>Roles &amp; Permissions</span>
+</a>
+<a class="text-[#464554] dark:text-slate-400 p-3 flex items-center gap-3 hover:bg-[#eaedff] rounded-lg" href="#">
+<span class="material-symbols-outlined">history</span>
+<span>Access Logs</span>
+</a>
+<a class="text-[#464554] dark:text-slate-400 p-3 flex items-center gap-3 hover:bg-[#eaedff] rounded-lg" href="#">
+<span class="material-symbols-outlined">shield</span>
+<span>Security</span>
+</a>
+<a class="text-[#464554] dark:text-slate-400 p-3 flex items-center gap-3 hover:bg-[#eaedff] rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-4 border-t border-outline-variant/10">
+<a class="text-[#464554] p-3 flex items-center gap-3 hover:bg-[#eaedff] rounded-lg" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>Help Center</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas (Background for Modal) -->
+<main class="lg:ml-64 pt-24 px-8 pb-12">
+<div class="max-w-6xl mx-auto">
+<header class="flex justify-between items-end mb-10">
+<div class="space-y-1">
+<h1 class="text-5xl font-extrabold tracking-tight text-on-background font-headline">Users</h1>
+<p class="text-on-surface-variant font-body">Manage your organization's directory and access control.</p>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">add</span>
+                    Add New User
+                </button>
+</header>
+<!-- User Grid (Mock) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- User Card 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl space-y-4">
+<div class="flex items-center gap-4">
+<div class="h-12 w-12 rounded-full overflow-hidden">
+<img alt="Sarah Chen" class="w-full h-full object-cover" data-alt="Portrait of a smiling professional woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZ5zTjcV5PURhWdV92AjEDTV71trwuB68s34hbS7bUVvk1v6GZsnFkPo5lxNKPHvVcCz4rT1bt0Vna1Sy1UTgPZ2V_RQa1jHV0Y9u1BQsibCXtmpMzkwLHMYj9KedogMcd1PQtB5jObfTkl6TZDpv3stYJbMR4IhU6FN8X__YuznHuUofEvXjR37dgHJDn5r1bNs0Xc3untOVLd5HPDdowyLGd3o-MIl6bfFwc9zQlemuhqr9CCGi7_d7Q4MvuBNmTHLls38OrnfTX"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Sarah Chen</h4>
+<span class="text-xs px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded-full">Administrator</span>
+</div>
+</div>
+<div class="text-sm text-on-surface-variant space-y-1">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-xs">mail</span> sarah.c@procureflow.com</div>
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-xs">event</span> Joined Oct 2023</div>
+</div>
+</div>
+<!-- User Card 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl space-y-4">
+<div class="flex items-center gap-4">
+<div class="h-12 w-12 rounded-full overflow-hidden">
+<img alt="Marcus Wright" class="w-full h-full object-cover" data-alt="Portrait of a professional man in a suit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD78wDswamWY9EeBVQOeawQdohA_GrDrts8ehN3LYWooUO1Pra7T5AvcJtMGI3jF9DWO62Kg1wwpw7WLSPSjCBEYXSuzmQbPyLWfzQfiF5DXEutZZpYihWx7_cyY9TwZe921vbSFpnnP1fx_G9hRxDA2BgClOyRpbCgKDOiXUpw04ygoJqp-xXJ5RRJHnkddIj_zpJmZLTzesJasc60Or9j8sateedgBiOKCQIEOfCSBllbvpJwRgBoMlVijolWv9n4jRQwwMIyAzO6"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Marcus Wright</h4>
+<span class="text-xs px-2 py-0.5 bg-surface-container-highest text-on-surface-variant rounded-full">Procurement Lead</span>
+</div>
+</div>
+<div class="text-sm text-on-surface-variant space-y-1">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-xs">mail</span> m.wright@procureflow.com</div>
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-xs">event</span> Joined Jan 2024</div>
+</div>
+</div>
+<!-- User Card 3 (Placeholder for more) -->
+<div class="bg-surface-container-low border-2 border-dashed border-outline-variant/30 rounded-xl flex flex-col items-center justify-center p-6 text-on-surface-variant opacity-50">
+<span class="material-symbols-outlined text-4xl mb-2">person_add</span>
+<p class="font-bold">Add User</p>
+</div>
+</div>
+</div>
+</main>
+<!-- MODAL OVERLAY -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center bg-on-background/40 backdrop-blur-sm">
+<!-- Modal Container -->
+<div class="bg-surface-container-lowest w-full max-w-lg mx-4 rounded-xl shadow-[0_20px_50px_-12px_rgba(19,27,46,0.15)] overflow-hidden">
+<!-- Modal Header -->
+<div class="px-8 pt-8 pb-4 flex justify-between items-start">
+<div>
+<h2 class="text-2xl font-extrabold text-on-background tracking-tight font-headline">Add User</h2>
+<p class="text-on-surface-variant body-md mt-1">Create a new member in your organization.</p>
+</div>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+<!-- Modal Form -->
+<div class="px-8 py-6 space-y-6">
+<!-- Full Name -->
+<div class="space-y-2">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label">Full Name</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-0 rounded-lg py-3 px-4 focus:ring-2 focus:ring-primary/20 text-on-surface placeholder:text-outline outline-none transition-all" placeholder="e.g. Alexander Thorne" type="text"/>
+</div>
+</div>
+<!-- Email Address -->
+<div class="space-y-2">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label">Email Address</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-0 rounded-lg py-3 px-4 focus:ring-2 focus:ring-primary/20 text-on-surface placeholder:text-outline outline-none transition-all" placeholder="alexander@company.com" type="email"/>
+</div>
+</div>
+<!-- Role Selection -->
+<!-- Permission Hint (Contextual Info) -->
+<div class="bg-surface-container-low p-4 rounded-lg flex gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">info</span>
+<p class="text-xs text-on-secondary-container leading-relaxed">
+                        New users will receive an invitation email to set their password. They will have access based on the assigned role immediately.
+                    </p>
+</div>
+</div>
+<!-- Modal Footer (Actions) -->
+<div class="px-8 py-6 bg-surface-container-low/50 flex flex-row-reverse gap-3">
+<button class="flex-1 sm:flex-none bg-gradient-to-br from-primary to-primary-container text-white px-8 py-3 rounded-lg font-bold text-sm shadow-lg shadow-primary/20 active:opacity-80 active:scale-95 transition-all">
+                    Save User
+                </button>
+<button class="flex-1 sm:flex-none bg-surface-container-highest text-primary px-8 py-3 rounded-lg font-bold text-sm hover:bg-surface-variant transition-colors">
+                    Cancel
+                </button>
+</div>
+</div>
+</div>
+</body></html>

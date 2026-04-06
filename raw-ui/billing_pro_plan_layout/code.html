@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-fixed-dim": "#ffb783",
+              "on-primary": "#ffffff",
+              "surface": "#faf8ff",
+              "secondary-fixed": "#d5e3fc",
+              "secondary-container": "#d5e3fc",
+              "on-secondary-fixed-variant": "#3a485b",
+              "surface-container": "#eaedff",
+              "tertiary-fixed": "#ffdcc5",
+              "on-tertiary-fixed": "#301400",
+              "on-surface": "#131b2e",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-highest": "#dae2fd",
+              "on-secondary-fixed": "#0d1c2e",
+              "secondary-fixed-dim": "#b9c7df",
+              "on-surface-variant": "#464554",
+              "primary-fixed-dim": "#d2bbff",
+              "surface-container-high": "#e2e7ff",
+              "outline": "#767586",
+              "outline-variant": "#c7c4d7",
+              "background": "#faf8ff",
+              "surface-variant": "#dae2fd",
+              "on-error": "#ffffff",
+              "inverse-on-surface": "#eef0ff",
+              "on-secondary": "#ffffff",
+              "on-primary-fixed-variant": "#5a00c6",
+              "on-primary-container": "#fffbff",
+              "error": "#ba1a1a",
+              "tertiary-container": "#b55d00",
+              "on-tertiary": "#ffffff",
+              "on-secondary-container": "#57657a",
+              "tertiary": "#904900",
+              "surface-dim": "#d2d9f4",
+              "surface-tint": "#732ee4",
+              "surface-bright": "#faf8ff",
+              "surface-container-low": "#f2f3ff",
+              "on-primary-fixed": "#25005a",
+              "inverse-surface": "#283044",
+              "secondary": "#515f74",
+              "on-background": "#131b2e",
+              "inverse-primary": "#d2bbff",
+              "primary": "#6366F1",
+              "on-tertiary-container": "#fffbff",
+              "error-container": "#ffdad6",
+              "on-tertiary-fixed-variant": "#703700",
+              "primary-fixed": "#eaddff",
+              "primary-container": "#8a4cfc",
+              "on-error-container": "#93000a"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {
+                "DEFAULT": "0.5rem", 
+                "lg": "0.5rem", 
+                "xl": "0.75rem", 
+                "2xl": "1rem", 
+                "3xl": "1.5rem", 
+                "full": "9999px"
+            },
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col p-6 bg-surface-container-low border-r border-outline-variant/10 z-50">
+<div class="mb-10 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-on-primary shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">dataset</span>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-tight text-on-surface">ProcureFlow</h1>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Editorial Edition</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium hover:bg-surface-container transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-manrope">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium hover:bg-surface-container transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-manrope">Suppliers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium hover:bg-surface-container transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span class="font-manrope">Purchase Order</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary font-bold bg-surface-container rounded-lg transition-transform" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-manrope">Billing</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium hover:bg-surface-container transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">business</span>
+<span class="font-manrope">Companies</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium hover:bg-surface-container transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-manrope">Users</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant/10">
+<div class="flex items-center gap-3 px-2 py-3 rounded-xl hover:bg-surface-container transition-colors cursor-pointer">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/20">
+<img alt="User" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTcAKI9UmNjIoxtZC1QG--D3ut_dNke5Ts1TJeNyeiuVK5YvKMwlv-_4RWb1iy3j8cV7e00qHLuOaWruKyuTpRz5cqJ4qNh8SKQN6_IdZktjdrW1Iu3ol6OlTDnZj-NPUrGxp4E4Dd6GnITL9Jx4UDtYcXBEQW_V2AI9XHBMnvXEcdQ4B-VEf4Gr3yEt5XbLPj8lJ2t2yd4ebru_2k5ds480ObSKaIuMMiMLAbgyhK4AeLxRu4qI4BmWVXjqqHhOdyiIN4MhwdThW7"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold text-on-surface truncate">Alex Rivera</p>
+<p class="text-xs text-on-surface-variant truncate">Procurement Manager</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-lg">more_vert</span>
+</div>
+</div>
+</aside>
+<!-- TopAppBar -->
+<header class="ml-64 flex justify-end items-center px-8 py-4 sticky top-0 w-[calc(100%-16rem)] z-40 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/5">
+<div class="flex items-center gap-2">
+<button class="flex items-center space-x-2 px-4 py-2 rounded-lg font-headline font-bold text-sm shadow-sm hover:opacity-90 transition-all mr-2 bg-surface-container-lowest text-primary border border-outline-variant/20"><span class="material-symbols-outlined text-[18px]">swap_horiz</span><span>Switch Company</span><span class="material-symbols-outlined text-[18px]">expand_more</span></button>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors rounded-full">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-8 min-h-screen bg-surface">
+<div class="max-w-6xl mx-auto space-y-12">
+<!-- Hero Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+<div>
+<h2 class="text-4xl font-extrabold font-headline tracking-tight text-on-surface mb-2">Billing &amp; Usage</h2>
+<p class="text-on-surface-variant max-w-lg leading-relaxed">Manage your Pro subscription, view your unlimited resources, and access your transaction history.</p>
+</div>
+<div class="bg-surface-container-high px-4 py-2 rounded-lg flex items-center gap-3 border border-outline-variant/10">
+<span class="text-sm font-semibold text-on-surface-variant">Billing Cycle:</span>
+<span class="text-sm font-bold text-primary">Monthly (Ends in 12 days)</span>
+</div>
+</div>
+<!-- 1. Current Plan Card (Pro Version) -->
+<section class="relative overflow-hidden bg-surface-container rounded-2xl p-8 border border-white/50">
+<div class="flex flex-col h-full justify-between">
+<div class="flex justify-between items-start">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">stars</span>
+</div>
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h3 class="font-headline text-3xl font-extrabold text-on-surface">Pro Plan</h3>
+<div class="bg-primary text-on-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                                        ACTIVE
+                                    </div>
+</div>
+<p class="text-on-surface-variant font-medium">Empowering your team with unlimited procurement capabilities.</p>
+</div>
+</div>
+<button class="px-6 py-2.5 bg-surface-container-lowest text-on-surface font-bold rounded-lg hover:bg-surface-bright transition-all shadow-sm border border-outline-variant/20 text-sm">
+                            Manage Subscription
+                        </button>
+</div>
+<div class="mt-12 pt-8 border-t border-outline-variant/10 grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant text-sm">Billing Period</span>
+<span class="font-bold text-on-surface">Sep 12 — Oct 11, 2023</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant text-sm">Next Renewal</span>
+<span class="font-bold text-on-surface">Oct 12, 2023 (In 12 Days)</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. Usage Grid (Unlimited) -->
+<section>
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-xl font-bold font-headline">Platform Usage</h3>
+<span class="text-sm text-on-surface-variant font-medium">Monthly cycle resets on Oct 1, 2023</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Purchase Orders -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_20px_rgba(19,27,46,0.03)] border border-outline-variant/5">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-primary/10 rounded-lg text-primary">
+<span class="material-symbols-outlined">receipt</span>
+</div>
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Orders</span>
+</div>
+<div class="mb-2">
+<span class="text-3xl font-bold font-headline text-primary">Unlimited</span>
+</div>
+<p class="text-xs font-medium text-on-surface-variant">No limit on monthly orders</p>
+</div>
+<!-- Shipments -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_20px_rgba(19,27,46,0.03)] border border-outline-variant/5">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-tertiary/10 rounded-lg text-tertiary">
+<span class="material-symbols-outlined">local_shipping</span>
+</div>
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Shipments</span>
+</div>
+<div class="mb-2">
+<span class="text-3xl font-bold font-headline text-tertiary">Unlimited</span>
+</div>
+<p class="text-xs font-medium text-on-surface-variant">Track all logistics without caps</p>
+</div>
+<!-- Users -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_20px_rgba(19,27,46,0.03)] border border-outline-variant/5">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-secondary/10 rounded-lg text-secondary">
+<span class="material-symbols-outlined">person_add</span>
+</div>
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Users</span>
+</div>
+<div class="mb-2">
+<span class="text-3xl font-bold font-headline text-secondary">Unlimited</span>
+</div>
+<p class="text-xs font-medium text-on-surface-variant">Add as many team members as needed</p>
+</div>
+<!-- Suppliers -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-[0_4px_20px_rgba(19,27,46,0.03)] border border-outline-variant/5">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-tertiary/10 rounded-lg text-tertiary">
+<span class="material-symbols-outlined">groups_3</span>
+</div>
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Suppliers</span>
+</div>
+<div class="mb-2">
+<span class="text-3xl font-bold font-headline text-tertiary">Unlimited</span>
+</div>
+<p class="text-xs font-medium text-on-surface-variant">Add as many suppliers as your network grows</p>
+</div>
+</div>
+</section>
+<!-- 3. Billing History -->
+<section class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-[0_10px_40px_rgba(19,27,46,0.04)] border border-outline-variant/10">
+<div class="p-8 border-b border-outline-variant/10 flex justify-between items-center">
+<div>
+<h3 class="text-xl font-bold font-headline">Billing History</h3>
+<p class="text-sm text-on-surface-variant">View and download your past invoices.</p>
+</div>
+<button class="text-primary font-bold text-sm hover:underline">Download All (PDF)</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-inter">
+<th class="px-8 py-4 font-semibold text-xs uppercase tracking-widest">Invoice ID</th>
+<th class="px-8 py-4 font-semibold text-xs uppercase tracking-widest">Date</th>
+<th class="px-8 py-4 font-semibold text-xs uppercase tracking-widest">Amount</th>
+<th class="px-8 py-4 font-semibold text-xs uppercase tracking-widest">Status</th>
+<th class="px-8 py-4 font-semibold text-xs uppercase tracking-widest text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="hover:bg-surface-container-low/30 transition-colors">
+<td class="px-8 py-6 font-medium text-on-surface">#INV-88219</td>
+<td class="px-8 py-6 text-on-surface-variant">Sep 12, 2023</td>
+<td class="px-8 py-6 font-bold text-on-surface">$299.00</td>
+<td class="px-8 py-6">
+<span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-bold">Paid</span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="text-primary hover:text-primary/80">
+<span class="material-symbols-outlined">download</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/30 transition-colors">
+<td class="px-8 py-6 font-medium text-on-surface">#INV-87102</td>
+<td class="px-8 py-6 text-on-surface-variant">Aug 12, 2023</td>
+<td class="px-8 py-6 font-bold text-on-surface">$299.00</td>
+<td class="px-8 py-6">
+<span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-bold">Paid</span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="text-primary hover:text-primary/80">
+<span class="material-symbols-outlined">download</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/30 transition-colors">
+<td class="px-8 py-6 font-medium text-on-surface">#INV-86005</td>
+<td class="px-8 py-6 text-on-surface-variant">Jul 12, 2023</td>
+<td class="px-8 py-6 font-bold text-on-surface">$299.00</td>
+<td class="px-8 py-6">
+<span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-bold">Paid</span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="text-primary hover:text-primary/80">
+<span class="material-symbols-outlined">download</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create Purchase Order - ProcureFlow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface": "#faf8ff",
+              "secondary-fixed": "#d5e3fc",
+              "secondary-container": "#d5e3fc",
+              "on-secondary-fixed-variant": "#3a485b",
+              "tertiary-fixed-dim": "#ffb783",
+              "on-primary": "#ffffff",
+              "surface-container": "#eaedff",
+              "on-surface": "#131b2e",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-fixed": "#ffdcc5",
+              "on-tertiary-fixed": "#301400",
+              "on-secondary-fixed": "#0d1c2e",
+              "surface-container-highest": "#dae2fd",
+              "secondary-fixed-dim": "#b9c7df",
+              "on-surface-variant": "#464554",
+              "primary-fixed-dim": "#d2bbff",
+              "surface-container-high": "#e2e7ff",
+              "outline": "#767586",
+              "background": "#faf8ff",
+              "outline-variant": "#c7c4d7",
+              "on-secondary": "#ffffff",
+              "on-primary-fixed-variant": "#5a00c6",
+              "on-primary-container": "#fffbff",
+              "error": "#ba1a1a",
+              "tertiary-container": "#b55d00",
+              "on-tertiary": "#ffffff",
+              "surface-variant": "#dae2fd",
+              "on-error": "#ffffff",
+              "inverse-on-surface": "#eef0ff",
+              "tertiary": "#904900",
+              "surface-dim": "#d2d9f4",
+              "on-secondary-container": "#57657a",
+              "surface-bright": "#faf8ff",
+              "surface-tint": "#732ee4",
+              "secondary": "#515f74",
+              "on-background": "#131b2e",
+              "inverse-primary": "#d2bbff",
+              "surface-container-low": "#f2f3ff",
+              "on-primary-fixed": "#25005a",
+              "inverse-surface": "#283044",
+              "primary": "#712ae2",
+              "on-tertiary-container": "#fffbff",
+              "error-container": "#ffdad6",
+              "on-tertiary-fixed-variant": "#703700",
+              "primary-container": "#8a4cfc",
+              "on-error-container": "#93000a",
+              "primary-fixed": "#eaddff"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf8ff;
+        }
+        .editorial-shadow {
+            box-shadow: 0 20px 50px -12px rgba(19, 27, 46, 0.08);
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #712ae2 0%, #8a4cfc 100%);
+        }
+        .modal-overlay {
+            background-color: rgba(19, 27, 46, 0.4);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="text-on-surface bg-background min-h-screen flex flex-col overflow-hidden">
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 modal-overlay">
+<div class="bg-surface-container-lowest w-full max-w-lg rounded-2xl editorial-shadow overflow-hidden">
+<header class="px-8 py-6 border-b border-outline-variant/15 flex justify-between items-center bg-surface-container-low">
+<h3 class="text-xl font-extrabold font-headline text-on-surface">Add New Item</h3>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</header>
+<div class="p-8 space-y-6">
+<div class="grid grid-cols-2 gap-4">
+<div class="col-span-1 flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider">SKU</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 focus:ring-1 focus:ring-primary rounded-lg px-4 py-3 text-sm font-body" placeholder="e.g. LAP-001" type="text"/>
+</div>
+<div class="col-span-1 flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider">Quantity</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 focus:ring-1 focus:ring-primary rounded-lg px-4 py-3 text-sm font-body" placeholder="0" type="number"/>
+</div>
+<div class="col-span-2 flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider">Item Name</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 focus:ring-1 focus:ring-primary rounded-lg px-4 py-3 text-sm font-body" placeholder="Enter product name..." type="text"/>
+</div>
+<div class="col-span-2 flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider">Price (USD)</label>
+<div class="relative">
+<span class="absolute left-4 top-3 text-on-surface-variant text-sm font-body">$</span>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 focus:ring-1 focus:ring-primary rounded-lg pl-8 pr-4 py-3 text-sm font-body" placeholder="0.00" step="0.01" type="number"/>
+</div>
+</div>
+</div>
+</div>
+<footer class="px-8 py-6 bg-surface-container-low flex justify-end gap-3 border-t border-outline-variant/15">
+<button class="px-5 py-2.5 bg-transparent text-primary font-semibold rounded-lg text-sm transition-all hover:bg-surface-container-high active:scale-95">
+                    Cancel
+                </button>
+<button class="primary-gradient px-6 py-2.5 text-on-primary font-bold rounded-lg text-sm editorial-shadow transition-all active:scale-95">
+                    Add to Order
+                </button>
+</footer>
+</div>
+</div>
+<!-- TopNavBar -->
+<header class="w-full h-16 sticky top-0 z-50 bg-[#faf8ff]/80 backdrop-blur-md flex justify-between items-center px-8 shadow-sm">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<span class="text-lg font-bold text-[#131b2e] font-headline">ProcureFlow</span>
+</div>
+<div class="hidden md:flex items-center gap-6">
+<span class="text-[#131b2e] font-semibold font-body text-sm cursor-pointer">Workspace Alpha</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant/15">
+<span class="material-symbols-outlined text-on-surface-variant text-lg" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 font-body" placeholder="Search POs..." type="text"/>
+</div>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="help_outline">help_outline</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-fixed overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYB-uRy64yDCrlZQxyB9yPP_KRyQi_prG82h9eJoSd07eCQ0_t_Wz4ZwjX6gmamMLIrgnltbHXnAZlzZCldS3Qtaup2Ws8WUkOaYcdm57Jb-jfFgLkMk3CIuhFPsPxgI73oZtvBIVUkdXCwXhowtpW4AZCmAb5B_OFeA4BFEwfF7QmvEaMHZRe8g4ftfnS6CayscUx-XLqYYJIAggcoVXaNkiCwXck8bVnAulPgQfiT-UnNSrAzrYsYbFPnSXj4nhbTuxEA2sONVmV"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col h-[calc(100vh-4rem)] w-64 py-6 px-4 bg-[#f2f3ff] sticky top-16">
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[#464554] hover:bg-[#eaedff] transition-colors duration-200 font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                    Dashboard
+                </a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[#712ae2] font-bold bg-[#eaedff] transition-colors duration-200 text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+                    Purchase Orders
+                </a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[#464554] hover:bg-[#eaedff] transition-colors duration-200 font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+                    Suppliers
+                </a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[#464554] hover:bg-[#eaedff] transition-colors duration-200 font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+                    Billing
+                </a>
+<a class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[#464554] hover:bg-[#eaedff] transition-colors duration-200 font-medium text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                    Settings
+                </a>
+</nav>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-8 lg:p-12 max-w-6xl mx-auto w-full">
+<header class="mb-10 flex justify-between items-end">
+<div class="space-y-2">
+<span class="text-xs font-bold uppercase tracking-widest text-primary font-body">Drafting New Order</span>
+<h1 class="text-4xl font-extrabold text-on-surface font-headline tracking-tight">Purchase Order</h1>
+</div>
+<div class="flex gap-3">
+<button class="px-5 py-2.5 bg-surface-container-highest text-primary font-semibold rounded-lg text-sm transition-all hover:bg-surface-container-high active:scale-95">
+                        Cancel
+                    </button>
+<button class="primary-gradient px-6 py-2.5 text-on-primary font-semibold rounded-lg text-sm editorial-shadow transition-all active:scale-95">
+                        Submit Order
+                    </button>
+</div>
+</header>
+<form class="space-y-8">
+<!-- Section 1: General Information -->
+<section class="bg-surface-container-low rounded-xl p-8 space-y-8">
+<div class="flex items-center justify-between border-b border-outline-variant/10 pb-4">
+<h2 class="text-lg font-bold font-headline flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="info">info</span>
+                            General Information
+                        </h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+<div class="space-y-6">
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider">PO Number</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-sm font-body cursor-not-allowed text-on-surface-variant" readonly="" type="text" value="PO-2024-0892"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider">Supplier</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-lowest border-none focus:ring-1 focus:ring-primary rounded-lg px-4 py-3 text-sm font-body shadow-sm">
+<option>Select a supplier...</option>
+<option selected="">Global Logistics Partners</option>
+<option>North Star Manufacturing</option>
+<option>Vertex Office Supplies</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-3 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider">Supplier Country</label>
+<input class="w-full bg-surface-container-lowest border-none focus:ring-1 focus:ring-primary rounded-lg px-4 py-3 text-sm font-body shadow-sm" placeholder="e.g. United Kingdom" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider">Supplier Address</label>
+<textarea class="w-full bg-surface-container-lowest border-1 border-error/30 focus:ring-1 focus:ring-error rounded-lg px-4 py-3 text-sm font-body shadow-sm placeholder:text-on-surface-variant/50" placeholder="Street, Building, Suite..." rows="3"></textarea>
+<span class="text-xs text-error font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="error">error</span>
+                                    Supplier Address is required
+                                </span>
+</div>
+</div>
+<div class="space-y-6">
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<label class="text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider">Company</label>
+<span class="text-[10px] bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full font-bold">Parent Workspace Only</span>
+</div>
+<input class="w-full bg-surface-container-low/50 border-none rounded-lg px-4 py-3 text-sm font-body cursor-not-allowed text-on-surface-variant" readonly="" type="text" value="ProcureFlow Enterprise Ltd"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider">Company Country</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-sm font-body cursor-not-allowed text-on-surface-variant" readonly="" type="text" value="United States"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider">Company Address</label>
+<textarea class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-sm font-body cursor-not-allowed text-on-surface-variant" readonly="" rows="4">888 Market Street, Floor 12
+San Francisco, CA 94103
+United States</textarea>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Items -->
+<section class="space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="text-lg font-bold font-headline flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="list_alt">list_alt</span>
+                            Items &amp; Quantities
+                        </h2>
+</div>
+<div class="overflow-hidden rounded-xl bg-surface-container-lowest border border-outline-variant/15 editorial-shadow">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-high">
+<tr>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider w-24">SKU</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider">Item Name</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider w-32 text-right">Quantity</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider w-40 text-right">Price (USD)</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant font-label uppercase tracking-wider w-24"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<tr>
+<td class="px-6 py-4 text-xs font-bold text-primary">LAP-MBP-14</td>
+<td class="px-6 py-4">
+<input class="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded-md px-2 py-1.5 text-sm font-body" type="text" value="MacBook Pro 14-inch M3 Max"/>
+</td>
+<td class="px-6 py-4 text-right">
+<input class="w-20 bg-transparent border-none focus:ring-1 focus:ring-primary rounded-md px-2 py-1.5 text-sm font-body text-right" type="number" value="12"/>
+</td>
+<td class="px-6 py-4 text-right">
+<input class="w-32 bg-transparent border-none focus:ring-1 focus:ring-primary rounded-md px-2 py-1.5 text-sm font-body text-right" type="number" value="3199.00"/>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 rounded-md hover:bg-surface-container text-on-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-lg" data-icon="update">update</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-error-container/20 text-error transition-colors" type="button">
+<span class="material-symbols-outlined text-lg" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="bg-surface-container-low/30">
+<td class="px-6 py-4 text-xs font-bold text-primary">MON-DEL-32</td>
+<td class="px-6 py-4">
+<input class="w-full bg-transparent border-none focus:ring-1 focus:ring-primary rounded-md px-2 py-1.5 text-sm font-body" type="text" value="Dell UltraSharp 32 4K USB-C Hub Monitor"/>
+</td>
+<td class="px-6 py-4 text-right">
+<input class="w-20 bg-transparent border-none focus:ring-1 focus:ring-primary rounded-md px-2 py-1.5 text-sm font-body text-right" type="number" value="15"/>
+</td>
+<td class="px-6 py-4 text-right">
+<input class="w-32 bg-transparent border-none focus:ring-1 focus:ring-primary rounded-md px-2 py-1.5 text-sm font-body text-right" type="number" value="849.50"/>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 rounded-md hover:bg-surface-container text-on-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-lg" data-icon="update">update</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-error-container/20 text-error transition-colors" type="button">
+<span class="material-symbols-outlined text-lg" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 text-primary font-bold text-sm hover:bg-primary/5 rounded-lg transition-colors group" type="button">
+<span class="material-symbols-outlined bg-primary text-on-primary rounded-full p-0.5 text-sm group-hover:scale-110 transition-transform" data-icon="add">add</span>
+                        Add Item
+                    </button>
+</section>
+<!-- Section 3: Footer Actions & Summary -->
+<footer class="mt-12 flex flex-col md:flex-row items-center justify-between bg-surface-container-high rounded-xl p-6 gap-6">
+<div class="flex flex-col gap-1">
+<span class="text-xs font-bold text-on-secondary-container font-label uppercase tracking-widest">Estimated Total</span>
+<span class="text-3xl font-extrabold text-on-surface font-headline tracking-tighter">$51,130.50</span>
+</div>
+<div class="flex gap-4 w-full md:w-auto">
+<button class="flex-1 md:flex-none px-8 py-3 bg-surface-container-lowest text-on-surface font-semibold rounded-lg text-sm border border-outline-variant/20 hover:bg-white transition-all active:scale-95" type="button">
+                            Save as Draft
+                        </button>
+<button class="flex-1 md:flex-none primary-gradient px-12 py-3 text-on-primary font-bold rounded-lg text-sm editorial-shadow hover:opacity-90 transition-all active:scale-95" type="submit">
+                            Submit Purchase Order
+                        </button>
+</div>
+</footer>
+</form>
+</main>
+</div>
+</body></html>

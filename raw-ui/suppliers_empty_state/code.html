@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Supplier Management | ProcureFlow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "tertiary-fixed": "#ffdcc5",
+                "outline": "#767586",
+                "surface-variant": "#dae2fd",
+                "secondary-fixed-dim": "#b9c7df",
+                "primary": "#712ae2",
+                "tertiary-fixed-dim": "#ffb783",
+                "surface-container-high": "#e2e7ff",
+                "secondary-container": "#d5e3fc",
+                "surface-container-highest": "#dae2fd",
+                "secondary-fixed": "#d5e3fc",
+                "on-tertiary-fixed": "#301400",
+                "on-surface-variant": "#464554",
+                "on-primary-fixed-variant": "#5a00c6",
+                "error-container": "#ffdad6",
+                "background": "#faf8ff",
+                "error": "#ba1a1a",
+                "inverse-surface": "#283044",
+                "surface-container-lowest": "#ffffff",
+                "surface-container-low": "#f2f3ff",
+                "on-primary-container": "#fffbff",
+                "on-background": "#131b2e",
+                "on-secondary-fixed": "#0d1c2e",
+                "on-tertiary-fixed-variant": "#703700",
+                "surface-tint": "#732ee4",
+                "surface": "#faf8ff",
+                "surface-bright": "#faf8ff",
+                "on-tertiary": "#ffffff",
+                "on-secondary-fixed-variant": "#3a485b",
+                "on-error-container": "#93000a",
+                "outline-variant": "#c7c4d7",
+                "tertiary": "#904900",
+                "on-surface": "#131b2e",
+                "on-error": "#ffffff",
+                "tertiary-container": "#b55d00",
+                "on-secondary-container": "#57657a",
+                "on-primary-fixed": "#25005a",
+                "surface-container": "#eaedff",
+                "primary-fixed-dim": "#d2bbff",
+                "on-tertiary-container": "#fffbff",
+                "on-primary": "#ffffff",
+                "primary-fixed": "#eaddff",
+                "inverse-on-surface": "#eef0ff",
+                "surface-dim": "#d2d9f4",
+                "primary-container": "#8a4cfc",
+                "secondary": "#515f74",
+                "inverse-primary": "#d2bbff",
+                "on-secondary": "#ffffff"
+              },
+              fontFamily: {
+                "headline": ["Manrope"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-gradient { background: linear-gradient(135deg, #712ae2 0%, #8a4cfc 100%); }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex selection:bg-primary/20">
+<!-- SideNavBar Shell -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-[#f2f3ff] z-50">
+<div class="flex flex-col justify-between py-8 h-full">
+<div class="space-y-8 flex-1">
+<!-- Header/Logo Area -->
+<div class="px-6 flex items-center gap-3">
+<div class="w-10 h-10 editorial-gradient rounded-xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dataset</span>
+</div>
+<div>
+<h1 class="text-2xl font-black tracking-tighter text-[#131b2e] font-manrope">ProcureFlow</h1>
+<p class="text-xs font-medium text-on-surface-variant uppercase tracking-widest">Editorial</p>
+</div>
+</div>
+<!-- Main Navigation -->
+<nav class="flex flex-col gap-1 pr-4">
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] font-medium hover:bg-[#eaedff] transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-manrope text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#712ae2] font-bold bg-[#eaedff] rounded-r-full active:scale-95 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-manrope text-sm">Suppliers</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] font-medium hover:bg-[#eaedff] transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-manrope text-sm">Purchase Order</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] font-medium hover:bg-[#eaedff] transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-manrope text-sm">Billing</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] font-medium hover:bg-[#eaedff] transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-manrope text-sm">Companies</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] font-medium hover:bg-[#eaedff] transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-manrope text-sm">Users</span>
+</a>
+</nav>
+</div>
+<!-- Footer Section -->
+<div class="flex flex-col gap-6">
+<!-- User Profile (Fixed Anchor) -->
+<div class="px-6 py-4 flex items-center gap-3 border-t border-outline-variant/10">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high ring-2 ring-primary/10">
+<img alt="Marcus Chen Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF36FFtcuR7MMoQMxZu-yrxOiI-d-sUYjOgEtoaQraeXMpmFIFTJrlGWUFhlalvt6LZDw5PtV77xdUErYussPm5adqfySaTOtBue5RAGFVXrsAiro1NDiGrD_WNIuhpynu_XSNoV6SCQ84I4iOa3smZdMylOWX4i-Ig05EdGW448PVCcS2SBRGCojW1tLPxnxA1QMwQt9tBO9yY2DwIYggniykdaWMkZtM2ta_Edk7vsE6ZAi89i3ZIn9xJ9STU65OjLijBbLBrB5b"/>
+</div>
+<div class="flex flex-col min-w-0">
+<p class="text-sm font-bold text-on-surface truncate font-manrope">Marcus Chen</p>
+<p class="text-xs text-on-surface-variant truncate font-inter">Global Procurement Lead</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-64 bg-surface-container min-h-screen">
+<!-- TopAppBar -->
+<header class="w-full sticky top-0 z-40 bg-[#faf8ff]/80 backdrop-blur-xl flex justify-between items-center px-8 h-16 shadow-[0_20px_50px_-12px_rgba(19,27,46,0.08)]">
+<div class="flex items-center gap-4">
+<h2 class="font-manrope text-xl font-bold tracking-tight text-[#131b2e]">Suppliers</h2>
+</div>
+<div class="flex items-center gap-6">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-low hover:bg-surface-container transition-colors rounded-lg text-sm font-semibold text-primary">
+<span class="material-symbols-outlined text-[18px]">business_center</span>
+<span>Switch Company</span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+<div class="h-6 w-px bg-outline-variant/30"></div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="relative">
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full ring-2 ring-background"></span>
+</button>
+</div>
+</div>
+</header>
+<!-- Page Canvas Section -->
+<section class="p-8 max-w-7xl mx-auto">
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-12">
+<div class="space-y-2">
+<h1 class="font-headline font-extrabold text-5xl tracking-tighter text-on-background">Global Network</h1>
+<p class="text-secondary font-body font-medium">Manage and monitor your strategic partners.</p>
+</div>
+<button class="flex items-center gap-2 editorial-gradient text-white px-6 py-3 rounded-xl font-bold active:scale-95 transition-all shadow-xl shadow-primary/20">
+<span class="material-symbols-outlined">add</span>
+                + Add Supplier
+            </button>
+</div>
+<!-- Custom Data Table (Minimalist Architecture) -->
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+<div class="flex-1 min-w-[300px] relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50 group-focus-within:text-primary transition-colors text-[20px]">search</span>
+<input class="w-full pl-11 pr-4 py-3 bg-surface-container-lowest border-none rounded-2xl shadow-sm focus:ring-2 focus:ring-primary/20 transition-all font-body text-sm text-on-surface placeholder:text-on-surface-variant/40" placeholder="Search suppliers..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative">
+<button class="flex items-center gap-2 px-5 py-3 bg-surface-container-lowest shadow-sm hover:bg-surface-container-low transition-colors rounded-2xl text-sm font-bold text-on-surface-variant font-manrope">
+<span class="material-symbols-outlined text-[20px] text-primary/60">domain</span>
+<span>Company</span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+</div>
+<div class="relative">
+<button class="flex items-center gap-2 px-5 py-3 bg-surface-container-lowest shadow-sm hover:bg-surface-container-low transition-colors rounded-2xl text-sm font-bold text-on-surface-variant font-manrope">
+<span class="material-symbols-outlined text-[20px] text-primary/60">public</span>
+<span>Country</span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+</div>
+<button class="flex items-center justify-center w-11 h-11 bg-surface-container-lowest shadow-sm hover:bg-surface-container-low transition-colors rounded-2xl text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+</button>
+</div>
+</div><div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="px-8 py-5 font-headline text-sm font-bold text-secondary uppercase tracking-wider">Supplier Name</th>
+<th class="px-8 py-5 font-headline text-sm font-bold text-secondary uppercase tracking-wider">Company</th>
+<th class="px-8 py-5 font-headline text-sm font-bold text-secondary uppercase tracking-wider">Address</th>
+<th class="px-8 py-5 font-headline text-sm font-bold text-secondary uppercase tracking-wider">Country</th>
+<th class="px-8 py-5 font-headline text-sm font-bold text-secondary uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody>
+<!-- Empty State Wrapper -->
+<tr>
+<td class="py-32 px-8" colspan="5">
+<div class="flex flex-col items-center justify-center text-center">
+<div class="w-24 h-24 mb-6 rounded-full bg-surface-container-low flex items-center justify-center text-primary/30">
+<span class="material-symbols-outlined text-6xl" style="font-variation-settings: 'wght' 200;">factory</span>
+</div>
+<h3 class="font-headline font-bold text-2xl text-on-background mb-2">No suppliers yet</h3>
+<p class="text-secondary font-body max-w-sm mx-auto mb-8">Get started by adding your first strategic partner to your procurement network.</p>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 editorial-gradient text-white px-6 py-3 rounded-xl font-bold active:scale-95 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>Add Supplier</span>
+</button>
+<button class="flex items-center gap-2 px-6 py-3 bg-surface-container-high hover:bg-surface-variant transition-colors rounded-xl font-bold text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">upload_file</span>
+<span>Import CSV</span>
+</button>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</main>
+</body></html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "inverse-on-surface": "#eef0ff",
+              "surface-bright": "#faf8ff",
+              "error-container": "#ffdad6",
+              "on-secondary": "#ffffff",
+              "surface-container-highest": "#dae2fd",
+              "surface-container-low": "#f2f3ff",
+              "on-secondary-fixed": "#0d1c2e",
+              "outline-variant": "#c7c4d7",
+              "background": "#faf8ff",
+              "on-surface": "#131b2e",
+              "on-primary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "primary": "#712ae2",
+              "inverse-primary": "#d2bbff",
+              "tertiary-fixed": "#ffdcc5",
+              "surface-dim": "#d2d9f4",
+              "secondary-fixed": "#d5e3fc",
+              "on-primary-fixed": "#25005a",
+              "on-surface-variant": "#464554",
+              "surface-tint": "#732ee4",
+              "surface": "#faf8ff",
+              "primary-fixed-dim": "#d2bbff",
+              "inverse-surface": "#283044",
+              "tertiary-fixed-dim": "#ffb783",
+              "surface-container-high": "#e2e7ff",
+              "on-secondary-fixed-variant": "#3a485b",
+              "on-error-container": "#93000a",
+              "primary-container": "#8a4cfc",
+              "on-error": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "tertiary": "#904900",
+              "tertiary-container": "#b55d00",
+              "surface-variant": "#dae2fd",
+              "on-tertiary-fixed": "#301400",
+              "outline": "#767586",
+              "on-primary-fixed-variant": "#5a00c6",
+              "secondary-container": "#d5e3fc",
+              "secondary": "#515f74",
+              "on-tertiary-fixed-variant": "#703700",
+              "secondary-fixed-dim": "#b9c7df",
+              "on-secondary-container": "#57657a",
+              "error": "#ba1a1a",
+              "primary-fixed": "#eaddff",
+              "surface-container": "#eaedff",
+              "on-tertiary-container": "#fffbff",
+              "on-primary-container": "#fffbff",
+              "on-background": "#131b2e"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-manrope { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- SIDE NAVIGATION (Shared Component) -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-[#f2f3ff] dark:bg-slate-900 flex flex-col p-6 z-40">
+<div class="mb-10">
+<h1 class="text-xl font-bold text-[#131b2e] dark:text-slate-100 font-manrope">ProcureFlow</h1>
+<p class="text-xs text-on-surface-variant opacity-70">Editorial Logistics</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-[#464554] dark:text-slate-400 hover:text-[#131b2e] hover:bg-[#eaedff] dark:hover:bg-slate-800 transition-colors duration-200 font-manrope text-sm font-semibold tracking-tight rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#712ae2] dark:text-[#8a4cfc] font-bold bg-[#eaedff] dark:bg-slate-800 rounded-lg font-manrope text-sm tracking-tight active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">local_shipping</span> Shipments
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#464554] dark:text-slate-400 hover:text-[#131b2e] hover:bg-[#eaedff] dark:hover:bg-slate-800 transition-colors duration-200 font-manrope text-sm font-semibold tracking-tight rounded-lg" href="#">
+<span class="material-symbols-outlined">inventory_2</span> Inventory
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#464554] dark:text-slate-400 hover:text-[#131b2e] hover:bg-[#eaedff] dark:hover:bg-slate-800 transition-colors duration-200 font-manrope text-sm font-semibold tracking-tight rounded-lg" href="#">
+<span class="material-symbols-outlined">analytics</span> Reports
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#464554] dark:text-slate-400 hover:text-[#131b2e] hover:bg-[#eaedff] dark:hover:bg-slate-800 transition-colors duration-200 font-manrope text-sm font-semibold tracking-tight rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span> Settings
+            </a>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant/10">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 transition-all">
+<span class="material-symbols-outlined">add</span> New Shipment
+            </button>
+</div>
+</aside>
+<!-- TOP NAVIGATION (Shared Component) -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] z-30 bg-[#faf8ff]/80 dark:bg-slate-950/80 backdrop-blur-md flex justify-between items-center h-16 px-8 ml-64">
+<div class="flex items-center gap-8">
+<h2 class="font-manrope text-xl font-bold text-[#131b2e] dark:text-white">Shipment Management</h2>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-[#515f74] dark:text-slate-400 hover:text-[#131b2e] dark:hover:text-white transition-all text-sm font-medium" href="#">Overview</a>
+<a class="text-[#712ae2] dark:text-[#8a4cfc] border-b-2 border-[#712ae2] pb-1 text-sm font-bold" href="#">Tracking</a>
+<a class="text-[#515f74] dark:text-slate-400 hover:text-[#131b2e] dark:hover:text-white transition-all text-sm font-medium" href="#">Documents</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-secondary hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-secondary hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant/20">
+<img alt="User Profile" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfUoxmwGstwbSu_kFlKMwsufM-PB9luLqjO2nJXNMhpFJ2JBqxjdVYnGT1O5VP1VqqrOZ5lbCaVJXsk3YQ3dCX1OcLL8cEpJgVtFHgOs2coPOMk6zVZRo-YHd7iEffU2OB7WA4ed5kFSUY7mggiH78bggt4W_hpDj9JeY0YeEutl035Me7Y-SXf3vqGeci09JFbaYKYUzFYoHAoCC5k4lkylNZZs9wIw2Egf2S9iVLX_bpe-BGXWA9M_K2dgXV5gthmOmGdZaa2naK"/>
+</div>
+</div>
+</header>
+<!-- MAIN BACKGROUND CONTENT (Shipment Creation Page) -->
+<main class="ml-64 pt-24 p-8 min-h-screen">
+<div class="max-w-5xl mx-auto space-y-8">
+<!-- Header Editorial Style -->
+<div class="flex justify-between items-end">
+<div>
+<span class="text-primary font-bold text-xs tracking-widest uppercase">Draft #SF-2024-089</span>
+<h1 class="text-5xl font-extrabold font-manrope tracking-tighter mt-2">Create New Shipment</h1>
+</div>
+</div>
+<!-- Asymmetric Bento Layout for Form Sections -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Main Form Section -->
+<div class="col-span-8 space-y-6">
+<section class="bg-white p-8 rounded-xl border border-outline-variant/10 shadow-sm">
+<h3 class="text-lg font-bold font-manrope mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">description</span>
+                            General Information
+                        </h3>
+<div class="grid grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-xs font-bold text-secondary uppercase tracking-wider">Origin Warehouse</label>
+<div class="bg-surface-container-low p-3 rounded-lg text-on-surface-variant text-sm">North Region Logi-Hub (WH-01)</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-secondary uppercase tracking-wider">Destination</label>
+<div class="bg-surface-container-low p-3 rounded-lg text-on-surface-variant text-sm">Metropolitan Construction Site C</div>
+</div>
+</div>
+</section>
+<section class="bg-white p-8 rounded-xl border border-outline-variant/10 shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-bold font-manrope flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">list_alt</span>
+                                Shipment Items
+                            </h3>
+<button class="text-primary font-bold text-sm hover:underline flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">add_circle</span> Add Item
+                            </button>
+</div>
+<!-- Empty State or List -->
+<div class="border-2 border-dashed border-outline-variant/30 rounded-xl p-12 text-center">
+<span class="material-symbols-outlined text-4xl text-outline-variant mb-2">inventory</span>
+<p class="text-secondary text-sm">No items added to this shipment yet.</p>
+</div>
+</section>
+</div>
+<!-- Sidebar Details Section -->
+<div class="col-span-4 space-y-6">
+<div class="bg-surface-container-high p-6 rounded-xl space-y-6">
+<h3 class="font-manrope font-bold">Summary</h3>
+<div class="space-y-4">
+<div class="flex justify-between text-sm">
+<span class="text-secondary">Total Weight</span>
+<span class="font-bold">0.00 kg</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-secondary">Total Volume</span>
+<span class="font-bold">0.00 m³</span>
+</div>
+<div class="pt-4 border-t border-outline-variant/20 flex justify-between items-center">
+<span class="text-secondary font-bold">Estimated Cost</span>
+<span class="text-2xl font-black font-manrope text-primary">$0.00</span>
+</div>
+</div>
+</div>
+<div class="bg-white p-6 rounded-xl border border-outline-variant/10">
+<h4 class="text-xs font-bold text-secondary uppercase mb-4">Route Preview</h4>
+<div class="relative h-48 rounded-lg overflow-hidden grayscale">
+<img alt="Minimalist map showing route from North Region Hub to Metropolitan Construction Site C" class="w-full h-full object-cover" data-location="Chicago" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAt6LdZmpWdO2el1fsuVJ0Xecl2IrouA8_-Yn0rkeTowhpKfXTcG2GY2HbGanAHEecXTJ4H9jRTLaeDWM4WGzPvW8MqkfoHcMdJtNv7rmiuFBgadQeIUowmy-jC8936Q6U4NtepZsQrcChZye3TC1LHQEZ29bT2uQO-rJ-DjkXVmfkHpfoPDhokMUfGTMTeTHOYXgsC9VbqZIWJhEMGDhcTQVzPYust8fS2WJnLZRv_l4QiNI----BKoEBUbK_MyPh9H3GTdCJ3-WAt"/>
+<div class="absolute inset-0 bg-primary/5"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- MODAL OVERLAY (The "Modal Dialog" Task) -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-on-background/40 backdrop-blur-sm"></div>
+<!-- Modal Content -->
+<div class="relative bg-white w-full max-w-xl rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+<!-- Modal Header -->
+<div class="bg-surface-container-low px-8 py-6 flex justify-between items-center border-b border-outline-variant/10">
+<h2 class="text-xl font-bold font-manrope text-on-surface">Add Shipment Item</h2>
+<button class="p-1 hover:bg-surface-container-high rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Body -->
+<form class="p-8 space-y-6">
+<!-- Product Selection -->
+<div class="space-y-2">
+<label class="text-xs font-bold text-secondary uppercase tracking-wider" for="product-select">Select Product</label>
+<div class="relative group">
+<select class="w-full bg-surface-container-lowest border-0 ring-1 ring-outline-variant/30 rounded-lg py-3 px-4 focus:ring-2 focus:ring-primary appearance-none text-sm font-medium text-on-surface transition-all" id="product-select">
+<option value="">Choose a product SKU...</option>
+<option selected="" value="ITM-77291">ITM-77291 - Steel Reinforced Concrete Beams</option>
+<option value="ITM-88302">ITM-88302 - High-Tensile Steel Cable (Roll)</option>
+<option value="ITM-12445">ITM-12445 - Industrial Grade Aggregate (1 Ton)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-secondary">expand_more</span>
+</div>
+</div>
+<!-- Read-Only Item Name -->
+<div class="grid grid-cols-2 gap-6">
+<!-- Quantity Input -->
+<div class="space-y-2">
+<label class="text-xs font-bold text-secondary uppercase tracking-wider" for="quantity">Quantity</label>
+<input class="w-full bg-surface-container-lowest border-0 ring-1 ring-outline-variant/30 rounded-lg py-3 px-4 focus:ring-2 focus:ring-primary text-sm font-bold text-on-surface transition-all" id="quantity" type="number" value="12"/>
+</div>
+<!-- Total Price Read-Only -->
+<div class="space-y-2">
+<label class="text-xs font-bold text-secondary uppercase tracking-wider">Total Price</label>
+<div class="bg-primary/5 p-3 rounded-lg flex items-center justify-between">
+<span class="text-xs text-primary font-medium">USD</span>
+<span class="text-lg font-black font-manrope text-primary">$14,400.00</span>
+</div>
+<p class="text-[10px] text-right text-secondary-container font-medium">Unit: $1,200.00</p>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="pt-6 flex items-center justify-end gap-3">
+<button class="px-6 py-2.5 rounded-lg text-sm font-bold text-secondary hover:bg-surface-container-high transition-colors" type="button">
+                        Cancel
+                    </button>
+<button class="px-8 py-2.5 rounded-lg text-sm font-bold text-white bg-gradient-to-br from-primary to-primary-container shadow-lg shadow-primary/20 active:scale-95 transition-all flex items-center gap-2" type="submit">
+<span class="material-symbols-outlined text-sm">add</span> Add Item
+                    </button>
+</div>
+</form>
+</div>
+</div>
+</body></html>

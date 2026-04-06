@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Supplier Management | ProcureFlow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "tertiary-fixed": "#ffdcc5",
+                "outline": "#767586",
+                "surface-variant": "#dae2fd",
+                "secondary-fixed-dim": "#b9c7df",
+                "primary": "#712ae2",
+                "tertiary-fixed-dim": "#ffb783",
+                "surface-container-high": "#e2e7ff",
+                "secondary-container": "#d5e3fc",
+                "surface-container-highest": "#dae2fd",
+                "secondary-fixed": "#d5e3fc",
+                "on-tertiary-fixed": "#301400",
+                "on-surface-variant": "#464554",
+                "on-primary-fixed-variant": "#5a00c6",
+                "error-container": "#ffdad6",
+                "background": "#faf8ff",
+                "error": "#ba1a1a",
+                "inverse-surface": "#283044",
+                "surface-container-lowest": "#ffffff",
+                "surface-container-low": "#f2f3ff",
+                "on-primary-container": "#fffbff",
+                "on-background": "#131b2e",
+                "on-secondary-fixed": "#0d1c2e",
+                "on-tertiary-fixed-variant": "#703700",
+                "surface-tint": "#732ee4",
+                "surface": "#faf8ff",
+                "surface-bright": "#faf8ff",
+                "on-tertiary": "#ffffff",
+                "on-secondary-fixed-variant": "#3a485b",
+                "on-error-container": "#93000a",
+                "outline-variant": "#c7c4d7",
+                "tertiary": "#904900",
+                "on-surface": "#131b2e",
+                "on-error": "#ffffff",
+                "tertiary-container": "#b55d00",
+                "on-secondary-container": "#57657a",
+                "on-primary-fixed": "#25005a",
+                "surface-container": "#eaedff",
+                "primary-fixed-dim": "#d2bbff",
+                "on-tertiary-container": "#fffbff",
+                "on-primary": "#ffffff",
+                "primary-fixed": "#eaddff",
+                "inverse-on-surface": "#eef0ff",
+                "surface-dim": "#d2d9f4",
+                "primary-container": "#8a4cfc",
+                "secondary": "#515f74",
+                "inverse-primary": "#d2bbff",
+                "on-secondary": "#ffffff"
+              },
+              fontFamily: {
+                "headline": ["Manrope"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-gradient { background: linear-gradient(135deg, #712ae2 0%, #8a4cfc 100%); }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex selection:bg-primary/20">
+<!-- SideNavBar Shell -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col bg-[#f2f3ff] z-50">
+<div class="flex flex-col justify-between py-8 h-full">
+<div class="space-y-8 flex-1">
+<!-- Header/Logo Area -->
+<div class="px-6 flex items-center gap-3">
+<div class="w-10 h-10 editorial-gradient rounded-xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dataset</span>
+</div>
+<div>
+<h1 class="text-2xl font-black tracking-tighter text-[#131b2e] font-manrope">ProcureFlow</h1>
+<p class="text-xs font-medium text-on-surface-variant uppercase tracking-widest">Editorial</p>
+</div>
+</div>
+<!-- Main Navigation -->
+<nav class="flex flex-col gap-1 pr-4">
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] font-medium hover:bg-[#eaedff] transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-manrope text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#712ae2] font-bold bg-[#eaedff] rounded-r-full active:scale-95 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-manrope text-sm">Suppliers</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] font-medium hover:bg-[#eaedff] transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-manrope text-sm">Purchase Order</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] font-medium hover:bg-[#eaedff] transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-manrope text-sm">Billing</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] font-medium hover:bg-[#eaedff] transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-manrope text-sm">Companies</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#464554] font-medium hover:bg-[#eaedff] transition-colors duration-200 rounded-r-full" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-manrope text-sm">Users</span>
+</a>
+</nav>
+</div>
+<!-- Footer Section -->
+<div class="flex flex-col gap-6">
+<!-- User Profile (Fixed Anchor) -->
+<div class="px-6 py-4 flex items-center gap-3 border-t border-outline-variant/10">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high ring-2 ring-primary/10">
+<img alt="Marcus Chen Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF36FFtcuR7MMoQMxZu-yrxOiI-d-sUYjOgEtoaQraeXMpmFIFTJrlGWUFhlalvt6LZDw5PtV77xdUErYussPm5adqfySaTOtBue5RAGFVXrsAiro1NDiGrD_WNIuhpynu_XSNoV6SCQ84I4iOa3smZdMylOWX4i-Ig05EdGW448PVCcS2SBRGCojW1tLPxnxA1QMwQt9tBO9yY2DwIYggniykdaWMkZtM2ta_Edk7vsE6ZAi89i3ZIn9xJ9STU65OjLijBbLBrB5b"/>
+</div>
+<div class="flex flex-col min-w-0">
+<p class="text-sm font-bold text-on-surface truncate font-manrope">Marcus Chen</p>
+<p class="text-xs text-on-surface-variant truncate font-inter">Global Procurement Lead</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-64 bg-surface-container min-h-screen">
+<!-- TopAppBar -->
+<header class="w-full sticky top-0 z-40 bg-[#faf8ff]/80 backdrop-blur-xl flex justify-between items-center px-8 h-16 shadow-[0_20px_50px_-12px_rgba(19,27,46,0.08)]">
+<div class="flex items-center gap-4">
+<h2 class="font-manrope text-xl font-bold tracking-tight text-[#131b2e]">Suppliers</h2>
+</div>
+<div class="flex items-center gap-6">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-low hover:bg-surface-container transition-colors rounded-lg text-sm font-semibold text-primary">
+<span class="material-symbols-outlined text-[18px]">business_center</span>
+<span>Switch Company</span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+<div class="h-6 w-px bg-outline-variant/30"></div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="relative">
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full ring-2 ring-background"></span>
+</button>
+</div>
+</div>
+</header>
+<!-- Page Canvas Section -->
+<section class="p-8 max-w-7xl mx-auto">
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-12">
+<div class="space-y-2">
+<h1 class="font-headline font-extrabold text-5xl tracking-tighter text-on-background">Global Network</h1>
+<p class="text-secondary font-body font-medium">Manage and monitor 124 active strategic partners.</p>
+</div>
+<button class="flex items-center gap-2 editorial-gradient text-white px-6 py-3 rounded-xl font-bold active:scale-95 transition-all shadow-xl shadow-primary/20">
+<span class="material-symbols-outlined">add</span>
+                + Add Supplier
+            </button>
+</div>
+<!-- Custom Data Table (Minimalist Architecture) -->
+<div class="flex flex-wrap items-center gap-4 mb-6 bg-surface-container-lowest p-4 rounded-2xl shadow-sm border border-outline-variant/10">
+<!-- Search Input -->
+<div class="flex-1 min-w-[300px] relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary group-focus-within:text-primary transition-colors text-[20px]">search</span>
+<input class="w-full pl-11 pr-4 py-2.5 bg-surface-container-low border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all font-body text-on-surface placeholder:text-secondary/60" placeholder="Search by supplier name..." type="text"/>
+</div>
+<!-- Company Filter -->
+<div class="relative min-w-[180px]">
+<select class="w-full appearance-none pl-4 pr-10 py-2.5 bg-surface-container-low border-none rounded-xl text-sm font-semibold text-on-surface-variant focus:ring-2 focus:ring-primary/20 cursor-pointer">
+<option value="">All Companies</option>
+<option value="atlas">Atlas Global</option>
+<option value="zenith">Zenith Mfg</option>
+<option value="tether">Tether Electronics</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-[20px]">expand_more</span>
+</div>
+<!-- Country Filter -->
+<div class="relative min-w-[180px]">
+<select class="w-full appearance-none pl-4 pr-10 py-2.5 bg-surface-container-low border-none rounded-xl text-sm font-semibold text-on-surface-variant focus:ring-2 focus:ring-primary/20 cursor-pointer">
+<option value="">All Countries</option>
+<option value="uk">United Kingdom</option>
+<option value="de">Germany</option>
+<option value="cn">China</option>
+<option value="us">USA</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-secondary pointer-events-none text-[20px]">expand_more</span>
+</div>
+<!-- Action Buttons -->
+<button class="px-4 py-2.5 text-sm font-bold text-secondary hover:text-primary transition-colors rounded-xl hover:bg-surface-container-high">
+    Clear Filters
+  </button>
+</div><div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="px-8 py-5 font-headline text-sm font-bold text-secondary uppercase tracking-wider">Supplier Name</th>
+<th class="px-8 py-5 font-headline text-sm font-bold text-secondary uppercase tracking-wider">Company</th>
+<th class="px-8 py-5 font-headline text-sm font-bold text-secondary uppercase tracking-wider">Address</th>
+<th class="px-8 py-5 font-headline text-sm font-bold text-secondary uppercase tracking-wider">Country</th>
+<th class="px-8 py-5 font-headline text-sm font-bold text-secondary uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Row 1 -->
+<tr class="group hover:bg-surface-container-low transition-colors duration-200">
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold">AL</div>
+<span class="font-inter font-semibold text-on-background">Atlas Logistics</span>
+</div>
+</td>
+<td class="px-8 py-6 text-secondary font-medium">Atlas Global Solutions Inc.</td>
+<td class="px-8 py-6 text-secondary text-sm">Harbor Square, Docklands SE1</td>
+<td class="px-8 py-6 font-medium text-on-background">United Kingdom</td>
+<td class="px-8 py-6 text-right">
+<div class="relative inline-block text-left group/menu">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors text-secondary">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+<div class="absolute right-0 mt-2 w-48 bg-surface-container-lowest rounded-xl shadow-xl border border-outline-variant/20 hidden group-hover/menu:block z-50 text-left">
+<div class="py-2">
+<button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-sm">edit</span>
+                                                Edit
+                                            </button>
+<button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-error hover:bg-error-container/20 transition-colors">
+<span class="material-symbols-outlined text-sm">delete</span>
+                                                Remove
+                                            </button>
+</div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="group hover:bg-surface-container-low transition-colors duration-200">
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-tertiary/10 flex items-center justify-center text-tertiary font-bold">NZ</div>
+<span class="font-inter font-semibold text-on-background">Nova Zenith Mfg.</span>
+</div>
+</td>
+<td class="px-8 py-6 text-secondary font-medium">Zenith Manufacturing Corp.</td>
+<td class="px-8 py-6 text-secondary text-sm">12 Industrial Parkway, Ste 400</td>
+<td class="px-8 py-6 font-medium text-on-background">Germany</td>
+<td class="px-8 py-6 text-right">
+<div class="relative inline-block text-left group/menu">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors text-secondary">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+<div class="absolute right-0 mt-2 w-48 bg-surface-container-lowest rounded-xl shadow-xl border border-outline-variant/20 hidden group-hover/menu:block z-50 text-left">
+<div class="py-2">
+<button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-sm">edit</span>
+                                                Edit
+                                            </button>
+<button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-error hover:bg-error-container/20 transition-colors">
+<span class="material-symbols-outlined text-sm">delete</span>
+                                                Remove
+                                            </button>
+</div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="group hover:bg-surface-container-low transition-colors duration-200">
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary font-bold">TC</div>
+<span class="font-inter font-semibold text-on-background">Tether Circuits</span>
+</div>
+</td>
+<td class="px-8 py-6 text-secondary font-medium">Tether Electronics Group</td>
+<td class="px-8 py-6 text-secondary text-sm">B-102 High-Tech Park, Nanshan</td>
+<td class="px-8 py-6 font-medium text-on-background">China</td>
+<td class="px-8 py-6 text-right">
+<div class="relative inline-block text-left group/menu">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors text-secondary">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+<div class="absolute right-0 mt-2 w-48 bg-surface-container-lowest rounded-xl shadow-xl border border-outline-variant/20 hidden group-hover/menu:block z-50 text-left">
+<div class="py-2">
+<button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-sm">edit</span>
+                                                Edit
+                                            </button>
+<button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-error hover:bg-error-container/20 transition-colors">
+<span class="material-symbols-outlined text-sm">delete</span>
+                                                Remove
+                                            </button>
+</div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="group hover:bg-surface-container-low transition-colors duration-200">
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary-container/10 flex items-center justify-center text-primary-container font-bold">SM</div>
+<span class="font-inter font-semibold text-on-background">Stellar Materials</span>
+</div>
+</td>
+<td class="px-8 py-6 text-secondary font-medium">Stellar Raw Goods LLC</td>
+<td class="px-8 py-6 text-secondary text-sm">4400 Commerce Way</td>
+<td class="px-8 py-6 font-medium text-on-background">USA</td>
+<td class="px-8 py-6 text-right">
+<div class="relative inline-block text-left group/menu">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors text-secondary">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+<div class="absolute right-0 mt-2 w-48 bg-surface-container-lowest rounded-xl shadow-xl border border-outline-variant/20 hidden group-hover/menu:block z-50 text-left">
+<div class="py-2">
+<button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-sm">edit</span>
+                                                Edit
+                                            </button>
+<button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-error hover:bg-error-container/20 transition-colors">
+<span class="material-symbols-outlined text-sm">delete</span>
+                                                Remove
+                                            </button>
+</div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="group hover:bg-surface-container-low transition-colors duration-200">
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-error/10 flex items-center justify-center text-error font-bold">KV</div>
+<span class="font-inter font-semibold text-on-background">Kinetic Ventures</span>
+</div>
+</td>
+<td class="px-8 py-6 text-secondary font-medium">Kinetic Global Freight</td>
+<td class="px-8 py-6 text-secondary text-sm">Via Roma 42, Milan</td>
+<td class="px-8 py-6 font-medium text-on-background">Italy</td>
+<td class="px-8 py-6 text-right">
+<div class="relative inline-block text-left group/menu">
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-colors text-secondary">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+<div class="absolute right-0 mt-2 w-48 bg-surface-container-lowest rounded-xl shadow-xl border border-outline-variant/20 hidden group-hover/menu:block z-50 text-left">
+<div class="py-2">
+<button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-sm">edit</span>
+                                                Edit
+                                            </button>
+<button class="w-full flex items-center gap-3 px-4 py-2 text-sm text-error hover:bg-error-container/20 transition-colors">
+<span class="material-symbols-outlined text-sm">delete</span>
+                                                Remove
+                                            </button>
+</div>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Minimalist -->
+<div class="p-6 flex justify-between items-center border-t border-outline-variant/10">
+<p class="text-xs text-secondary font-medium">Showing 5 of 124 Suppliers</p>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg hover:bg-surface-container-low text-secondary transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-2 rounded-lg bg-primary text-white font-bold text-xs px-4">1</button>
+<button class="p-2 rounded-lg hover:bg-surface-container-low text-secondary transition-colors text-xs px-4">2</button>
+<button class="p-2 rounded-lg hover:bg-surface-container-low text-secondary transition-colors text-xs px-4">3</button>
+<button class="p-2 rounded-lg hover:bg-surface-container-low text-secondary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+</body></html>
