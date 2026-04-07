@@ -2,7 +2,9 @@
 
 ---
 
-## 📦 1. Product Context
+# 📦 PROJECT_CONTEXT
+
+## 🧭 Product Overview
 
 ProcureFlow is a **B2B multi-tenant SaaS** for procurement & shipment.
 
@@ -16,74 +18,78 @@ Core modules:
 * Companies (multi-tenant)
 * Users
 
-Multi-tenant model:
+---
+
+## 🧠 Multi-Tenant Model
 
 * 1 workspace = 1 company
 * Supports parent → child (max 2 levels)
 
----
-
-## 🔐 2. Critical Rules
-
-These rules are NON-NEGOTIABLE:
-
-* ALWAYS include `workspace_id` in every query
-* NEVER allow cross-workspace access
-* ALWAYS validate RBAC via policies
-* NEVER query database from UI/components
-* ALWAYS use service layer
-
-Hierarchy rules:
+Hierarchy:
 
 * Parent → can access child data
 * Child → only its own data
 
+---
+
+## 👥 Roles (RBAC)
+
+* Admin
+* Manager
+* Procurement
+* Logistics
+* Supplier
+* Viewer
+
+---
+
+## 🔐 Access Rules (CRITICAL)
+
+* ALWAYS include `workspace_id` in every query
+* NEVER allow cross-workspace access
+* ALWAYS validate RBAC via policies
+
 Supplier restriction:
 
-```sql
+```sql id="ctxsql2"
 purchase_orders WHERE supplier_id = current_supplier_id
 ```
 
 ---
 
-## 🏗️ 3. Tech Stack
+## 🔄 Core Business Flow
 
-* Next.js (App Router)
-* TypeScript (strict)
-* Tailwind CSS + shadcn/ui
-* Supabase (Auth + DB)
-* Vercel
+### Purchase Order
 
----
+* Draft → Submitted → Approved / Rejected
 
-## 📁 4. Project Structure
+### Shipment
 
-* `app/` → routing
-* `features/` → business modules (MAIN SOURCE)
-* `components/` → UI only
-* `hooks/` → reusable logic
-* `services/` → business + DB logic
-* `policies/` → RBAC enforcement
-* `lib/` → utilities (supabase, auth, helpers)
-* `config/` → roles & permissions
-* `types/` → global types
-* `middleware.ts` → auth + workspace guard
+* Pending → In Transit → Delivered
+* No backward status
 
-Feature structure:
+Rules:
 
-```
-feature/
-  ├── components/
-  ├── hooks/
-  ├── services/
-  └── types.ts
-```
+* Only Approved PO can create Shipment
 
 ---
 
-## 🧩 5. Architecture
+## 🧩 System Modules
 
-```
+* Authentication & Workspace
+* Supplier Management
+* Purchase Orders
+* Shipments
+* Dashboard
+* Billing
+
+---
+
+# 🏗️ ARCHITECTURE
+
+## 🧩 Core Architecture Flow
+
+```id="archflow2"
 UI Component
   ↓
 Feature Hook
@@ -95,26 +101,33 @@ Policy (RBAC)
 Supabase (with workspace filter)
 ```
 
-Rules:
+---
 
-* Server Components → default
-* Client Components → only if needed
-* Server Actions → for mutations
+## 🧱 Layer Responsibilities
+
+### UI Layer (`components/`)
+
+* Presentational only
+* No business logic
+* No data fetching
 
 ---
 
-## 🔄 6. Service Layer
+### Hooks Layer (`hooks/`, `features/*/hooks`)
 
-All business logic MUST go through `/services`.
+* Handle state & side effects
+* Encapsulate reusable logic
 
-Responsibilities:
+---
 
+### Service Layer (`services/`) (MANDATORY)
+
+* Business logic
 * Supabase queries
 * Enforce `workspace_id`
-* Apply policies
-* RBAC validation
-* Data transformation
-* Error handling
+* Apply RBAC via policies
+* Handle errors
+* Transform data
 
 DO NOT:
 
@@ -123,157 +136,90 @@ DO NOT:
 
 ---
 
-## 🛡️ 7. RBAC & Policies
+### Policy Layer (`policies/`)
 
-Roles:
-
-* Admin
-* Manager
-* Procurement
-* Logistics
-* Supplier
-* Viewer
-
-Rules:
-
-* Defined in `config/roles.ts` & `permissions.ts`
-* ALWAYS validate via `/policies`
-* DENY if unauthorized
+* RBAC validation
+* Ownership checks
+* Business rule enforcement
 
 ---
 
-## 🌐 8. Data Fetching Strategy
+### Middleware (`middleware.ts`)
+
+* Auth validation
+* Workspace access guard
+
+---
+
+## ⚙️ Rendering Strategy
+
+* Server Components → default
+* Client Components → only when needed
+* Server Actions → for mutations
+
+---
+
+## 🌐 Data Fetching Rules
 
 * Prefer Server Components
-* Use services for all data access
-* Client fetch only for interactivity
+* Always fetch via services
+* Never fetch directly from UI
 
 ---
 
-## 🔐 9. Authentication Flow
+## 📁 Project Structure (SOURCE OF TRUTH)
 
-1. Login via Supabase Auth
-2. Session stored (server/client)
-3. Middleware validates:
+* `app/` → routing
+* `features/` → business modules
+* `components/` → UI
+* `hooks/` → shared logic
+* `services/` → business logic
+* `policies/` → RBAC
+* `lib/` → utilities
+* `config/` → roles & permissions
+* `types/` → global types
+* `middleware.ts` → auth + tenant guard
 
-   * Auth
-   * Workspace access
+Feature structure:
 
----
-
-## ⚙️ 10. Middleware Responsibilities
-
-* Protect routes
-* Validate session
-* Validate workspace access
-
----
-
-## 🔄 11. Business Rules
-
-### Purchase Order
-
-* Draft → Submitted → Approved / Rejected
-* ONLY approved PO can create shipment
-
-### Shipment
-
-* Pending → In Transit → Delivered
-* NO backward transition
-
-### Supplier
-
-* Can view assigned PO only
-* Can set shipment → In Transit
-
----
-
-## ⚙️ 12. Data Access Rules
-
-* ALWAYS pass `workspace_id`
-* ALWAYS go through services
-
-Example services:
-
-* `purchaseOrder.service.ts`
-* `shipment.service.ts`
-* `supplier.service.ts`
-
----
-
-## 🎨 13. UI Rules
-
-UI = PRESENTATIONAL ONLY
-
-* NO business logic
-* NO direct data access
-* Use Tailwind + shadcn/ui
-
-Structure:
-
-* `components/ui` → base
-* `components/shared` → reusable
-* `components/features` → feature-specific
-
-Must handle:
-
-* loading state
-* error state
-
----
-
-## ⚙️ 14. Hooks
-
-Responsibilities:
-
-* Encapsulate UI logic
-* Handle state & side effects
-* Reuse logic across components
-
-Global hooks:
-
-* `useAuth()`
-* `useWorkspace()`
-* `useCompanyContext()`
-* `usePermissions()`
-
----
-
-## 🛡️ 15. Policies
-
-Handle:
-
-* Role permission
-* Ownership validation
-* Business rules enforcement
-
----
-
-## 🧬 16. Database (Migration & Seeder)
-
-Location:
-
-```
-db/migrations/
-db/seed/
+```id="archfeat"
+feature/
+  ├── components/
+  ├── hooks/
+  ├── services/
+  └── types.ts
 ```
 
-Rules:
+---
 
-* Use SQL (Supabase)
-* NEVER modify old migration
-* Seeder must be idempotent
+## 🛡️ Security Flow
+
+```id="archsec2"
+Request
+  ↓
+middleware.ts (auth + workspace)
+  ↓
+policy (RBAC)
+  ↓
+service layer
+  ↓
+database query (with workspace_id)
+```
 
 ---
 
-## 🧼 17. Coding Conventions
+## 🚫 Strict Rules
 
-* TypeScript strict (NO `any`)
-* Use async/await
-* Prefer `const`
-* Named exports
+* NEVER query database in UI
+* ALWAYS use service layer
+* ALWAYS enforce `workspace_id`
+* ALWAYS validate via policy
 
-Naming:
+---
+
+# 🧼 CONVENTIONS
+
+## 🔤 Naming Conventions
 
 * Components → PascalCase
 * Hooks → useXxx
@@ -283,7 +229,69 @@ Naming:
 
 ---
 
-## 🚫 18. Anti-Patterns
+## 🧠 Code Style
+
+* TypeScript strict (NO `any`)
+* Use async/await
+* Prefer `const`
+* Use arrow functions
+* Prefer named exports
+
+---
+
+## 📦 Feature Structure
+
+```id="convfeat2"
+feature/
+  ├── components/
+  ├── hooks/
+  ├── services/
+  └── types.ts
+```
+
+---
+
+## 🎨 UI Rules
+
+* Use Tailwind CSS + shadcn/ui
+* No business logic in UI
+* No direct data access
+* Keep components small & reusable
+* Prefer existing components
+
+Must handle:
+
+* loading state
+* error state
+
+---
+
+## ⚙️ Hooks Rules
+
+* Extract reusable logic
+* Avoid unnecessary global state
+* Keep hooks focused
+
+---
+
+## 🧬 Database Rules
+
+Location:
+
+```id="convdb2"
+db/migrations/
+db/seed/
+```
+
+Rules:
+
+* Use SQL (Supabase)
+* Never modify existing migration
+* Seeder must be idempotent
+
+---
+
+## ⚠️ Anti-Patterns
 
 * Direct Supabase calls in components
 * Skipping `workspace_id`
@@ -293,9 +301,9 @@ Naming:
 
 ---
 
-## 🚀 19. Scalability Principles
+## 🚀 Best Practices
 
-* Feature-based architecture
-* Loose coupling
-* Reusable components/hooks
-* Independent services
+* Reuse hooks instead of duplicating logic
+* Keep functions small and focused
+* Prefer readability over complexity
+* Follow existing patterns before creating new ones
