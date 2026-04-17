@@ -1,40 +1,56 @@
-# 🧠 Copilot Instructions — ProcureFlow
+# ProcureFlow — GitHub Copilot Instructions (Final + Super Admin)
+
+You are a senior engineer building ProcureFlow, a production-grade multi-tenant B2B SaaS.
 
 ---
 
-# 📦 PROJECT_CONTEXT
+# 1) THINKING PRIORITY (MANDATORY)
 
-## 🧭 Product Overview
+Always think in this order:
 
-ProcureFlow is a **B2B multi-tenant SaaS** for procurement & shipment.
+1. Tenant isolation
+2. RBAC / authorization
+3. Business rules
+4. Data integrity
+5. UX
 
-Core modules:
-
-* Dashboard
-* Suppliers
-* Purchase Orders
-* Shipments
-* Billing
-* Companies (multi-tenant)
-* Users
+Never skip this order.
 
 ---
 
-## 🧠 Multi-Tenant Model
+# 2) CORE ARCHITECTURE
 
-* 1 workspace = 1 company
-* Supports parent → child (max 2 levels)
+## Tech Stack (STRICT)
 
-Hierarchy:
-
-* Parent → can access child data
-* Child → only its own data
+* Next.js App Router
+* Server Components (default)
+* Server Actions (for mutations)
+* Supabase (Auth + DB + RLS)
+* Drizzle ORM (CRUD, migrations, seeder)
+* Tailwind CSS
+* shadcn/ui
+* React Hook Form + Valibot
 
 ---
 
-## 👥 Roles (RBAC)
+# 3) MULTI-TENANT RULES (CRITICAL)
 
-* Admin
+* Every table MUST include `workspace_id`
+* Every query MUST filter by `workspace_id`
+* NEVER allow cross-workspace access
+* Parent can view child data (via policy)
+* Child CANNOT access parent data
+
+Supabase RLS is the source of truth.
+
+---
+
+# 4) RBAC RULES (UPDATED)
+
+## Roles
+
+* Super Admin (platform-level)
+* Admin (workspace-level)
 * Manager
 * Procurement
 * Logistics
@@ -43,267 +59,216 @@ Hierarchy:
 
 ---
 
-## 🔐 Access Rules (CRITICAL)
+## Core Rules
 
-* ALWAYS include `workspace_id` in every query
-* NEVER allow cross-workspace access
-* ALWAYS validate RBAC via policies
-
-Supplier restriction:
-
-```sql id="ctxsql2"
-purchase_orders WHERE supplier_id = current_supplier_id
-```
+* Always validate role on server
+* NEVER trust frontend
+* All permission logic MUST be in `policies/`
+* NEVER hardcode permissions in UI
 
 ---
 
-## 🔄 Core Business Flow
+## Super Admin Rules (CRITICAL)
 
-### Purchase Order
+* NOT tied to workspace
+* Has global access
+* Can:
+
+  * Create workspace
+  * Add users to workspace
+  * Assign Admin role
+
+---
+
+## Admin Rules (UPDATED)
+
+* Scoped to workspace via `memberships`
+* Has full access ONLY inside workspace
+* Cannot:
+
+  * Create workspace
+  * Assign users across workspace
+
+---
+
+## Permission Strategy
+
+* Super Admin → bypass all checks
+* Others → must pass:
+
+  * workspace_id match
+  * role validation
+
+---
+
+# 5) FEATURE-BASED ARCHITECTURE (MANDATORY)
+
+Each domain MUST follow:
+
+features/
+└── <module>/
+├── components/
+├── hooks/
+├── services/
+├── types.ts
+└── index.ts
+
+---
+
+# 6) GLOBAL VS FEATURE RESPONSIBILITY
+
+## Global
+
+* cross-feature logic
+* shared utilities
+* generic components
+
+## Feature
+
+* module-specific logic
+* module UI
+* module services
+
+Rule:
+→ Prefer feature first
+
+---
+
+# 7) PROJECT STRUCTURE (STRICT)
+
+* app/ → routing only
+* features/ → business logic
+* components/ → shared UI
+* hooks/ → global hooks
+* services/ → cross-feature only
+* db/ → Drizzle schema
+* policies/ → RBAC enforcement
+* lib/ → utilities
+
+---
+
+# 8) DATA ACCESS RULES
+
+Flow:
+
+Server Component / Action
+→ feature service
+→ policy check
+→ db query
+
+NEVER:
+
+* call DB from UI
+* bypass service layer
+
+---
+
+# 9) WORKSPACE RULES (NEW - CRITICAL)
+
+* User MUST belong to workspace via `memberships`
+* EXCEPTION: Super Admin
+
+---
+
+## Workspace Creation
+
+* ONLY Super Admin can create workspace
+* Workspace MUST have at least 1 Admin
+
+---
+
+## Membership Rules
+
+* User can belong to multiple workspaces
+* Role is stored in `memberships`
+* All access MUST resolve from membership
+
+---
+
+# 10) DOMAIN RULES
+
+## Purchase Order
 
 * Draft → Submitted → Approved / Rejected
+* Only Approved PO → Shipment
 
-### Shipment
+## Shipment
 
 * Pending → In Transit → Delivered
-* No backward status
+* No backward transition
 
-Rules:
+## Supplier
 
-* Only Approved PO can create Shipment
+* Only see assigned PO
+* Cannot approve
+* Cannot access workspace settings
 
----
+## Billing
 
-## 🧩 System Modules
-
-* Authentication & Workspace
-* Supplier Management
-* Purchase Orders
-* Shipments
-* Dashboard
-* Billing
+* Enforce limits on server
+* Block when limit reached
 
 ---
 
-# 🏗️ ARCHITECTURE
+# 11) UI RULES
 
-## 🧩 Core Architecture Flow
+* Components = UI only
+* No business logic in components
+* Server Components by default
+* Client Components only when needed
 
-```id="archflow2"
-UI Component
-  ↓
-Feature Hook
-  ↓
-Service Layer
-  ↓
-Policy (RBAC)
-  ↓
-Supabase (with workspace filter)
-```
+Always handle:
+
+* loading
+* error
+* empty state
 
 ---
 
-## 🧱 Layer Responsibilities
+# 12) FORMS & VALIDATION
 
-### UI Layer (`components/`)
-
-* Presentational only
-* No business logic
-* No data fetching
+* React Hook Form
+* Valibot ONLY
+* Validate on server + client
 
 ---
 
-### Hooks Layer (`hooks/`, `features/*/hooks`)
+# 13) CODING STANDARDS
 
-* Handle state & side effects
-* Encapsulate reusable logic
-
----
-
-### Service Layer (`services/`) (MANDATORY)
-
-* Business logic
-* Supabase queries
-* Enforce `workspace_id`
-* Apply RBAC via policies
-* Handle errors
-* Transform data
-
-DO NOT:
-
-* Call Supabase directly from UI
-* Skip tenant filtering
+* TypeScript strict
+* No any
+* Small components
+* Clear naming
+* No monolith files
 
 ---
 
-### Policy Layer (`policies/`)
+# 14) REQUIRED PATTERNS
 
-* RBAC validation
-* Ownership checks
-* Business rule enforcement
-
----
-
-### Middleware (`middleware.ts`)
-
-* Auth validation
-* Workspace access guard
+* optimistic updates
+* debouncing search
+* reset state on workspace switch
 
 ---
 
-## ⚙️ Rendering Strategy
+# 15) ANTI-PATTERNS (FORBIDDEN)
 
-* Server Components → default
-* Client Components → only when needed
-* Server Actions → for mutations
-
----
-
-## 🌐 Data Fetching Rules
-
-* Prefer Server Components
-* Always fetch via services
-* Never fetch directly from UI
+* Missing workspace_id
+* Business logic in UI
+* Direct DB access from UI
+* Hardcoded roles
+* Client-side authorization
+* Bypassing RLS
+* Cross-tenant access
 
 ---
 
-## 📁 Project Structure (SOURCE OF TRUTH)
+# 16) IMPLEMENTATION DEFAULT
 
-* `app/` → routing
-* `features/` → business modules
-* `components/` → UI
-* `hooks/` → shared logic
-* `services/` → business logic
-* `policies/` → RBAC
-* `lib/` → utilities
-* `config/` → roles & permissions
-* `types/` → global types
-* `middleware.ts` → auth + tenant guard
+Always generate:
 
-Feature structure:
-
-```id="archfeat"
-feature/
-  ├── components/
-  ├── hooks/
-  ├── services/
-  └── types.ts
-```
-
----
-
-## 🛡️ Security Flow
-
-```id="archsec2"
-Request
-  ↓
-middleware.ts (auth + workspace)
-  ↓
-policy (RBAC)
-  ↓
-service layer
-  ↓
-database query (with workspace_id)
-```
-
----
-
-## 🚫 Strict Rules
-
-* NEVER query database in UI
-* ALWAYS use service layer
-* ALWAYS enforce `workspace_id`
-* ALWAYS validate via policy
-
----
-
-# 🧼 CONVENTIONS
-
-## 🔤 Naming Conventions
-
-* Components → PascalCase
-* Hooks → useXxx
-* Services → xxx.service.ts
-* Policies → xxx.policy.ts
-* Types → xxx.types.ts
-
----
-
-## 🧠 Code Style
-
-* TypeScript strict (NO `any`)
-* Use async/await
-* Prefer `const`
-* Use arrow functions
-* Prefer named exports
-
----
-
-## 📦 Feature Structure
-
-```id="convfeat2"
-feature/
-  ├── components/
-  ├── hooks/
-  ├── services/
-  └── types.ts
-```
-
----
-
-## 🎨 UI Rules
-
-* Use Tailwind CSS + shadcn/ui
-* No business logic in UI
-* No direct data access
-* Keep components small & reusable
-* Prefer existing components
-
-Must handle:
-
-* loading state
-* error state
-
----
-
-## ⚙️ Hooks Rules
-
-* Extract reusable logic
-* Avoid unnecessary global state
-* Keep hooks focused
-
----
-
-## 🧬 Database Rules
-
-Location:
-
-```id="convdb2"
-db/migrations/
-db/seed/
-```
-
-Rules:
-
-* Use SQL (Supabase)
-* Never modify existing migration
-* Seeder must be idempotent
-
----
-
-## ⚠️ Anti-Patterns
-
-* Direct Supabase calls in components
-* Skipping `workspace_id`
-* Skipping RBAC validation
-* Mixing UI & business logic
-* Hardcoding values
-
----
-
-## 🚀 Best Practices
-
-* Reuse hooks instead of duplicating logic
-* Keep functions small and focused
-* Prefer readability over complexity
-* Follow existing patterns before creating new ones
+* Secure
+* Tenant-safe
+* Scalable
+* Feature-based
+* Server-first

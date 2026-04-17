@@ -22,7 +22,8 @@ It enables companies to streamline purchase orders, approvals, and shipment trac
 
 * **Frontend**: Next.js (App Router), TypeScript
 * **UI**: Tailwind CSS, Shadcn UI
-* **Backend**: Supabase (Auth + Database)
+* **Forms & Validation**: React Hook Form, Valibot
+* **Backend**: Supabase (Auth) + Drizzle (Database)
 * **Deployment**: Vercel
 
 ---
@@ -126,15 +127,6 @@ npm run lint     # Lint code
 
 * All business rules and AI context are defined in `.github/copilot-instructions.md`
 * Feature-level logic is defined in `.github/instructions/*`
-
----
-
-## 📈 Roadmap
-
-* Notifications system
-* Multi-level approval
-* Third-party logistics integration
-* Payment integration
 
 ---
 
