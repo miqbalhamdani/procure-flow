@@ -45,11 +45,10 @@ npm install
 
 ### 3. Setup environment variables
 
-Create `.env.local`:
+Copy the example file and fill in your values:
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```bash
+cp .env.example .env
 ```
 
 ### 4. Run development server
