@@ -22,7 +22,8 @@ It enables companies to streamline purchase orders, approvals, and shipment trac
 
 * **Frontend**: Next.js (App Router), TypeScript
 * **UI**: Tailwind CSS, Shadcn UI
-* **Backend**: Supabase (Auth + Database)
+* **Forms & Validation**: React Hook Form, Valibot
+* **Backend**: Supabase (Auth) + Drizzle (Database)
 * **Deployment**: Vercel
 
 ---
@@ -44,11 +45,10 @@ npm install
 
 ### 3. Setup environment variables
 
-Create `.env.local`:
+Copy the example file and fill in your values:
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```bash
+cp .env.example .env
 ```
 
 ### 4. Run development server
@@ -126,15 +126,6 @@ npm run lint     # Lint code
 
 * All business rules and AI context are defined in `.github/copilot-instructions.md`
 * Feature-level logic is defined in `.github/instructions/*`
-
----
-
-## 📈 Roadmap
-
-* Notifications system
-* Multi-level approval
-* Third-party logistics integration
-* Payment integration
 
 ---
 

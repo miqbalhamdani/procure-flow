@@ -1,301 +1,274 @@
-# 🧠 Copilot Instructions — ProcureFlow
+# ProcureFlow — GitHub Copilot Instructions (Final + Super Admin)
+
+You are a senior engineer building ProcureFlow, a production-grade multi-tenant B2B SaaS.
 
 ---
 
-## 📦 1. Product Context
+# 1) THINKING PRIORITY (MANDATORY)
 
-ProcureFlow is a **B2B multi-tenant SaaS** for procurement & shipment.
+Always think in this order:
 
-Core modules:
+1. Tenant isolation
+2. RBAC / authorization
+3. Business rules
+4. Data integrity
+5. UX
 
-* Dashboard
-* Suppliers
-* Purchase Orders
-* Shipments
-* Billing
-* Companies (multi-tenant)
-* Users
-
-Multi-tenant model:
-
-* 1 workspace = 1 company
-* Supports parent → child (max 2 levels)
+Never skip this order.
 
 ---
 
-## 🔐 2. Critical Rules
+# 2) CORE ARCHITECTURE
 
-These rules are NON-NEGOTIABLE:
+## Tech Stack (STRICT)
 
-* ALWAYS include `workspace_id` in every query
+* Next.js App Router
+* Server Components (default)
+* Server Actions (for mutations)
+* Supabase (Auth + DB + RLS)
+* Drizzle ORM (CRUD, migrations, seeder)
+* Tailwind CSS
+* shadcn/ui
+* React Hook Form + Valibot
+
+---
+
+# 3) MULTI-TENANT RULES (CRITICAL)
+
+* Every table MUST include `workspace_id`
+* Every query MUST filter by `workspace_id`
 * NEVER allow cross-workspace access
-* ALWAYS validate RBAC via policies
-* NEVER query database from UI/components
-* ALWAYS use service layer
+* Parent can view child data (via policy)
+* Child CANNOT access parent data
 
-Hierarchy rules:
-
-* Parent → can access child data
-* Child → only its own data
-
-Supplier restriction:
-
-```sql
-purchase_orders WHERE supplier_id = current_supplier_id
-```
+Supabase RLS is the source of truth.
 
 ---
 
-## 🏗️ 3. Tech Stack
+# 4) RBAC RULES (UPDATED)
 
-* Next.js (App Router)
-* TypeScript (strict)
-* Tailwind CSS + shadcn/ui
-* Supabase (Auth + DB)
-* Vercel
+## Roles
 
----
-
-## 📁 4. Project Structure
-
-* `app/` → routing
-* `features/` → business modules (MAIN SOURCE)
-* `components/` → UI only
-* `hooks/` → reusable logic
-* `services/` → business + DB logic
-* `policies/` → RBAC enforcement
-* `lib/` → utilities (supabase, auth, helpers)
-* `config/` → roles & permissions
-* `types/` → global types
-* `middleware.ts` → auth + workspace guard
-
-Feature structure:
-
-```
-feature/
-  ├── components/
-  ├── hooks/
-  ├── services/
-  └── types.ts
-```
-
----
-
-## 🧩 5. Architecture
-
-```
-UI Component
-  ↓
-Feature Hook
-  ↓
-Service Layer
-  ↓
-Policy (RBAC)
-  ↓
-Supabase (with workspace filter)
-```
-
-Rules:
-
-* Server Components → default
-* Client Components → only if needed
-* Server Actions → for mutations
-
----
-
-## 🔄 6. Service Layer
-
-All business logic MUST go through `/services`.
-
-Responsibilities:
-
-* Supabase queries
-* Enforce `workspace_id`
-* Apply policies
-* RBAC validation
-* Data transformation
-* Error handling
-
-DO NOT:
-
-* Call Supabase directly from UI
-* Skip tenant filtering
-
----
-
-## 🛡️ 7. RBAC & Policies
-
-Roles:
-
-* Admin
+* Super Admin (platform-level)
+* Admin (workspace-level)
 * Manager
 * Procurement
 * Logistics
 * Supplier
 * Viewer
 
-Rules:
+---
 
-* Defined in `config/roles.ts` & `permissions.ts`
-* ALWAYS validate via `/policies`
-* DENY if unauthorized
+## Core Rules
+
+* Always validate role on server
+* NEVER trust frontend
+* All permission logic MUST be in `policies/`
+* NEVER hardcode permissions in UI
 
 ---
 
-## 🌐 8. Data Fetching Strategy
+## Super Admin Rules (CRITICAL)
 
-* Prefer Server Components
-* Use services for all data access
-* Client fetch only for interactivity
+* NOT tied to workspace
+* Has global access
+* Can:
 
----
-
-## 🔐 9. Authentication Flow
-
-1. Login via Supabase Auth
-2. Session stored (server/client)
-3. Middleware validates:
-
-   * Auth
-   * Workspace access
+  * Create workspace
+  * Add users to workspace
+  * Assign Admin role
 
 ---
 
-## ⚙️ 10. Middleware Responsibilities
+## Admin Rules (UPDATED)
 
-* Protect routes
-* Validate session
-* Validate workspace access
+* Scoped to workspace via `memberships`
+* Has full access ONLY inside workspace
+* Cannot:
+
+  * Create workspace
+  * Assign users across workspace
 
 ---
 
-## 🔄 11. Business Rules
+## Permission Strategy
 
-### Purchase Order
+* Super Admin → bypass all checks
+* Others → must pass:
+
+  * workspace_id match
+  * role validation
+
+---
+
+# 5) FEATURE-BASED ARCHITECTURE (MANDATORY)
+
+Each domain MUST follow:
+
+features/
+└── <module>/
+├── components/
+├── hooks/
+├── services/
+├── types.ts
+└── index.ts
+
+---
+
+# 6) GLOBAL VS FEATURE RESPONSIBILITY
+
+## Global
+
+* cross-feature logic
+* shared utilities
+* generic components
+
+## Feature
+
+* module-specific logic
+* module UI
+* module services
+
+Rule:
+→ Prefer feature first
+
+---
+
+# 7) PROJECT STRUCTURE (STRICT)
+
+* app/ → routing only
+* features/ → business logic
+* components/ → shared UI
+* hooks/ → global hooks
+* services/ → cross-feature only
+* db/ → Drizzle schema
+* policies/ → RBAC enforcement
+* lib/ → utilities
+
+---
+
+# 8) DATA ACCESS RULES
+
+Flow:
+
+Server Component / Action
+→ feature service
+→ policy check
+→ db query
+
+NEVER:
+
+* call DB from UI
+* bypass service layer
+
+---
+
+# 9) WORKSPACE RULES (NEW - CRITICAL)
+
+* User MUST belong to workspace via `memberships`
+* EXCEPTION: Super Admin
+
+---
+
+## Workspace Creation
+
+* ONLY Super Admin can create workspace
+* Workspace MUST have at least 1 Admin
+
+---
+
+## Membership Rules
+
+* User can belong to multiple workspaces
+* Role is stored in `memberships`
+* All access MUST resolve from membership
+
+---
+
+# 10) DOMAIN RULES
+
+## Purchase Order
 
 * Draft → Submitted → Approved / Rejected
-* ONLY approved PO can create shipment
+* Only Approved PO → Shipment
 
-### Shipment
+## Shipment
 
 * Pending → In Transit → Delivered
-* NO backward transition
+* No backward transition
 
-### Supplier
+## Supplier
 
-* Can view assigned PO only
-* Can set shipment → In Transit
+* Only see assigned PO
+* Cannot approve
+* Cannot access workspace settings
 
----
+## Billing
 
-## ⚙️ 12. Data Access Rules
-
-* ALWAYS pass `workspace_id`
-* ALWAYS go through services
-
-Example services:
-
-* `purchaseOrder.service.ts`
-* `shipment.service.ts`
-* `supplier.service.ts`
+* Enforce limits on server
+* Block when limit reached
 
 ---
 
-## 🎨 13. UI Rules
+# 11) UI RULES
 
-UI = PRESENTATIONAL ONLY
+* Components = UI only
+* No business logic in components
+* Server Components by default
+* Client Components only when needed
 
-* NO business logic
-* NO direct data access
-* Use Tailwind + shadcn/ui
+Always handle:
 
-Structure:
-
-* `components/ui` → base
-* `components/shared` → reusable
-* `components/features` → feature-specific
-
-Must handle:
-
-* loading state
-* error state
+* loading
+* error
+* empty state
 
 ---
 
-## ⚙️ 14. Hooks
+# 12) FORMS & VALIDATION
 
-Responsibilities:
-
-* Encapsulate UI logic
-* Handle state & side effects
-* Reuse logic across components
-
-Global hooks:
-
-* `useAuth()`
-* `useWorkspace()`
-* `useCompanyContext()`
-* `usePermissions()`
+* React Hook Form
+* Valibot ONLY
+* Validate on server + client
 
 ---
 
-## 🛡️ 15. Policies
+# 13) CODING STANDARDS
 
-Handle:
-
-* Role permission
-* Ownership validation
-* Business rules enforcement
-
----
-
-## 🧬 16. Database (Migration & Seeder)
-
-Location:
-
-```
-db/migrations/
-db/seed/
-```
-
-Rules:
-
-* Use SQL (Supabase)
-* NEVER modify old migration
-* Seeder must be idempotent
+* TypeScript strict
+* No any
+* Small components
+* Clear naming
+* No monolith files
 
 ---
 
-## 🧼 17. Coding Conventions
+# 14) REQUIRED PATTERNS
 
-* TypeScript strict (NO `any`)
-* Use async/await
-* Prefer `const`
-* Named exports
-
-Naming:
-
-* Components → PascalCase
-* Hooks → useXxx
-* Services → xxx.service.ts
-* Policies → xxx.policy.ts
-* Types → xxx.types.ts
+* optimistic updates
+* debouncing search
+* reset state on workspace switch
 
 ---
 
-## 🚫 18. Anti-Patterns
+# 15) ANTI-PATTERNS (FORBIDDEN)
 
-* Direct Supabase calls in components
-* Skipping `workspace_id`
-* Skipping RBAC validation
-* Mixing UI & business logic
-* Hardcoding values
+* Missing workspace_id
+* Business logic in UI
+* Direct DB access from UI
+* Hardcoded roles
+* Client-side authorization
+* Bypassing RLS
+* Cross-tenant access
 
 ---
 
-## 🚀 19. Scalability Principles
+# 16) IMPLEMENTATION DEFAULT
 
-* Feature-based architecture
-* Loose coupling
-* Reusable components/hooks
-* Independent services
+Always generate:
+
+* Secure
+* Tenant-safe
+* Scalable
+* Feature-based
+* Server-first
