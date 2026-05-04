@@ -19,7 +19,7 @@ export async function listWorkspacesForSuperAdmin(
 
   const { data, error, count } = await supabase
     .from("workspaces")
-    .select("id, name, parent_id", { count: "exact" })
+    .select("id, name, parent_id, address, country", { count: "exact" })
     .order("created_at", { ascending: true })
     .range(rangeFrom, rangeTo);
 

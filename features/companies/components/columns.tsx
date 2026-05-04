@@ -23,38 +23,32 @@ export const columns: ColumnDef<WorkspaceSummary>[] = [
           )}
           <div>
             <p className="text-sm font-bold text-on-background">{workspace.name}</p>
-            {!isParent && (
-              <p className="text-[10px] font-medium text-on-surface-variant">
-                Regional Subsidiary
-              </p>
-            )}
+            <p className={isParent
+              ? "text-[10px] font-black uppercase tracking-tighter text-tertiary"
+              : "text-[10px] font-medium text-on-surface-variant"
+            }>
+              {isParent ? "Parent Entity" : "Regional Subsidiary"}
+            </p>
           </div>
         </div>
       );
     },
   },
   {
-    accessorKey: "parent_id",
-    header: "Type",
-    cell: ({ row }) => {
-      const isParent = !row.original.parent_id;
-      return isParent ? (
-        <span className="text-[10px] font-black uppercase tracking-tighter text-tertiary">
-          Parent Entity
-        </span>
-      ) : (
-        <span className="text-[10px] font-medium uppercase tracking-tight text-on-surface-variant">
-          Subsidiary
-        </span>
-      );
-    },
+    accessorKey: "address",
+    header: "Address",
+    cell: ({ row }) => (
+      <span className="text-sm text-on-surface-variant">
+        {row.original.address ?? <span className="italic text-on-surface-variant/50">—</span>}
+      </span>
+    ),
   },
   {
-    accessorKey: "id",
-    header: "Workspace ID",
+    accessorKey: "country",
+    header: "Country",
     cell: ({ row }) => (
-      <span className="rounded-md bg-surface-container px-2 py-1 font-mono text-xs text-on-surface-variant">
-        {row.original.id}
+      <span className="text-sm text-on-surface-variant">
+        {row.original.country ?? <span className="italic text-on-surface-variant/50">—</span>}
       </span>
     ),
   },
