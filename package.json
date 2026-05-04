@@ -17,6 +17,7 @@
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.101.1",
     "@tabler/icons-react": "^3.41.1",
+    "@tanstack/react-table": "^8.21.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
