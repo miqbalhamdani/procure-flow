@@ -2,6 +2,7 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import type { WorkspaceSummary } from "@/features/companies/types";
+import { findCountryByName, flagUrl } from "@/lib/countries";
 
 export const columns: ColumnDef<WorkspaceSummary>[] = [
   {
@@ -46,11 +47,25 @@ export const columns: ColumnDef<WorkspaceSummary>[] = [
   {
     accessorKey: "country",
     header: "Country",
-    cell: ({ row }) => (
-      <span className="text-sm text-on-surface-variant">
-        {row.original.country ?? <span className="italic text-on-surface-variant/50">—</span>}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const name = row.original.country;
+      if (!name) return <span className="italic text-on-surface-variant/50">—</span>;
+      const country = findCountryByName(name);
+      return (
+        <span className="flex items-center gap-2">
+          {country && (
+            <img
+              src={flagUrl(country.code)}
+              alt={name}
+              width={20}
+              height={15}
+              className="flex-shrink-0 rounded-sm object-cover shadow-sm"
+            />
+          )}
+          <span className="text-sm text-on-surface-variant">{name}</span>
+        </span>
+      );
+    },
   },
   {
     id: "actions",

@@ -8,4 +8,6 @@ export type WorkspaceSummary = {
   country: string | null;
 };
 
+export type ParentWorkspaceOption = Pick<WorkspaceSummary, "id" | "name">;
+
 export type PaginatedWorkspaces = Paginated<WorkspaceSummary>;

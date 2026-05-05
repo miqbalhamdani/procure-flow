@@ -11,21 +11,56 @@ export async function listWorkspacesForSuperAdmin(
 ): Promise<PaginatedWorkspaces> {
   const user = await getCurrentUser();
 
+  if (!user?.isSuperAdmin) {
+    throw new Error("Unauthorized");
+  }
+
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
   const rangeFrom = (page - 1) * pageSize;
   const rangeTo = rangeFrom + pageSize - 1;
 
-  const { data, error, count } = await supabase
+  // 1. Paginate over parent workspaces only
+  const { data: parents, error: parentsError, count } = await supabase
     .from("workspaces")
     .select("id, name, parent_id, address, country", { count: "exact" })
-    .order("created_at", { ascending: true })
+    .is("parent_id", null)
     .range(rangeFrom, rangeTo);
 
-  if (error) {
-    throw new Error(error.message);
+  if (parentsError) {
+    throw new Error(parentsError.message);
   }
 
-  return buildPaginated<WorkspaceSummary>(data ?? [], count ?? 0, page, pageSize);
+  const parentIds = (parents ?? []).map((p) => p.id);
+
+  // 2. Fetch all children belonging to this page's parents
+  const { data: children, error: childrenError } = parentIds.length > 0
+    ? await supabase
+        .from("workspaces")
+        .select("id, name, parent_id, address, country")
+        .in("parent_id", parentIds)
+        .order("name", { ascending: true })
+    : { data: [], error: null };
+
+  if (childrenError) {
+    throw new Error(childrenError.message);
+  }
+
+  // 3. Interleave: parent → its children → next parent → …
+  const childrenByParent = new Map<string, WorkspaceSummary[]>();
+  for (const child of children ?? []) {
+    const list = childrenByParent.get(child.parent_id!) ?? [];
+    list.push(child);
+    childrenByParent.set(child.parent_id!, list);
+  }
+
+  const rows: WorkspaceSummary[] = [];
+  for (const parent of parents ?? []) {
+    rows.push(parent);
+    const kids = childrenByParent.get(parent.id) ?? [];
+    rows.push(...kids);
+  }
+
+  return buildPaginated<WorkspaceSummary>(rows, count ?? 0, page, pageSize);
 }

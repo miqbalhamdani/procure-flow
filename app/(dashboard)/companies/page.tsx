@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { BaseTable } from "@/components/ui/base-table";
 import { columns } from "@/features/companies/components/columns";
+import { CreateCompanyModal } from "@/features/companies/components/create-company-modal";
 import { listWorkspacesForSuperAdmin } from "@/features/companies/services/company-service";
 
 export default async function CompaniesPage({
@@ -45,13 +46,7 @@ export default async function CompaniesPage({
             Manage your corporate hierarchy and entity locations.
           </p>
         </div>
-        <button
-          type="button"
-          className="editorial-gradient flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-transform hover:scale-[1.02] active:scale-[0.98]"
-        >
-          <span className="material-symbols-outlined text-[18px] leading-none">add</span>
-          <span>Add Company</span>
-        </button>
+        <CreateCompanyModal />
       </div>
 
       {/* Error banner */}
