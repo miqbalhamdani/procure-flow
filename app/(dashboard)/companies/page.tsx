@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { BaseTable } from "@/components/ui/base-table";
 import { columns } from "@/features/companies/components/columns";
-import { CreateCompanyModal } from "@/features/companies/components/create-company-modal";
+import { CompanyModal } from "@/features/companies/components/company-modal";
 import { listWorkspacesForSuperAdmin } from "@/features/companies/services/company-service";
 
 export default async function CompaniesPage({
@@ -46,7 +46,7 @@ export default async function CompaniesPage({
             Manage your corporate hierarchy and entity locations.
           </p>
         </div>
-        <CreateCompanyModal />
+        <CompanyModal />
       </div>
 
       {/* Error banner */}

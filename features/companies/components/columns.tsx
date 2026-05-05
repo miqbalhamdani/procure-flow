@@ -1,8 +1,10 @@
 "use client";
 
 import type { ColumnDef } from "@tanstack/react-table";
+
 import type { WorkspaceSummary } from "@/features/companies/types";
 import { findCountryByName, flagUrl } from "@/lib/countries";
+import { ActionsCell } from "@/components/ui/actions-cell";
 
 export const columns: ColumnDef<WorkspaceSummary>[] = [
   {
@@ -70,14 +72,6 @@ export const columns: ColumnDef<WorkspaceSummary>[] = [
   {
     id: "actions",
     header: "Actions",
-    cell: () => (
-      <button
-        type="button"
-        className="rounded-lg p-2 text-on-surface-variant transition-all hover:bg-surface-container"
-        aria-label="More actions"
-      >
-        <span className="material-symbols-outlined text-[20px] leading-none">more_vert</span>
-      </button>
-    ),
+    cell: ({ row }) => <ActionsCell workspace={row.original} />,
   },
 ];

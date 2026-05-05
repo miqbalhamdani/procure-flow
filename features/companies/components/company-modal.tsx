@@ -3,23 +3,28 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { toast } from "sonner";
 import * as v from "valibot";
 
-import { createCompany, fetchParentWorkspacesAction } from "@/features/companies/services/create-company-action";
+import {
+  createCompany,
+  updateCompany,
+  fetchParentWorkspacesAction,
+} from "@/features/companies/services/company-action";
 import { ComboboxSelect, type ComboboxOption } from "@/components/ui/combobox-select";
 import { COUNTRIES, flagUrl } from "@/lib/countries";
-import type { ParentWorkspaceOption } from "@/features/companies/types";
+import type { ParentWorkspaceOption, WorkspaceSummary } from "@/features/companies/types";
 
-const createCompanySchema = v.object({
+const companySchema = v.object({
   name: v.pipe(v.string(), v.trim(), v.minLength(1, "Company name is required")),
   address: v.optional(v.string()),
   country: v.optional(v.string()),
   parentId: v.optional(v.nullable(v.string())),
 });
 
-type FormValues = v.InferInput<typeof createCompanySchema>;
+type FormValues = v.InferInput<typeof companySchema>;
 
 const COUNTRY_OPTIONS: ComboboxOption[] = COUNTRIES.map((c) => ({
   value: c.name,
@@ -35,7 +40,8 @@ const COUNTRY_OPTIONS: ComboboxOption[] = COUNTRIES.map((c) => ({
   ),
 }));
 
-const ICON_CLASS = "material-symbols-outlined flex-shrink-0 text-[16px] leading-none text-on-surface-variant";
+const ICON_CLASS =
+  "material-symbols-outlined flex-shrink-0 text-[16px] leading-none text-on-surface-variant";
 
 const NONE_OPTION: ComboboxOption = {
   value: "",
@@ -43,16 +49,35 @@ const NONE_OPTION: ComboboxOption = {
   prefix: <span className={ICON_CLASS}>remove_circle_outline</span>,
 };
 
-interface Props {}
+// ─── Create mode (self-managed trigger) ─────────────────────────────────────
+interface CreateModeProps {
+  workspace?: undefined;
+  open?: undefined;
+  onOpenChange?: undefined;
+}
 
-export function CreateCompanyModal(_props: Props) {
+// ─── Edit mode (controlled from parent) ─────────────────────────────────────
+interface EditModeProps {
+  workspace: WorkspaceSummary;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+type Props = CreateModeProps | EditModeProps;
+
+export function CompanyModal(props: Props) {
+  const isEditMode = props.workspace !== undefined;
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = isEditMode ? props.open : internalOpen;
+  const setOpen = isEditMode ? props.onOpenChange : setInternalOpen;
+
   const [serverError, setServerError] = useState<string | null>(null);
   const [parentWorkspaces, setParentWorkspaces] = useState<ParentWorkspaceOption[]>([]);
   const [loadingParents, setLoadingParents] = useState(false);
 
-  const resolver = useMemo(() => valibotResolver(createCompanySchema), []);
+  const resolver = useMemo(() => valibotResolver(companySchema), []);
   const {
     register,
     handleSubmit,
@@ -61,18 +86,43 @@ export function CreateCompanyModal(_props: Props) {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver,
-    defaultValues: { name: "", address: "", country: "", parentId: null },
+    defaultValues: isEditMode
+      ? {
+          name: props.workspace.name,
+          address: props.workspace.address ?? "",
+          country: props.workspace.country ?? "",
+          parentId: props.workspace.parent_id,
+        }
+      : { name: "", address: "", country: "", parentId: null },
   });
 
-  const handleOpenChange = (next: boolean) => {
-    if (next) {
-      setLoadingParents(true);
-      fetchParentWorkspacesAction().then(({ data }) => {
-        setParentWorkspaces(data);
-        setLoadingParents(false);
+  // Fetch parent options & sync form whenever dialog opens
+  useEffect(() => {
+    if (!open) return;
+
+    setLoadingParents(true);
+    fetchParentWorkspacesAction().then(({ data }) => {
+      const filtered = isEditMode
+        ? data.filter((w) => w.id !== props.workspace!.id)
+        : data;
+      setParentWorkspaces(filtered);
+      setLoadingParents(false);
+    });
+
+    if (isEditMode) {
+      reset({
+        name: props.workspace.name,
+        address: props.workspace.address ?? "",
+        country: props.workspace.country ?? "",
+        parentId: props.workspace.parent_id,
       });
-    } else {
-      reset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const handleOpenChange = (next: boolean) => {
+    if (!next) {
+      if (!isEditMode) reset();
       setServerError(null);
     }
     setOpen(next);
@@ -80,27 +130,36 @@ export function CreateCompanyModal(_props: Props) {
 
   const onSubmit = handleSubmit(async (values) => {
     setServerError(null);
-    const result = await createCompany(values);
+
+    const result = isEditMode
+      ? await updateCompany({ id: props.workspace.id, ...values })
+      : await createCompany(values);
+
     if (result.error) {
       setServerError(result.error);
       return;
     }
-    reset();
+
+    toast.success(isEditMode ? "Company updated." : "Company created.");
+    if (!isEditMode) reset();
     setOpen(false);
     router.refresh();
   });
 
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
-      <Dialog.Trigger asChild>
-        <button
-          type="button"
-          className="editorial-gradient flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-transform hover:scale-[1.02] active:scale-[0.98]"
-        >
-          <span className="material-symbols-outlined text-[18px] leading-none">add</span>
-          <span>Add Company</span>
-        </button>
-      </Dialog.Trigger>
+      {/* Trigger — only in create mode */}
+      {!isEditMode && (
+        <Dialog.Trigger asChild>
+          <button
+            type="button"
+            className="editorial-gradient flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <span className="material-symbols-outlined text-[18px] leading-none">add</span>
+            <span>Add Company</span>
+          </button>
+        </Dialog.Trigger>
+      )}
 
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-[100] bg-[#131b2e]/40 backdrop-blur-sm" />
@@ -110,16 +169,18 @@ export function CreateCompanyModal(_props: Props) {
             <div className="flex items-center justify-between px-8 pb-6 pt-8">
               <div>
                 <Dialog.Title className="text-2xl font-extrabold tracking-tight text-on-background">
-                  Add New Company
+                  {isEditMode ? "Edit Company" : "Add New Company"}
                 </Dialog.Title>
                 <Dialog.Description className="mt-1 text-sm text-on-surface-variant">
-                  Configure details for your new procurement entity.
+                  {isEditMode
+                    ? "Update the details for this procurement entity."
+                    : "Configure details for your new procurement entity."}
                 </Dialog.Description>
               </div>
               <Dialog.Close asChild>
                 <button
                   type="button"
-                  className="rounded-full p-2 transition-colors hover:bg-surface-container"
+                  className="flex size-9 items-center justify-center rounded-full transition-colors hover:bg-surface-container"
                   aria-label="Close"
                 >
                   <span className="material-symbols-outlined text-on-surface-variant">close</span>
@@ -242,7 +303,13 @@ export function CreateCompanyModal(_props: Props) {
                   className="relative group overflow-hidden rounded-xl bg-gradient-to-br from-primary to-primary-container px-8 py-3 font-bold text-white shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:scale-100 disabled:opacity-60"
                 >
                   <span className="relative z-10">
-                    {isSubmitting ? "Creating…" : "Create Entity"}
+                    {isSubmitting
+                      ? isEditMode
+                        ? "Saving…"
+                        : "Creating…"
+                      : isEditMode
+                      ? "Save Changes"
+                      : "Create Entity"}
                   </span>
                   <div className="absolute inset-0 bg-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
                 </button>

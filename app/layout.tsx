@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Inter, Manrope } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/shadcn-ui/sonner";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -33,6 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={cn(
         "h-full antialiased",
         manrope.variable,
@@ -47,7 +50,10 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col font-body bg-surface text-on-surface">
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
