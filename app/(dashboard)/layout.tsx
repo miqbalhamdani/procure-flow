@@ -1,18 +1,23 @@
 import type { ReactNode } from "react";
 
-import { LogoutButton } from "@/features/auth/components/logout-button";
+import { DashboardHeader } from "@/components/layout/dashboard-header";
+import { Sidebar } from "@/components/layout/sidebar";
+import { getCurrentUser } from "@/lib/auth/session";
 
 type DashboardLayoutProps = {
   children: ReactNode;
 };
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default async function DashboardLayout({ children }: DashboardLayoutProps) {
+  const user = await getCurrentUser();
+
   return (
-    <>
-      <div className="fixed top-4 right-4 z-[70]">
-        <LogoutButton />
+    <div className="min-h-screen bg-surface-container text-on-surface">
+      <Sidebar user={user} />
+      <div className="ml-64 flex min-h-screen flex-col">
+        <DashboardHeader />
+        <main className="flex-1">{children}</main>
       </div>
-      {children}
-    </>
+    </div>
   );
 }

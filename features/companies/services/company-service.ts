@@ -1,24 +1,66 @@
-import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import type { WorkspaceSummary } from "@/features/companies/types";
+import { buildPaginated } from "@/lib/pagination";
+import type { PaginatedWorkspaces, WorkspaceSummary } from "@/features/companies/types";
 
-export async function listWorkspacesForSuperAdmin(): Promise<WorkspaceSummary[]> {
+export async function listWorkspacesForSuperAdmin(
+  page: number = 1,
+  pageSize: number = 10,
+): Promise<PaginatedWorkspaces> {
   const user = await getCurrentUser();
+
+  if (!user?.isSuperAdmin) {
+    throw new Error("Unauthorized");
+  }
 
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
-  const { data, error } = await supabase
-    .from("workspaces")
-    .select("id, name, parent_id")
-    .order("created_at", { ascending: true });
+  const rangeFrom = (page - 1) * pageSize;
+  const rangeTo = rangeFrom + pageSize - 1;
 
-  if (error) {
-    throw new Error(error.message);
+  // 1. Paginate over parent workspaces only
+  const { data: parents, error: parentsError, count } = await supabase
+    .from("workspaces")
+    .select("id, name, parent_id, address, country", { count: "exact" })
+    .is("parent_id", null)
+    .range(rangeFrom, rangeTo);
+
+  if (parentsError) {
+    throw new Error(parentsError.message);
   }
 
-  return (data ?? []) as WorkspaceSummary[];
+  const parentIds = (parents ?? []).map((p) => p.id);
+
+  // 2. Fetch all children belonging to this page's parents
+  const { data: children, error: childrenError } = parentIds.length > 0
+    ? await supabase
+        .from("workspaces")
+        .select("id, name, parent_id, address, country")
+        .in("parent_id", parentIds)
+        .order("name", { ascending: true })
+    : { data: [], error: null };
+
+  if (childrenError) {
+    throw new Error(childrenError.message);
+  }
+
+  // 3. Interleave: parent → its children → next parent → …
+  const childrenByParent = new Map<string, WorkspaceSummary[]>();
+  for (const child of children ?? []) {
+    const list = childrenByParent.get(child.parent_id!) ?? [];
+    list.push(child);
+    childrenByParent.set(child.parent_id!, list);
+  }
+
+  const rows: WorkspaceSummary[] = [];
+  for (const parent of parents ?? []) {
+    rows.push(parent);
+    const kids = childrenByParent.get(parent.id) ?? [];
+    rows.push(...kids);
+  }
+
+  return buildPaginated<WorkspaceSummary>(rows, count ?? 0, page, pageSize);
 }
