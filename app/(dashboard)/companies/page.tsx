@@ -59,7 +59,6 @@ export default async function CompaniesPage({
       {/* Table card + pagination */}
       <Suspense>
         <BaseTable
-          title="Entity Directory"
           columns={columns}
           data={data}
           emptyMessage="No companies available."

@@ -108,7 +108,6 @@ Each domain MUST follow:
 features/
 └── <module>/
 ├── components/
-├── hooks/
 ├── services/
 ├── types.ts
 └── index.ts
@@ -139,7 +138,6 @@ Rule:
 * app/ → routing only
 * features/ → business logic
 * components/ → shared UI
-* hooks/ → global hooks
 * services/ → cross-feature only
 * db/ → Drizzle schema
 * policies/ → RBAC enforcement
@@ -216,6 +214,29 @@ NEVER:
 * No business logic in components
 * Server Components by default
 * Client Components only when needed
+* Always follow DESIGN.instructions.md.
+
+### UI LIBRARY
+
+- MUST use shadcn/ui
+- NEVER build base UI from scratch (button, input, dialog, etc.)
+
+### COMPONENT LOCATION
+
+- Shared UI → /components/ui
+- Shadcn UI → /components/shadcn-ui
+- Feature UI → /features/<module>/components
+
+### STYLING
+
+- Tailwind only
+- Follow design spacing rules
+- No arbitrary values unless justified
+
+### CONSISTENCY
+
+- Match existing UI patterns
+- Reuse components before creating new ones
 
 Always handle:
 

@@ -316,9 +316,6 @@ export function CompanyModal(props: Props) {
               </div>
             </form>
 
-            {/* Decorative blobs */}
-            <div className="pointer-events-none absolute -mr-16 -mt-16 right-0 top-0 h-32 w-32 rounded-full bg-primary/5 blur-2xl" />
-            <div className="pointer-events-none absolute -ml-12 -mb-12 bottom-0 left-0 h-24 w-24 rounded-full bg-secondary/5 blur-xl" />
           </div>
         </Dialog.Content>
       </Dialog.Portal>

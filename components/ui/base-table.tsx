@@ -6,7 +6,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -19,7 +19,6 @@ import type { PaginationMeta } from "@/lib/pagination";
 import { TablePagination } from "@/components/ui/table-pagination";
 
 type BaseTableProps<TData> = {
-  title: string;
   columns: ColumnDef<TData>[];
   data: TData[];
   emptyMessage?: string;
@@ -28,7 +27,6 @@ type BaseTableProps<TData> = {
 };
 
 export function BaseTable<TData>({
-  title,
   columns,
   data,
   emptyMessage = "No data available.",
@@ -37,6 +35,7 @@ export function BaseTable<TData>({
 }: BaseTableProps<TData>) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const table = useReactTable({
     data,
@@ -51,17 +50,18 @@ export function BaseTable<TData>({
   const canPreviousPage = (pagination?.current_page ?? 1) > 1;
   const canNextPage = (pagination?.current_page ?? 1) < (pagination?.last_page ?? 0);
 
-  const handlePreviousPage = () => router.push(`${pathname}?page=${(pagination?.current_page ?? 1) - 1}`);
-  const handleNextPage = () => router.push(`${pathname}?page=${(pagination?.current_page ?? 1) + 1}`);
-  const handlePageClick = (page: number) => router.push(`${pathname}?page=${page + 1}`);
+  const navigateToPage = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(page));
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const handlePreviousPage = () => navigateToPage((pagination?.current_page ?? 1) - 1);
+  const handleNextPage = () => navigateToPage((pagination?.current_page ?? 1) + 1);
+  const handlePageClick = (page: number) => navigateToPage(page + 1);
 
   return (
     <div className="overflow-hidden rounded-3xl border border-outline-variant/5 bg-surface-container-lowest shadow-sm">
-      {/* Card header */}
-      <div className="flex items-center justify-between border-b border-outline-variant/5 px-8 py-6">
-        <h3 className="font-headline text-lg font-bold text-on-background">{title}</h3>
-      </div>
-
       {/* Table */}
       <Table>
         <TableHeader>
@@ -126,7 +126,7 @@ export function BaseTable<TData>({
       </Table>
 
       {/* Pagination footer */}
-      {pagination.total > 0 && (
+      {pagination != null && pagination.total > 0 && (
         <TablePagination
           from={pagination.from}
           to={pagination.to}
@@ -143,4 +143,3 @@ export function BaseTable<TData>({
     </div>
   );
 }
-

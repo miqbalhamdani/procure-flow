@@ -2,9 +2,11 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 
+import { ActionsCell } from "@/components/ui/actions-cell";
+import { CompanyModal } from "@/features/companies/components/company-modal";
+import { deleteCompany } from "@/features/companies/services/company-action";
 import type { WorkspaceSummary } from "@/features/companies/types";
 import { findCountryByName, flagUrl } from "@/lib/countries";
-import { ActionsCell } from "@/components/ui/actions-cell";
 
 export const columns: ColumnDef<WorkspaceSummary>[] = [
   {
@@ -72,6 +74,28 @@ export const columns: ColumnDef<WorkspaceSummary>[] = [
   {
     id: "actions",
     header: "Actions",
-    cell: ({ row }) => <ActionsCell workspace={row.original} />,
+    cell: ({ row }) => {
+      const workspace = row.original;
+
+      return (
+        <ActionsCell
+          editAction={{
+            type: "modal",
+            render: ({ open, onOpenChange }) => (
+              <CompanyModal
+                workspace={workspace}
+                open={open}
+                onOpenChange={onOpenChange}
+              />
+            ),
+          }}
+          deleteAction={{
+            resourceName: "Company",
+            itemName: workspace.name,
+            onConfirm: async () => deleteCompany(workspace.id),
+          }}
+        />
+      );
+    },
   },
 ];

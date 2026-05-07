@@ -13,9 +13,11 @@ export function getPostLoginPath(user: SessionUser): string {
   return user.isSuperAdmin ? "/companies" : "/dashboard";
 }
 
-export async function getCurrentUser(): Promise<SessionUser | null> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+export async function getCurrentUser(
+  existingClient?: ReturnType<typeof createClient>,
+): Promise<SessionUser | null> {
+  const supabase =
+    existingClient ?? createClient(await cookies());
 
   const {
     data: { user },

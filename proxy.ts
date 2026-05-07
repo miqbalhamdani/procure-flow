@@ -7,9 +7,15 @@ export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   const isLoginRoute = pathname === "/login";
-  const isProtectedRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/companies");
-
-  console.log("Middleware session update:", { user, pathname });
+  const protectedPrefixes = [
+    "/dashboard",
+    "/companies",
+    "/users",
+    "/suppliers",
+    "/purchase-orders",
+    "/billing",
+  ];
+  const isProtectedRoute = protectedPrefixes.some((prefix) => pathname.startsWith(prefix));
 
   if (!user && isProtectedRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
@@ -30,5 +36,13 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/login", "/dashboard/:path*", "/companies/:path*"],
+  matcher: [
+    "/login",
+    "/dashboard/:path*",
+    "/companies/:path*",
+    "/users/:path*",
+    "/suppliers/:path*",
+    "/purchase-orders/:path*",
+    "/billing/:path*",
+  ],
 };
