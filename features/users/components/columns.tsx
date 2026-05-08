@@ -16,7 +16,7 @@ export const columns: ColumnDef<UserSummary>[] = [
       return (
         <div className="flex items-center gap-4">
           <div className="flex size-10 flex-shrink-0 items-center justify-center rounded-xl bg-secondary-container text-sm font-bold text-primary">
-            {getInitials(name, email)}
+            {getInitials(name)}
           </div>
           <span className="font-semibold text-on-background">{name ?? <span className="italic text-outline">—</span>}</span>
         </div>

@@ -60,7 +60,7 @@ export function UserProfileForm({ user }: { user: UserDetail }) {
       <div className="flex flex-col items-center px-8 pb-6 pt-8 text-center">
         {/* Avatar */}
         <div className="flex size-24 flex-shrink-0 items-center justify-center rounded-full bg-secondary-container text-2xl font-bold text-primary ring-4 ring-primary/10">
-          {getInitials(user.name, user.email)}
+          {getInitials(user.name)}
         </div>
         <h2 className="mt-4 font-headline text-xl font-bold text-on-surface">
           {user.name ?? <span className="italic text-outline">No name</span>}

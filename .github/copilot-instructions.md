@@ -210,39 +210,103 @@ NEVER:
 
 # 11) UI RULES
 
-* Components = UI only
-* No business logic in components
-* Server Components by default
-* Client Components only when needed
-* Always follow DESIGN.instructions.md.
+### COMPONENT LOCATION (STRICT)
 
-### UI LIBRARY
+Use the correct location based on responsibility:
+* Base UI (shadcn) → `/components/shadcn-ui`
+* Shared Components → `/components/ui`
+* Layout Components → `/components/layouts`
+* Feature-specific UI → `/features/<module>/components`
 
-- MUST use shadcn/ui
-- NEVER build base UI from scratch (button, input, dialog, etc.)
+Rules:
+* NEVER duplicate components across layers
+* Prefer shared → fallback to feature → never reverse
 
-### COMPONENT LOCATION
+---
 
-- Shared UI → /components/ui
-- Shadcn UI → /components/shadcn-ui
-- Feature UI → /features/<module>/components
+### SHADCN USAGE (MANDATORY)
 
-### STYLING
+* MUST use shadcn/ui for all base components:
+  * Button
+  * Input
+  * Select
+  * Dialog
+  * Table
+  * Form
+* NEVER build base components from scratch
+* ALWAYS extend shadcn instead of replacing it
 
-- Tailwind only
-- Follow design spacing rules
-- No arbitrary values unless justified
+Allowed:
+* Wrap shadcn components
+* Compose new components using shadcn primitives
 
-### CONSISTENCY
+---
 
-- Match existing UI patterns
-- Reuse components before creating new ones
+### STYLING RULES
 
-Always handle:
+* Tailwind CSS ONLY
+* Follow design spacing system (consistent padding, gap, margin)
+* NO arbitrary values unless justified
 
-* loading
-* error
+Bad:
+
+```tsx
+className="mt-[13px]"
+```
+
+Good:
+
+```tsx
+className="mt-3"
+```
+
+---
+
+### CONSISTENCY RULES
+
+* Match existing UI patterns before creating new ones
+* Reuse components from `/components/ui` first
+* Only create new if truly needed
+
+---
+
+### STATE HANDLING (REQUIRED)
+
+Every UI MUST handle:
+
+* loading state
+* error state
 * empty state
+
+Examples:
+
+* loading → skeleton / spinner
+* empty → "No data available"
+* error → alert / message
+
+---
+
+### ANTI-PATTERNS (FORBIDDEN)
+
+* ❌ Creating custom button/input from scratch
+* ❌ Business logic inside UI
+* ❌ Hardcoding role/permission in UI
+* ❌ Direct API/DB call in component
+* ❌ Duplicate components across folders
+* ❌ Overusing `"use client"`
+
+---
+
+### IMPLEMENTATION DEFAULT
+
+Always build UI that is:
+
+* Consistent
+* Accessible
+* Reusable
+* Minimal
+* Aligned with design system
+
 
 ---
 
@@ -293,3 +357,11 @@ Always generate:
 * Scalable
 * Feature-based
 * Server-first
+
+# 17) MIGRATIONS STEPS
+
+1. Create new migration file with Drizzle CLI
+    `npm run db:generate <migration_name>`
+2. Define schema changes in migration file
+3. Run migration locally and test
+    `npm run db:migrate`
