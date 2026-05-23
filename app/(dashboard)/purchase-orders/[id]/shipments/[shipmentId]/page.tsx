@@ -61,7 +61,7 @@ export default async function ShipmentPage({ params }: Props) {
   );
 
   // RBAC for action buttons
-  let canSubmit = user.isSuperAdmin;
+  let canTransit = user.isSuperAdmin;
   let canDeliver = user.isSuperAdmin;
 
   if (!user.isSuperAdmin && user.workspaceId) {
@@ -73,7 +73,7 @@ export default async function ShipmentPage({ params }: Props) {
       .maybeSingle();
 
     const role = membership?.role ?? "";
-    canSubmit = ["admin", "manager", "supplier"].includes(role);
+    canTransit = ["admin", "manager", "supplier"].includes(role);
     canDeliver = ["admin", "manager", "logistics"].includes(role);
   }
 
@@ -177,7 +177,7 @@ export default async function ShipmentPage({ params }: Props) {
                 </h3>
                 <ShipmentActionButtons
                   shipment={shipment}
-                  canSubmit={canSubmit}
+                  canTransit={canTransit}
                   canDeliver={canDeliver}
                 />
               </section>
