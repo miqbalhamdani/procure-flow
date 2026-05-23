@@ -3,9 +3,9 @@
 import * as v from "valibot";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import type { ParentWorkspaceOption } from "@/features/companies/types";
+import { requireSuperAdmin } from "@/policies";
 
 // ─── Schemas ────────────────────────────────────────────────────────────────
 
@@ -34,8 +34,8 @@ export type CreateCompanyInput = v.InferInput<typeof createCompanySchema>;
 export type UpdateCompanyInput = v.InferInput<typeof updateCompanySchema>;
 
 export async function createCompany(input: CreateCompanyInput): Promise<{ error?: string }> {
-  const user = await getCurrentUser();
-  if (!user?.isSuperAdmin) return { error: "Unauthorized" };
+  const { error: authError } = await requireSuperAdmin();
+  if (authError) return { error: authError };
 
   const parsed = v.safeParse(createCompanySchema, input);
   if (!parsed.success) return { error: parsed.issues[0].message };
@@ -58,8 +58,8 @@ export async function createCompany(input: CreateCompanyInput): Promise<{ error?
 }
 
 export async function updateCompany(input: UpdateCompanyInput): Promise<{ error?: string }> {
-  const user = await getCurrentUser();
-  if (!user?.isSuperAdmin) return { error: "Unauthorized" };
+  const { error: authError } = await requireSuperAdmin();
+  if (authError) return { error: authError };
 
   const parsed = v.safeParse(updateCompanySchema, input);
   if (!parsed.success) return { error: parsed.issues[0].message };
@@ -85,8 +85,8 @@ export async function updateCompany(input: UpdateCompanyInput): Promise<{ error?
 }
 
 export async function deleteCompany(id: string): Promise<{ error?: string }> {
-  const user = await getCurrentUser();
-  if (!user?.isSuperAdmin) return { error: "Unauthorized" };
+  const { error: authError } = await requireSuperAdmin();
+  if (authError) return { error: authError };
 
   const parsed = v.safeParse(v.pipe(v.string(), v.uuid("Invalid company ID")), id);
   if (!parsed.success) return { error: parsed.issues[0].message };
@@ -115,8 +115,10 @@ export async function fetchParentWorkspacesAction(): Promise<{
   error: string | null;
 }> {
   try {
-    const cookieStore = await cookies();
-    const supabase = createClient(cookieStore);
+    const { error: authError, supabase } = await requireSuperAdmin();
+    if (authError || !supabase) {
+      return { data: [], error: authError ?? "Unauthorized" };
+    }
 
     const { data, error } = await supabase
       .from("workspaces")

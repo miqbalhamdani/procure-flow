@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { getCurrentUser, getCurrentWorkspaceContext } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { buildPaginated } from "@/lib/pagination";
+import { PURCHASE_ORDER_APPROVAL_ROLES, requireRoles } from "@/policies";
 import type {
   PaginatedPurchaseOrders,
   PurchaseOrderDetail,
@@ -12,8 +13,6 @@ import type {
   CompanyOption,
   SupplierOption,
 } from "@/features/purchase-orders/types";
-
-const PO_APPROVER_ROLES = new Set(["admin", "manager"]);
 
 // ─── List Purchase Orders ─────────────────────────────────────────────────────
 
@@ -189,24 +188,9 @@ export async function getPurchaseOrderById(id: string): Promise<PurchaseOrderDet
 }
 
 export async function canCurrentUserApprovePurchaseOrders(): Promise<boolean> {
-  const user = await getCurrentUser();
+  const { error } = await requireRoles(PURCHASE_ORDER_APPROVAL_ROLES);
 
-  if (!user?.workspaceId) return false;
-  if (user.isSuperAdmin) return true;
-
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-
-  const { data: membership, error } = await supabase
-    .from("memberships")
-    .select("role")
-    .eq("workspace_id", user.workspaceId)
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (error) throw new Error(error.message);
-
-  return PO_APPROVER_ROLES.has(membership?.role ?? "");
+  return error == null;
 }
 
 // ─── Company Options ──────────────────────────────────────────────────────────

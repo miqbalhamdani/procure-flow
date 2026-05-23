@@ -7,6 +7,10 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import type { CompanyOption } from "@/features/suppliers/types";
+import {
+  requireRoles,
+  SUPPLIER_MANAGEMENT_ROLES,
+} from "@/policies";
 
 // ─── Schemas ─────────────────────────────────────────────────────────────────
 
@@ -36,37 +40,13 @@ const updateSupplierSchema = v.object({
 export type CreateSupplierInput = v.InferInput<typeof createSupplierSchema>;
 export type UpdateSupplierInput = v.InferInput<typeof updateSupplierSchema>;
 
-// ─── RBAC helper ─────────────────────────────────────────────────────────────
-
-async function requireAdminOrManager() {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
-
-  if (!user) return { error: "Unauthorized" as const, supabase: null, user: null };
-  if (!user.workspaceId) return { error: "Unauthorized" as const, supabase: null, user: null };
-
-  // Super admin bypasses role check
-  if (user.isSuperAdmin) return { error: null, supabase, user };
-
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("role")
-    .eq("workspace_id", user.workspaceId)
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (!membership || !["admin", "manager"].includes(membership.role)) {
-    return { error: "Unauthorized: Admin or Manager role required" as const, supabase: null, user: null };
-  }
-
-  return { error: null, supabase, user };
-}
-
 // ─── Actions ─────────────────────────────────────────────────────────────────
 
 export async function createSupplier(input: CreateSupplierInput): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireAdminOrManager();
+  const { error: authError, supabase, user } = await requireRoles(
+    SUPPLIER_MANAGEMENT_ROLES,
+    { insufficientRoleMessage: "Unauthorized: Admin or Manager role required" },
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(createSupplierSchema, input);
@@ -92,7 +72,10 @@ export async function createSupplier(input: CreateSupplierInput): Promise<{ erro
 }
 
 export async function updateSupplier(input: UpdateSupplierInput): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireAdminOrManager();
+  const { error: authError, supabase, user } = await requireRoles(
+    SUPPLIER_MANAGEMENT_ROLES,
+    { insufficientRoleMessage: "Unauthorized: Admin or Manager role required" },
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(updateSupplierSchema, input);
@@ -131,7 +114,10 @@ export async function updateSupplier(input: UpdateSupplierInput): Promise<{ erro
 }
 
 export async function deleteSupplier(id: string): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireAdminOrManager();
+  const { error: authError, supabase, user } = await requireRoles(
+    SUPPLIER_MANAGEMENT_ROLES,
+    { insufficientRoleMessage: "Unauthorized: Admin or Manager role required" },
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(uuidSchema, id);

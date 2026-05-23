@@ -1,8 +1,5 @@
-import { cookies } from "next/headers";
-
-import { getCurrentUser } from "@/lib/auth/session";
-import { createClient } from "@/lib/supabase/server";
 import { buildPaginated } from "@/lib/pagination";
+import { requireSuperAdmin } from "@/policies";
 import type {
   PaginatedUsers,
   UserDetail,
@@ -15,10 +12,12 @@ export async function listUsers(
   search: string = "",
   pageSize: number = 10,
 ): Promise<PaginatedUsers> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
-  if (!user?.isSuperAdmin) throw new Error("Unauthorized");
+  const auth = await requireSuperAdmin();
+  if (auth.error || !auth.supabase) {
+    throw new Error(auth.error ?? "Unauthorized");
+  }
+
+  const { supabase } = auth;
 
   const rangeFrom = (page - 1) * pageSize;
   const rangeTo = rangeFrom + pageSize - 1;
@@ -41,10 +40,12 @@ export async function listUsers(
 }
 
 export async function getUserById(id: string): Promise<UserDetail | null> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
-  if (!user?.isSuperAdmin) throw new Error("Unauthorized");
+  const auth = await requireSuperAdmin();
+  if (auth.error || !auth.supabase) {
+    throw new Error(auth.error ?? "Unauthorized");
+  }
+
+  const { supabase } = auth;
 
   const { data: userRow, error: userError } = await supabase
     .from("users")

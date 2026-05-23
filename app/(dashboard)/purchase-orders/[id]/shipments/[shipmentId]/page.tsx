@@ -16,6 +16,11 @@ import { getPurchaseOrderById } from "@/features/purchase-orders/services/po-ser
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
+import {
+  requireRoles,
+  SHIPMENT_DELIVERY_ROLES,
+  SHIPMENT_TRANSIT_ROLES,
+} from "@/policies";
 
 interface Props {
   params: Promise<{ id: string; shipmentId: string }>;
@@ -60,22 +65,19 @@ export default async function ShipmentPage({ params }: Props) {
     isNew ? undefined : shipmentId,
   );
 
-  // RBAC for action buttons
-  let canTransit = user.isSuperAdmin;
-  let canDeliver = user.isSuperAdmin;
+  const [transitAccess, deliveryAccess] = await Promise.all([
+    requireRoles(SHIPMENT_TRANSIT_ROLES, {
+      existingClient: supabase,
+      existingUser: user,
+    }),
+    requireRoles(SHIPMENT_DELIVERY_ROLES, {
+      existingClient: supabase,
+      existingUser: user,
+    }),
+  ]);
 
-  if (!user.isSuperAdmin && user.workspaceId) {
-    const { data: membership } = await supabase
-      .from("memberships")
-      .select("role")
-      .eq("workspace_id", user.workspaceId)
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    const role = membership?.role ?? "";
-    canTransit = ["admin", "manager", "supplier"].includes(role);
-    canDeliver = ["admin", "manager", "logistics"].includes(role);
-  }
+  const canTransit = !transitAccess.error;
+  const canDeliver = !deliveryAccess.error;
 
   const shipmentListUrl = `/purchase-orders/${poId}/manage?tab=shipments`;
 

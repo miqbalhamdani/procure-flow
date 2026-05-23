@@ -4,10 +4,14 @@ import * as v from "valibot";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
-import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { MembershipRole, WorkspaceOption } from "@/features/users/types";
+import {
+  MEMBERSHIP_ROLES,
+  type MembershipRole,
+  type WorkspaceOption,
+} from "@/features/users/types";
+import { requireSuperAdmin } from "@/policies";
 
 // ─── Schemas ────────────────────────────────────────────────────────────────
 
@@ -53,18 +57,12 @@ const updateUserSchema = v.object({
 const addMembershipSchema = v.object({
   userId: uuidSchema,
   workspaceId: uuidSchema,
-  role: v.picklist(
-    ["admin", "manager", "procurement", "logistics", "supplier", "viewer"],
-    "Invalid role",
-  ),
+  role: v.picklist(MEMBERSHIP_ROLES, "Invalid role"),
 });
 
 const updateMembershipSchema = v.object({
   id: uuidSchema,
-  role: v.picklist(
-    ["admin", "manager", "procurement", "logistics", "supplier", "viewer"],
-    "Invalid role",
-  ),
+  role: v.picklist(MEMBERSHIP_ROLES, "Invalid role"),
 });
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -77,8 +75,8 @@ export type UpdateMembershipInput = v.InferInput<typeof updateMembershipSchema>;
 // ─── Actions ─────────────────────────────────────────────────────────────────
 
 export async function createUser(input: CreateUserInput): Promise<{ error?: string }> {
-  const user = await getCurrentUser();
-  if (!user?.isSuperAdmin) return { error: "Unauthorized" };
+  const { error: authError } = await requireSuperAdmin();
+  if (authError) return { error: authError };
 
   const parsed = v.safeParse(createUserSchema, input);
   if (!parsed.success) return { error: parsed.issues[0].message };
@@ -125,8 +123,8 @@ export async function createUser(input: CreateUserInput): Promise<{ error?: stri
 }
 
 export async function updateUser(input: UpdateUserInput): Promise<{ error?: string }> {
-  const user = await getCurrentUser();
-  if (!user?.isSuperAdmin) return { error: "Unauthorized" };
+  const { error: authError } = await requireSuperAdmin();
+  if (authError) return { error: authError };
 
   const parsed = v.safeParse(updateUserSchema, input);
   if (!parsed.success) return { error: parsed.issues[0].message };
@@ -151,8 +149,8 @@ export async function updateUser(input: UpdateUserInput): Promise<{ error?: stri
 }
 
 export async function deleteUser(id: string): Promise<{ error?: string }> {
-  const user = await getCurrentUser();
-  if (!user?.isSuperAdmin) return { error: "Unauthorized" };
+  const { error: authError } = await requireSuperAdmin();
+  if (authError) return { error: authError };
 
   const parsed = v.safeParse(uuidSchema, id);
   if (!parsed.success) return { error: parsed.issues[0].message };
@@ -174,16 +172,16 @@ export async function deleteUser(id: string): Promise<{ error?: string }> {
   if (userError) return { error: userError.message };
 
   // Delete from Supabase Auth
-  const { error: authError } = await adminClient.auth.admin.deleteUser(id);
-  if (authError) return { error: authError.message };
+  const { error: deleteAuthError } = await adminClient.auth.admin.deleteUser(id);
+  if (deleteAuthError) return { error: deleteAuthError.message };
 
   revalidatePath("/users");
   return {};
 }
 
 export async function addMembership(input: AddMembershipInput): Promise<{ error?: string }> {
-  const user = await getCurrentUser();
-  if (!user?.isSuperAdmin) return { error: "Unauthorized" };
+  const { error: authError } = await requireSuperAdmin();
+  if (authError) return { error: authError };
 
   const parsed = v.safeParse(addMembershipSchema, input);
   if (!parsed.success) return { error: parsed.issues[0].message };
@@ -210,8 +208,8 @@ export async function updateMembership(
   input: UpdateMembershipInput,
   userId: string,
 ): Promise<{ error?: string }> {
-  const user = await getCurrentUser();
-  if (!user?.isSuperAdmin) return { error: "Unauthorized" };
+  const { error: authError } = await requireSuperAdmin();
+  if (authError) return { error: authError };
 
   const parsed = v.safeParse(updateMembershipSchema, input);
   if (!parsed.success) return { error: parsed.issues[0].message };
@@ -236,8 +234,8 @@ export async function deleteMembership(
   id: string,
   userId: string,
 ): Promise<{ error?: string }> {
-  const user = await getCurrentUser();
-  if (!user?.isSuperAdmin) return { error: "Unauthorized" };
+  const { error: authError } = await requireSuperAdmin();
+  if (authError) return { error: authError };
 
   const parsed = v.safeParse(uuidSchema, id);
   if (!parsed.success) return { error: parsed.issues[0].message };
@@ -257,8 +255,10 @@ export async function fetchAllWorkspacesAction(): Promise<{
   error: string | null;
 }> {
   try {
-    const cookieStore = await cookies();
-    const supabase = createClient(cookieStore);
+    const { error: authError, supabase } = await requireSuperAdmin();
+    if (authError || !supabase) {
+      return { data: [], error: authError ?? "Unauthorized" };
+    }
 
     const { data, error } = await supabase
       .from("workspaces")
