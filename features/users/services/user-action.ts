@@ -196,7 +196,7 @@ export async function addMembership(input: AddMembershipInput): Promise<{ error?
     .insert({ user_id: userId, workspace_id: workspaceId, role });
 
   if (error) {
-    if (error.code === "23505") return { error: "User is already a member of this company." };
+    if (error.code === "23505") return { error: "User already has this role in this company." };
     return { error: error.message };
   }
 

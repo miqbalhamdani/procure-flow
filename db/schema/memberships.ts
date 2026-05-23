@@ -30,6 +30,7 @@ export const memberships = pgTable(
     uniqueMembership: unique("memberships_user_workspace_unique").on(
       table.userId,
       table.workspaceId,
+      table.role,
     ),
   }),
 );

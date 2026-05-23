@@ -1,8 +1,5 @@
-import { cookies } from "next/headers";
-
-import { getCurrentUser } from "@/lib/auth/session";
-import { createClient } from "@/lib/supabase/server";
 import { buildPaginated } from "@/lib/pagination";
+import { requireRoles, SUPPLIER_MANAGEMENT_ROLES } from "@/policies";
 import type { PaginatedSuppliers, SupplierSummary } from "@/features/suppliers/types";
 
 export async function listSuppliers(
@@ -10,11 +7,14 @@ export async function listSuppliers(
   search: string = "",
   pageSize: number = 10,
 ): Promise<PaginatedSuppliers> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
+  const { error: authError, supabase, user } = await requireRoles(
+    SUPPLIER_MANAGEMENT_ROLES,
+    { insufficientRoleMessage: "Unauthorized" },
+  );
 
-  if (!user?.workspaceId) throw new Error("Unauthorized");
+  if (authError || !supabase || !user?.workspaceId) {
+    throw new Error(authError ?? "Unauthorized");
+  }
 
   // Resolve workspace hierarchy
   const { data: workspace, error: wsError } = await supabase
@@ -84,5 +84,4 @@ export async function listSuppliers(
 
   return buildPaginated<SupplierSummary>(rows, count ?? 0, page, pageSize);
 }
-
 

@@ -108,7 +108,7 @@ async function seed() {
       role: "admin",
     },
     {
-      onConflict: "user_id,workspace_id",
+      onConflict: "user_id,workspace_id,role",
     },
   );
 
