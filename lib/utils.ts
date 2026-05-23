@@ -22,7 +22,7 @@ export function getInitials(name: string | null | undefined): string {
     .toUpperCase()
 }
 
-export function formatDateDdMmmYyyy(value: string | number | Date): string {
+export function formatDate(value: string | number | Date): string {
   const date = value instanceof Date ? value : new Date(value)
 
   if (Number.isNaN(date.getTime())) {

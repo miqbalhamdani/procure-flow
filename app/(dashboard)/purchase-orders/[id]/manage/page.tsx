@@ -5,14 +5,14 @@ import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PoDetailView } from "@/features/purchase-orders/components/po-detail-view";
 import { PoApprovalActions } from "@/features/purchase-orders/components/po-approval-actions";
-import { ShipmentListTable } from "@/features/shipments/components/shipment-list-table";
+import { ShipmentListTable } from "@/features/shipments/components/shipment-column";
 import {
   canCurrentUserApprovePurchaseOrders,
   getPurchaseOrderById,
 } from "@/features/purchase-orders/services/po-service";
 import { listShipments } from "@/features/shipments/services/shipment-service";
 import { getCurrentUser } from "@/lib/auth/session";
-import { formatDateDdMmmYyyy } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -73,7 +73,7 @@ export default async function PurchaseOrderManagePage({ params, searchParams }: 
             <StatusBadge status={po.status} />
           </div>
           <p className="mt-1 text-sm text-on-surface-variant">
-            Created {formatDateDdMmmYyyy(po.created_at)}
+            Created {formatDate(po.created_at)}
           </p>
         </div>
         <div className="flex items-center gap-3">
