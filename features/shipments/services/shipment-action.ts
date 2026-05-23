@@ -491,6 +491,15 @@ export async function submitShipment(
     return { error: "Shipment not found." };
   if (shipment.status !== "pending") return { error: "Only pending shipments can be submitted." };
 
+  const { count } = await supabase
+    .from("shipment_items")
+    .select("id", { count: "exact", head: true })
+    .eq("shipment_id", id);
+
+  if (!count || count === 0) {
+    return { error: "Shipment must have at least one item before submitting." };
+  }
+
   const { error: updateError } = await supabase
     .from("shipments")
     .update({ status: "in_transit", updated_at: new Date().toISOString() })

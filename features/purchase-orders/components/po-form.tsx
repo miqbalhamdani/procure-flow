@@ -63,6 +63,7 @@ export function PoForm({
   const [serverError, setServerError] = useState<string | null>(null);
   const [savedPoId, setSavedPoId] = useState<string | null>(po?.id ?? null);
   const poId = savedPoId ?? po?.id ?? null;
+  const hasItems = (po?.items.length ?? 0) > 0;
 
   const resolver = useMemo(() => valibotResolver(poSchema), []);
 
@@ -171,6 +172,10 @@ export function PoForm({
   const onSubmitForApproval = handleSubmit(async (values) => {
     setServerError(null);
     if (!poId) {
+      return;
+    }
+    if (!hasItems) {
+      setServerError("Add at least one purchase order item before submitting.");
       return;
     }
 
@@ -351,7 +356,11 @@ export function PoForm({
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-sm font-semibold text-on-background">
-              {poId ? "Review your items and submit for approval." : "Save a draft to start adding items."}
+              {poId
+                ? hasItems
+                  ? "Review your items and submit for approval."
+                  : "Add at least one item before submitting for approval."
+                : "Save a draft to start adding items."}
             </p>
             <p className="mt-0.5 text-xs text-on-surface-variant">
               Submitted POs will be sent to a manager or admin for approval.
@@ -370,7 +379,7 @@ export function PoForm({
             <button
               type="button"
               onClick={onSubmitForApproval}
-              disabled={isSubmitting || !poId}
+              disabled={isSubmitting || !poId || !hasItems}
               className="flex items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-container px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:scale-100 disabled:opacity-60"
             >
               <span className="material-symbols-outlined text-[16px] leading-none">send</span>
