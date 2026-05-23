@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { getCurrentUser } from "@/lib/auth/session";
+import { getCurrentUser, getCurrentWorkspaceContext } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { buildPaginated } from "@/lib/pagination";
 import type {
@@ -13,34 +13,6 @@ import type {
   SupplierOption,
 } from "@/features/purchase-orders/types";
 
-// ─── Workspace hierarchy helper ───────────────────────────────────────────────
-
-async function resolveWorkspaceIds(
-  supabase: ReturnType<typeof createClient>,
-  workspaceId: string,
-): Promise<{ ids: string[]; isParent: boolean }> {
-  const { data: workspace } = await supabase
-    .from("workspaces")
-    .select("id, parent_id")
-    .eq("id", workspaceId)
-    .single();
-
-  if (!workspace) return { ids: [workspaceId], isParent: false };
-
-  if (!workspace.parent_id) {
-    const { data: children } = await supabase
-      .from("workspaces")
-      .select("id")
-      .eq("parent_id", workspaceId);
-    return {
-      ids: [workspaceId, ...(children ?? []).map((c) => c.id)],
-      isParent: true,
-    };
-  }
-
-  return { ids: [workspaceId], isParent: false };
-}
-
 // ─── List Purchase Orders ─────────────────────────────────────────────────────
 
 export async function listPurchaseOrders(
@@ -48,13 +20,12 @@ export async function listPurchaseOrders(
   filters: PurchaseOrderFilters = {},
   pageSize: number = 10,
 ): Promise<PaginatedPurchaseOrders> {
+  const workspaceContext = await getCurrentWorkspaceContext();
+
+  if (!workspaceContext) throw new Error("Unauthorized");
+
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
-
-  if (!user?.workspaceId) throw new Error("Unauthorized");
-
-  const { ids: workspaceIds } = await resolveWorkspaceIds(supabase, user.workspaceId);
 
   const rangeFrom = (page - 1) * pageSize;
   const rangeTo = rangeFrom + pageSize - 1;
@@ -64,7 +35,7 @@ export async function listPurchaseOrders(
     .select("id, workspace_id, company_id, supplier_id, po_number, status, created_at", {
       count: "exact",
     })
-    .in("workspace_id", workspaceIds)
+    .in("workspace_id", workspaceContext.accessibleWorkspaceIds)
     .order("created_at", { ascending: false })
     .range(rangeFrom, rangeTo);
 
@@ -115,11 +86,12 @@ export async function listPurchaseOrders(
 // ─── Get Purchase Order Detail ────────────────────────────────────────────────
 
 export async function getPurchaseOrderById(id: string): Promise<PurchaseOrderDetail | null> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
+  const user = await getCurrentUser();
 
   if (!user?.workspaceId) throw new Error("Unauthorized");
+
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
 
   const { data: po, error } = await supabase
     .from("purchase_orders")
@@ -217,19 +189,18 @@ export async function getPurchaseOrderById(id: string): Promise<PurchaseOrderDet
 // ─── Company Options ──────────────────────────────────────────────────────────
 
 export async function getCompanyOptions(): Promise<CompanyOption[]> {
+  const workspaceContext = await getCurrentWorkspaceContext();
+
+  if (!workspaceContext) throw new Error("Unauthorized");
+
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
-
-  if (!user?.workspaceId) throw new Error("Unauthorized");
-
-  const { ids: workspaceIds, isParent } = await resolveWorkspaceIds(supabase, user.workspaceId);
 
   // Parent workspace: child workspaces are "companies"
   // Child workspace: itself is the company
-  const companyIds = isParent
-    ? workspaceIds
-    : [user.workspaceId];
+  const companyIds = workspaceContext.isChildWorkspace
+    ? [workspaceContext.workspaceId]
+    : workspaceContext.accessibleWorkspaceIds;
 
   if (companyIds.length === 0) return [];
 
@@ -250,11 +221,12 @@ export async function getCompanyOptions(): Promise<CompanyOption[]> {
 // ─── Supplier Options (filtered by company) ───────────────────────────────────
 
 export async function getSupplierOptionsForCompany(companyId: string): Promise<SupplierOption[]> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
+  const user = await getCurrentUser();
 
   if (!user?.workspaceId) throw new Error("Unauthorized");
+
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
 
   const { data } = await supabase
     .from("suppliers")

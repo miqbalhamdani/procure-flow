@@ -6,9 +6,7 @@ import { BaseTable } from "@/components/ui/base-table";
 import { poColumns } from "@/features/purchase-orders/components/po-columns";
 import { PoListFilters } from "@/features/purchase-orders/components/po-filters";
 import { listPurchaseOrders, getCompanyOptions, getSupplierOptionsForCompany } from "@/features/purchase-orders/services/po-service";
-import { getCurrentUser } from "@/lib/auth/session";
-import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
+import { getCurrentWorkspaceContext } from "@/lib/auth/session";
 
 export default async function PurchaseOrdersPage({
   searchParams,
@@ -28,18 +26,8 @@ export default async function PurchaseOrdersPage({
     status: params.status,
   };
 
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
-
-  const isChildWorkspace = !!(user?.workspaceId && !(await (async () => {
-    const { data } = await supabase
-      .from("workspaces")
-      .select("parent_id")
-      .eq("id", user.workspaceId!)
-      .single();
-    return !data?.parent_id;
-  })()));
+  const workspaceContext = await getCurrentWorkspaceContext();
+  const isChildWorkspace = workspaceContext?.isChildWorkspace ?? false;
 
   let companies: Awaited<ReturnType<typeof getCompanyOptions>> = [];
   let suppliers: Awaited<ReturnType<typeof getSupplierOptionsForCompany>> = [];
