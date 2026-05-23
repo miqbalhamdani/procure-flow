@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { cookies } from "next/headers";
 
 import { createClient } from "@/lib/supabase/server";
@@ -13,11 +14,24 @@ export function getPostLoginPath(user: SessionUser): string {
   return user.isSuperAdmin ? "/companies" : "/dashboard";
 }
 
-export async function getCurrentUser(
+type SupabaseServerClient = ReturnType<typeof createClient>;
+
+export type CurrentWorkspaceContext = {
+  user: SessionUser;
+  workspaceId: string;
+  parentWorkspaceId: string | null;
+  isChildWorkspace: boolean;
+  accessibleWorkspaceIds: string[];
+};
+
+const getRequestSupabaseClient = cache(async (): Promise<SupabaseServerClient> => {
+  return createClient(await cookies());
+});
+
+export const getCurrentUser = cache(async (
   existingClient?: ReturnType<typeof createClient>,
-): Promise<SessionUser | null> {
-  const supabase =
-    existingClient ?? createClient(await cookies());
+): Promise<SessionUser | null> => {
+  const supabase = existingClient ?? await getRequestSupabaseClient();
 
   const {
     data: { user },
@@ -44,4 +58,46 @@ export async function getCurrentUser(
     workspaceId: userRecord.workspace_id,
     isSuperAdmin: userRecord.is_super_admin,
   };
-}
+});
+
+export const getCurrentWorkspaceContext = cache(async (
+  existingClient?: SupabaseServerClient,
+): Promise<CurrentWorkspaceContext | null> => {
+  const supabase = existingClient ?? await getRequestSupabaseClient();
+  const user = await getCurrentUser(existingClient);
+
+  if (!user?.workspaceId) {
+    return null;
+  }
+
+  const workspaceId = user.workspaceId;
+  let parentWorkspaceId: string | null = null;
+  let isChildWorkspace = false;
+  let accessibleWorkspaceIds = [workspaceId];
+
+  const { data: workspace } = await supabase
+    .from("workspaces")
+    .select("id, parent_id")
+    .eq("id", workspaceId)
+    .maybeSingle();
+
+  if (workspace?.parent_id) {
+    parentWorkspaceId = workspace.parent_id;
+    isChildWorkspace = true;
+  } else if (workspace) {
+    const { data: children } = await supabase
+      .from("workspaces")
+      .select("id")
+      .eq("parent_id", workspaceId);
+
+    accessibleWorkspaceIds = [workspaceId, ...(children ?? []).map((child) => child.id)];
+  }
+
+  return {
+    user,
+    workspaceId,
+    parentWorkspaceId,
+    isChildWorkspace,
+    accessibleWorkspaceIds,
+  };
+});

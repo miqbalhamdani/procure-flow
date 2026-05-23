@@ -6,6 +6,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import type { ReactNode } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   Table,
@@ -23,6 +24,7 @@ type BaseTableProps<TData> = {
   data: TData[];
   emptyMessage?: string;
   emptyDescription?: string;
+  footer?: ReactNode;
   pagination: PaginationMeta | null;
 };
 
@@ -31,6 +33,7 @@ export function BaseTable<TData>({
   data,
   emptyMessage = "No data available.",
   emptyDescription,
+  footer,
   pagination,
 }: BaseTableProps<TData>) {
   const router = useRouter();
@@ -124,6 +127,12 @@ export function BaseTable<TData>({
           )}
         </TableBody>
       </Table>
+
+      {footer && (
+        <div className="border-t border-outline-variant/5 px-8 py-4">
+          {footer}
+        </div>
+      )}
 
       {/* Pagination footer */}
       {pagination != null && pagination.total > 0 && (

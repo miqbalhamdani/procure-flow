@@ -43,6 +43,20 @@
       "when": 1778153930061,
       "tag": "0005_suppliers",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1778353345804,
+      "tag": "0006_purchase_orders_shipments",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1778402224133,
+      "tag": "0007_brown_rhodey",
+      "breakpoints": true
     }
   ]
 }
