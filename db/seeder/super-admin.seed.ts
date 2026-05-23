@@ -89,7 +89,6 @@ async function seed() {
     {
       id: user.id,
       email,
-      workspace_id: workspaceId,
       is_super_admin: true,
     },
     {

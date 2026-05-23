@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 export type SessionUser = {
   id: string;
   email: string;
-  workspaceId: string | null;
+  workspaceId: string;
   isSuperAdmin: boolean;
 };
 
@@ -44,7 +44,7 @@ export const getCurrentUser = cache(async (
 
   const { data: userRecord, error: userRecordError } = await supabase
     .from("users")
-    .select("id, email, workspace_id, is_super_admin")
+    .select("id, email, is_super_admin")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -52,10 +52,18 @@ export const getCurrentUser = cache(async (
     return null;
   }
 
+  const { data: membership } = await supabase
+    .from("memberships")
+    .select("workspace_id")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
   return {
     id: userRecord.id,
     email: userRecord.email,
-    workspaceId: userRecord.workspace_id,
+    workspaceId: membership?.workspace_id,
     isSuperAdmin: userRecord.is_super_admin,
   };
 });

@@ -42,7 +42,7 @@ export async function signInWithPassword(values: LoginCredentials): Promise<Sign
 
   const { data: userRecord, error: userRecordError } = await supabase
     .from("users")
-    .select("id, email, workspace_id, is_super_admin")
+    .select("id, is_super_admin")
     .eq("id", data.user.id)
     .maybeSingle();
 
@@ -52,17 +52,19 @@ export async function signInWithPassword(values: LoginCredentials): Promise<Sign
     };
   }
 
-  if (!userRecord.workspace_id) {
-    return {
-      error: "Workspace membership is required for this account.",
-    };
-  }
+  const { data: membership } = await supabase
+    .from("memberships")
+    .select("workspace_id")
+    .eq("user_id", userRecord.id)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
 
   return {
     redirectTo: getPostLoginPath({
       id: userRecord.id,
-      email: userRecord.email,
-      workspaceId: userRecord.workspace_id,
+      email: data.user.email ?? "",
+      workspaceId: membership?.workspace_id,
       isSuperAdmin: userRecord.is_super_admin,
     }),
   };
