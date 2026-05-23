@@ -20,12 +20,17 @@ type DialogControlProps = {
   onOpenChange: (open: boolean) => void;
 };
 
-type EditLinkAction = {
+type ActionPresentation = {
+  label?: string;
+  icon?: string;
+};
+
+type EditLinkAction = ActionPresentation & {
   type: "link";
   href: string;
 };
 
-type EditModalAction = {
+type EditModalAction = ActionPresentation & {
   type: "modal";
   render: (props: DialogControlProps) => ReactNode;
 };
@@ -53,6 +58,10 @@ export function ActionsCell({ editAction, deleteAction }: ActionsCellProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  if (!editAction && !deleteAction) {
+    return null;
+  }
+
   const handleDelete = async () => {
     if (!deleteAction) return;
 
@@ -69,6 +78,9 @@ export function ActionsCell({ editAction, deleteAction }: ActionsCellProps) {
     toast.success(deleteAction.successMessage ?? `${deleteAction.resourceName} deleted.`);
     router.refresh();
   };
+
+  const editLabel = editAction?.label ?? "Edit";
+  const editIcon = editAction?.icon ?? "edit";
 
   return (
     <>
@@ -88,9 +100,9 @@ export function ActionsCell({ editAction, deleteAction }: ActionsCellProps) {
               <DropdownMenuItem asChild>
                 <Link href={editAction.href} className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[16px] leading-none">
-                    edit
+                    {editIcon}
                   </span>
-                  Edit
+                  {editLabel}
                 </Link>
               </DropdownMenuItem>
             ) : (
@@ -101,9 +113,9 @@ export function ActionsCell({ editAction, deleteAction }: ActionsCellProps) {
                 }}
               >
                 <span className="material-symbols-outlined text-[16px] leading-none">
-                  edit
+                  {editIcon}
                 </span>
-                Edit
+                {editLabel}
               </DropdownMenuItem>
             )
           ) : null}
@@ -125,7 +137,7 @@ export function ActionsCell({ editAction, deleteAction }: ActionsCellProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {editAction?.type === "modal"
+      {editAction?.type === "modal" && editOpen
         ? editAction.render({ open: editOpen, onOpenChange: setEditOpen })
         : null}
 

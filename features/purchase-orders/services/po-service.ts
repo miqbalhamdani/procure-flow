@@ -13,6 +13,8 @@ import type {
   SupplierOption,
 } from "@/features/purchase-orders/types";
 
+const PO_APPROVER_ROLES = new Set(["admin", "manager"]);
+
 // ─── List Purchase Orders ─────────────────────────────────────────────────────
 
 export async function listPurchaseOrders(
@@ -184,6 +186,27 @@ export async function getPurchaseOrderById(id: string): Promise<PurchaseOrderDet
     created_at: po.created_at,
     items: poItems,
   };
+}
+
+export async function canCurrentUserApprovePurchaseOrders(): Promise<boolean> {
+  const user = await getCurrentUser();
+
+  if (!user?.workspaceId) return false;
+  if (user.isSuperAdmin) return true;
+
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+
+  const { data: membership, error } = await supabase
+    .from("memberships")
+    .select("role")
+    .eq("workspace_id", user.workspaceId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+
+  return PO_APPROVER_ROLES.has(membership?.role ?? "");
 }
 
 // ─── Company Options ──────────────────────────────────────────────────────────
