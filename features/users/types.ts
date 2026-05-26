@@ -6,6 +6,7 @@ import {
 
 export { MEMBERSHIP_ROLES };
 export type { MembershipRole };
+export type { Paginated };
 
 export type UserSummary = {
   id: string;
