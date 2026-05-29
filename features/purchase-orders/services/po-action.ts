@@ -7,11 +7,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import type { CompanyOption, SupplierOption } from "@/features/purchase-orders/types";
-import {
-  PURCHASE_ORDER_APPROVAL_ROLES,
-  PURCHASE_ORDER_MANAGEMENT_ROLES,
-  requireRoles,
-} from "@/policies";
+import { requirePermission } from "@/policies";
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -70,8 +66,8 @@ export type RejectPoInput = v.InferInput<typeof rejectPoSchema>;
 export async function createPurchaseOrder(
   input: CreatePoInput,
 ): Promise<{ error?: string; id?: string }> {
-  const { error: authError, supabase, user } = await requireRoles(
-    PURCHASE_ORDER_MANAGEMENT_ROLES,
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.create",
   );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
@@ -105,8 +101,8 @@ export async function createPurchaseOrder(
 export async function updatePurchaseOrder(
   input: UpdatePoInput,
 ): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRoles(
-    PURCHASE_ORDER_MANAGEMENT_ROLES,
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.edit",
   );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
@@ -145,8 +141,8 @@ export async function updatePurchaseOrder(
 }
 
 export async function deletePurchaseOrder(id: string): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRoles(
-    PURCHASE_ORDER_MANAGEMENT_ROLES,
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.delete",
   );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
@@ -174,8 +170,8 @@ export async function deletePurchaseOrder(id: string): Promise<{ error?: string 
 export async function addPurchaseOrderItem(
   input: CreatePoItemInput,
 ): Promise<{ error?: string; id?: string }> {
-  const { error: authError, supabase, user } = await requireRoles(
-    PURCHASE_ORDER_MANAGEMENT_ROLES,
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.edit",
   );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
@@ -216,8 +212,8 @@ export async function addPurchaseOrderItem(
 export async function updatePurchaseOrderItem(
   input: UpdatePoItemInput,
 ): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRoles(
-    PURCHASE_ORDER_MANAGEMENT_ROLES,
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.edit",
   );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
@@ -252,8 +248,8 @@ export async function deletePurchaseOrderItem(
   itemId: string,
   purchaseOrderId: string,
 ): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRoles(
-    PURCHASE_ORDER_MANAGEMENT_ROLES,
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.edit",
   );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
@@ -281,8 +277,8 @@ export async function deletePurchaseOrderItem(
 // ─── Status Transitions ───────────────────────────────────────────────────────
 
 export async function submitPurchaseOrder(id: string): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRoles(
-    PURCHASE_ORDER_MANAGEMENT_ROLES,
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.submit",
   );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
@@ -317,8 +313,8 @@ export async function submitPurchaseOrder(id: string): Promise<{ error?: string 
 }
 
 export async function approvePurchaseOrder(input: ApprovePoInput): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRoles(
-    PURCHASE_ORDER_APPROVAL_ROLES,
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.approve",
   );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
@@ -355,8 +351,8 @@ export async function approvePurchaseOrder(input: ApprovePoInput): Promise<{ err
 }
 
 export async function rejectPurchaseOrder(input: RejectPoInput): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRoles(
-    PURCHASE_ORDER_APPROVAL_ROLES,
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.reject",
   );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
@@ -400,33 +396,15 @@ export async function fetchCompanyOptionsAction(): Promise<{
   const supabase = createClient(cookieStore);
   const user = await getCurrentUser(supabase);
 
-  if (!user?.workspaceId) return { error: "Unauthorized" };
+  if (!user?.membershipId) return { error: "Unauthorized" };
 
-  const { data: workspace } = await supabase
-    .from("workspaces")
-    .select("id, parent_id")
-    .eq("id", user.workspaceId)
-    .single();
-
-  let companyIds: string[] = [];
-
-  if (!workspace?.parent_id) {
-    const { data: children } = await supabase
-      .from("workspaces")
-      .select("id")
-      .eq("parent_id", user.workspaceId);
-    companyIds = (children ?? []).map((c) => c.id);
-  } else {
-    companyIds = [user.workspaceId];
-  }
-
-  if (companyIds.length === 0) return { data: [] };
-
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("workspaces")
     .select("id, name, address, country")
-    .in("id", companyIds)
+    .in("id", user.accessibleWorkspaceIds)
     .order("name", { ascending: true });
+
+  if (error) return { error: error.message };
 
   return {
     data: (data ?? []).map((w) => ({

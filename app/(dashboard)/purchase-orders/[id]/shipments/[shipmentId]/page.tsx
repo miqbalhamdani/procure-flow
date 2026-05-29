@@ -16,11 +16,7 @@ import { getPurchaseOrderById } from "@/features/purchase-orders/services/po-ser
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
-import {
-  requireRoles,
-  SHIPMENT_DELIVERY_ROLES,
-  SHIPMENT_TRANSIT_ROLES,
-} from "@/policies";
+import { requirePermission } from "@/policies";
 
 interface Props {
   params: Promise<{ id: string; shipmentId: string }>;
@@ -66,11 +62,11 @@ export default async function ShipmentPage({ params }: Props) {
   );
 
   const [transitAccess, deliveryAccess] = await Promise.all([
-    requireRoles(SHIPMENT_TRANSIT_ROLES, {
+    requirePermission("shipment.markInTransit", {
       existingClient: supabase,
       existingUser: user,
     }),
-    requireRoles(SHIPMENT_DELIVERY_ROLES, {
+    requirePermission("shipment.markDelivered", {
       existingClient: supabase,
       existingUser: user,
     }),

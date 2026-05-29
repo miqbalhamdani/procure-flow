@@ -6,6 +6,8 @@ import * as v from "valibot";
 import type { LoginCredentials, SignInResult, SignOutResult } from "@/features/auth/types";
 import { getPostLoginPath } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { ACTIVE_MEMBERSHIP_COOKIE } from "@/features/membership-switch";
+import { setActiveMembershipCookie } from "@/features/membership-switch/cookies";
 
 const signInSchema = v.object({
   email: v.pipe(v.string(), v.trim(), v.email("Please enter a valid email")),
@@ -54,17 +56,18 @@ export async function signInWithPassword(values: LoginCredentials): Promise<Sign
 
   const { data: membership } = await supabase
     .from("memberships")
-    .select("workspace_id")
+    .select("id, workspace_id, role")
     .eq("user_id", userRecord.id)
     .order("created_at", { ascending: true })
     .limit(1)
     .maybeSingle();
 
+  if (membership?.id) {
+    setActiveMembershipCookie(cookieStore, membership.id);
+  }
+
   return {
     redirectTo: getPostLoginPath({
-      id: userRecord.id,
-      email: data.user.email ?? "",
-      workspaceId: membership?.workspace_id,
       isSuperAdmin: userRecord.is_super_admin,
     }),
   };
@@ -81,6 +84,8 @@ export async function signOut(): Promise<SignOutResult> {
       error: error.message,
     };
   }
+
+  cookieStore.delete(ACTIVE_MEMBERSHIP_COOKIE);
 
   return {};
 }

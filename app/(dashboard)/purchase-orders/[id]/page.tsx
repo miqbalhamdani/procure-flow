@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { PoForm } from "@/features/purchase-orders/components/po-form";
 import { getPurchaseOrderById, getCompanyOptions } from "@/features/purchase-orders/services/po-service";
-import { getCurrentWorkspaceContext } from "@/lib/auth/session";
+import { getCurrentUser } from "@/lib/auth/session";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -14,9 +14,9 @@ export default async function PurchaseOrderFormPage({ params }: Props) {
   const { id } = await params;
   const isNew = id === "new";
 
-  const workspaceContext = await getCurrentWorkspaceContext();
+  const user = await getCurrentUser();
 
-  if (!workspaceContext) redirect("/login");
+  if (!user) redirect("/login");
 
   let po: Awaited<ReturnType<typeof getPurchaseOrderById>> = null;
 
@@ -64,12 +64,7 @@ export default async function PurchaseOrderFormPage({ params }: Props) {
         </Link>
       </div>
 
-      <PoForm
-        po={po ?? undefined}
-        initialCompanies={companies}
-        isChildWorkspace={workspaceContext.isChildWorkspace}
-        currentWorkspaceId={workspaceContext.workspaceId}
-      />
+      <PoForm po={po ?? undefined} initialCompanies={companies} />
     </div>
   );
 }

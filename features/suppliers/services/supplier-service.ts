@@ -1,5 +1,5 @@
 import { buildPaginated } from "@/lib/pagination";
-import { requireRoles, SUPPLIER_MANAGEMENT_ROLES } from "@/policies";
+import { requirePermission } from "@/policies";
 import type { PaginatedSuppliers, SupplierSummary } from "@/features/suppliers/types";
 
 export async function listSuppliers(
@@ -7,36 +7,16 @@ export async function listSuppliers(
   search: string = "",
   pageSize: number = 10,
 ): Promise<PaginatedSuppliers> {
-  const { error: authError, supabase, user } = await requireRoles(
-    SUPPLIER_MANAGEMENT_ROLES,
+  const { error: authError, supabase, user } = await requirePermission(
+    "supplier.view",
     { insufficientRoleMessage: "Unauthorized" },
   );
 
-  if (authError || !supabase || !user?.workspaceId) {
+  if (authError || !supabase || !user?.membershipId || !user.workspaceId) {
     throw new Error(authError ?? "Unauthorized");
   }
 
-  // Resolve workspace hierarchy
-  const { data: workspace, error: wsError } = await supabase
-    .from("workspaces")
-    .select("id, parent_id")
-    .eq("id", user.workspaceId)
-    .single();
-
-  if (wsError || !workspace) throw new Error("Workspace not found");
-
-  let workspaceIds: string[] = [user.workspaceId];
-
-  // Parent workspace (no parent_id) can see its children's suppliers too
-  if (!workspace.parent_id) {
-    const { data: children } = await supabase
-      .from("workspaces")
-      .select("id")
-      .eq("parent_id", user.workspaceId);
-
-    workspaceIds = [user.workspaceId, ...(children ?? []).map((c) => c.id)];
-  }
-
+  const accessibleCompanyIds = user.accessibleWorkspaceIds;
   const rangeFrom = (page - 1) * pageSize;
   const rangeTo = rangeFrom + pageSize - 1;
 
@@ -45,7 +25,7 @@ export async function listSuppliers(
     .select("id, workspace_id, company_id, name, address, country, created_at", {
       count: "exact",
     })
-    .in("workspace_id", workspaceIds)
+    .in("company_id", accessibleCompanyIds)
     .order("created_at", { ascending: false })
     .range(rangeFrom, rangeTo);
 
@@ -84,4 +64,3 @@ export async function listSuppliers(
 
   return buildPaginated<SupplierSummary>(rows, count ?? 0, page, pageSize);
 }
-

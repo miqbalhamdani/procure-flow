@@ -6,7 +6,7 @@ import { BaseTable } from "@/components/ui/base-table";
 import { poColumns } from "@/features/purchase-orders/components/po-columns";
 import { PoListFilters } from "@/features/purchase-orders/components/po-filters";
 import { listPurchaseOrders, getCompanyOptions, getSupplierOptionsForCompany } from "@/features/purchase-orders/services/po-service";
-import { getCurrentWorkspaceContext } from "@/lib/auth/session";
+import { getCurrentUser } from "@/lib/auth/session";
 
 export default async function PurchaseOrdersPage({
   searchParams,
@@ -26,8 +26,8 @@ export default async function PurchaseOrdersPage({
     status: params.status,
   };
 
-  const workspaceContext = await getCurrentWorkspaceContext();
-  const isChildWorkspace = workspaceContext?.isChildWorkspace ?? false;
+  const user = await getCurrentUser();
+  const isChildWorkspace = user?.isChildWorkspace ?? false;
 
   let companies: Awaited<ReturnType<typeof getCompanyOptions>> = [];
   let suppliers: Awaited<ReturnType<typeof getSupplierOptionsForCompany>> = [];

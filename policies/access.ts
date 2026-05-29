@@ -3,9 +3,9 @@ import { cookies } from "next/headers";
 import { getCurrentUser, type SessionUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import {
-  hasRequiredRole,
-  isMembershipRole,
+  hasPermission,
   type MembershipRole,
+  type Permission,
 } from "@/policies/roles";
 
 type SupabaseServerClient = ReturnType<typeof createClient>;
@@ -14,10 +14,6 @@ type WorkspaceSessionUser = SessionUser & { workspaceId: string };
 type PolicyContextOptions = {
   existingClient?: SupabaseServerClient;
   existingUser?: SessionUser | null;
-};
-
-type MembershipFetchOptions = {
-  throwOnError?: boolean;
 };
 
 type RequiredRolesSuccess = {
@@ -58,38 +54,13 @@ async function getPolicyContext(
   return { supabase, user };
 }
 
-async function fetchCurrentMembershipRole(
-  supabase: SupabaseServerClient,
-  user: WorkspaceSessionUser,
-  options: MembershipFetchOptions = {},
-): Promise<MembershipRole | null> {
-  const { data: membership, error } = await supabase
-    .from("memberships")
-    .select("role")
-    .eq("workspace_id", user.workspaceId)
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (error) {
-    if (options.throwOnError) {
-      throw new Error(error.message);
-    }
-
-    return null;
-  }
-
-  return membership?.role && isMembershipRole(membership.role)
-    ? membership.role
-    : null;
-}
-
-export async function requireRoles(
-  allowedRoles: readonly MembershipRole[],
+export async function requirePermission(
+  permission: Permission,
   options: PolicyContextOptions & { insufficientRoleMessage?: string } = {},
 ): Promise<RequiredRolesSuccess | RequiredRolesFailure> {
   const { supabase, user } = await getPolicyContext(options);
 
-  if (!user || !user.workspaceId) {
+  if (!user || !user.membershipId || !user.workspaceId) {
     return { error: "Unauthorized", supabase: null, user: null, role: null };
   }
 
@@ -102,14 +73,11 @@ export async function requireRoles(
     };
   }
 
-  const role = await fetchCurrentMembershipRole(
-    supabase,
-    user as WorkspaceSessionUser,
-  );
+  const role = user.role;
 
-  if (!hasRequiredRole(role, allowedRoles)) {
+  if (!hasPermission(role, permission)) {
     return {
-      error: options.insufficientRoleMessage ?? "Unauthorized: Insufficient role",
+      error: options.insufficientRoleMessage ?? "Unauthorized: Insufficient permissions",
       supabase: null,
       user: null,
       role: null,

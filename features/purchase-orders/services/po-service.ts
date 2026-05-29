@@ -1,9 +1,5 @@
-import { cookies } from "next/headers";
-
-import { getCurrentUser, getCurrentWorkspaceContext } from "@/lib/auth/session";
-import { createClient } from "@/lib/supabase/server";
 import { buildPaginated } from "@/lib/pagination";
-import { PURCHASE_ORDER_APPROVAL_ROLES, requireRoles } from "@/policies";
+import { isOperationalRole, requirePermission } from "@/policies";
 import type {
   PaginatedPurchaseOrders,
   PurchaseOrderDetail,
@@ -21,12 +17,10 @@ export async function listPurchaseOrders(
   filters: PurchaseOrderFilters = {},
   pageSize: number = 10,
 ): Promise<PaginatedPurchaseOrders> {
-  const workspaceContext = await getCurrentWorkspaceContext();
-
-  if (!workspaceContext) throw new Error("Unauthorized");
-
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+  const { error: authError, supabase, user, role } = await requirePermission(
+    "purchaseOrder.view",
+  );
+  if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
 
   const rangeFrom = (page - 1) * pageSize;
   const rangeTo = rangeFrom + pageSize - 1;
@@ -36,13 +30,16 @@ export async function listPurchaseOrders(
     .select("id, workspace_id, company_id, supplier_id, po_number, status, created_at", {
       count: "exact",
     })
-    .in("workspace_id", workspaceContext.accessibleWorkspaceIds)
+    .in("company_id", user.accessibleWorkspaceIds)
     .order("created_at", { ascending: false })
     .range(rangeFrom, rangeTo);
 
   if (filters.companyId) query = query.eq("company_id", filters.companyId);
   if (filters.supplierId) query = query.eq("supplier_id", filters.supplierId);
   if (filters.status) query = query.eq("status", filters.status);
+  if (isOperationalRole(role)) {
+    query = query.neq("status", "draft").neq("status", "rejected");
+  }
 
   const { data, error, count } = await query;
   if (error) throw new Error(error.message);
@@ -87,20 +84,24 @@ export async function listPurchaseOrders(
 // ─── Get Purchase Order Detail ────────────────────────────────────────────────
 
 export async function getPurchaseOrderById(id: string): Promise<PurchaseOrderDetail | null> {
-  const user = await getCurrentUser();
+  const { error: authError, supabase, user, role } = await requirePermission(
+    "purchaseOrder.view",
+  );
+  if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
 
-  if (!user?.workspaceId) throw new Error("Unauthorized");
-
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-
-  const { data: po, error } = await supabase
+  let query = supabase
     .from("purchase_orders")
     .select(
       "id, workspace_id, company_id, supplier_id, po_number, status, approval_note, rejection_reason, approved_by, approved_at, created_at",
     )
     .eq("id", id)
-    .maybeSingle();
+    .in("company_id", user.accessibleWorkspaceIds);
+
+  if (isOperationalRole(role)) {
+    query = query.neq("status", "draft").neq("status", "rejected");
+  }
+
+  const { data: po, error } = await query.maybeSingle();
 
   if (error) throw new Error(error.message);
   if (!po) return null;
@@ -188,33 +189,22 @@ export async function getPurchaseOrderById(id: string): Promise<PurchaseOrderDet
 }
 
 export async function canCurrentUserApprovePurchaseOrders(): Promise<boolean> {
-  const { error } = await requireRoles(PURCHASE_ORDER_APPROVAL_ROLES);
-
+  const { error } = await requirePermission("purchaseOrder.approve");
   return error == null;
 }
 
 // ─── Company Options ──────────────────────────────────────────────────────────
 
 export async function getCompanyOptions(): Promise<CompanyOption[]> {
-  const workspaceContext = await getCurrentWorkspaceContext();
-
-  if (!workspaceContext) throw new Error("Unauthorized");
-
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-
-  // Parent workspace: child workspaces are "companies"
-  // Child workspace: itself is the company
-  const companyIds = workspaceContext.isChildWorkspace
-    ? [workspaceContext.workspaceId]
-    : workspaceContext.accessibleWorkspaceIds;
-
-  if (companyIds.length === 0) return [];
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.view",
+  );
+  if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
 
   const { data } = await supabase
     .from("workspaces")
     .select("id, name, address, country")
-    .in("id", companyIds)
+    .in("id", user.accessibleWorkspaceIds)
     .order("name", { ascending: true });
 
   return (data ?? []).map((w) => ({
@@ -228,12 +218,10 @@ export async function getCompanyOptions(): Promise<CompanyOption[]> {
 // ─── Supplier Options (filtered by company) ───────────────────────────────────
 
 export async function getSupplierOptionsForCompany(companyId: string): Promise<SupplierOption[]> {
-  const user = await getCurrentUser();
-
-  if (!user?.workspaceId) throw new Error("Unauthorized");
-
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.view",
+  );
+  if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
 
   const { data } = await supabase
     .from("suppliers")

@@ -143,7 +143,7 @@ export function Sidebar({ user }: SidebarProps) {
           </div>
 
           {/* Navigation */}
-          <SidebarNav />
+          <SidebarNav isSuperAdmin={user?.isSuperAdmin ?? false} role={user?.role || null} />
         </div>
 
         {/* Bottom: User profile dropdown */}

@@ -1,8 +1,5 @@
-import { cookies } from "next/headers";
-
-import { getCurrentUser } from "@/lib/auth/session";
-import { createClient } from "@/lib/supabase/server";
 import { buildPaginated } from "@/lib/pagination";
+import { isOperationalRole, requirePermission } from "@/policies";
 import type {
   PaginatedShipments,
   ShipmentDetail,
@@ -19,16 +16,15 @@ export async function listShipments(
   page: number = 1,
   pageSize: number = 10,
 ): Promise<PaginatedShipments> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
-
-  if (!user?.workspaceId) throw new Error("Unauthorized");
+  const { error: authError, supabase, user, role } = await requirePermission(
+    "shipment.view",
+  );
+  if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
 
   const rangeFrom = (page - 1) * pageSize;
   const rangeTo = rangeFrom + pageSize - 1;
 
-  const { data, error, count } = await supabase
+  let query = supabase
     .from("shipments")
     .select("id, purchase_order_id, workspace_id, shipment_number, shipment_date, status, created_at", {
       count: "exact",
@@ -37,6 +33,12 @@ export async function listShipments(
     .order("created_at", { ascending: false })
     .range(rangeFrom, rangeTo);
 
+  // Operational roles only need shipments from their workspace.
+  if (isOperationalRole(role)) {
+    query = query.eq("workspace_id", user.workspaceId);
+  }
+
+  const { data, error, count } = await query;
   if (error) throw new Error(error.message);
 
   // Fetch last tracking event per shipment
@@ -74,11 +76,10 @@ export async function listShipments(
 // ─── Get Shipment Detail ──────────────────────────────────────────────────────
 
 export async function getShipmentById(id: string): Promise<ShipmentDetail | null> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
-
-  if (!user?.workspaceId) throw new Error("Unauthorized");
+  const { error: authError, supabase, user } = await requirePermission(
+    "shipment.view",
+  );
+  if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
 
   const { data: shipment, error } = await supabase
     .from("shipments")
@@ -170,11 +171,10 @@ export async function getRemainingQuantities(
   purchaseOrderId: string,
   excludeShipmentId?: string,
 ): Promise<RemainingQuantity[]> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
-
-  if (!user?.workspaceId) throw new Error("Unauthorized");
+  const { error: authError, supabase, user } = await requirePermission(
+    "shipment.create",
+  );
+  if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
 
   // Get PO items
   const { data: poItems } = await supabase

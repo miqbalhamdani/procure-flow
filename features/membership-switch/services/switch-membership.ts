@@ -6,7 +6,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { isMembershipRole } from "@/policies/roles";
 import { createClient } from "@/lib/supabase/server";
 import type { MembershipWithWorkspace, SwitchMembershipResult } from "@/features/membership-switch/types";
-import { ACTIVE_MEMBERSHIP_COOKIE } from "@/features/membership-switch/constants";
+import { setActiveMembershipCookie } from "@/features/membership-switch/cookies";
 
 /**
  * Returns all memberships for the given user joined with workspace name.
@@ -63,12 +63,7 @@ export async function switchMembership(membershipId: string): Promise<SwitchMemb
     return { error: "You do not have access to this workspace." };
   }
 
-  cookieStore.set(ACTIVE_MEMBERSHIP_COOKIE, membershipId, {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    // No explicit maxAge — session cookie; clears on browser close
-  });
+  setActiveMembershipCookie(cookieStore, membershipId);
 
   return {};
 }

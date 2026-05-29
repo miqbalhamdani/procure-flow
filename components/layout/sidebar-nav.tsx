@@ -2,28 +2,61 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { hasPermission, type MembershipRole } from "@/policies/roles";
 
 type NavItem = {
   href: string;
   label: string;
   icon: string;
+  allowedFor: (isSuperAdmin: boolean, role: MembershipRole | null) => boolean;
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-  { href: "/suppliers", label: "Suppliers", icon: "inventory_2" },
-  { href: "/purchase-orders", label: "Purchase Order", icon: "receipt_long" },
-  { href: "/billing", label: "Billing", icon: "payments" },
-  { href: "/companies", label: "Companies", icon: "domain" },
-  { href: "/users", label: "Users", icon: "group" },
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: "dashboard",
+    allowedFor: (isSuperAdmin) => !isSuperAdmin,
+  },
+  {
+    href: "/suppliers",
+    label: "Suppliers",
+    icon: "inventory_2",
+    allowedFor: (isSuperAdmin, role) => !isSuperAdmin && hasPermission(role, "supplier.view"),
+  },
+  {
+    href: "/purchase-orders",
+    label: "Purchase Order",
+    icon: "receipt_long",
+    allowedFor: (isSuperAdmin, role) =>
+      !isSuperAdmin && hasPermission(role, "purchaseOrder.view"),
+  },
+  {
+    href: "/companies",
+    label: "Companies",
+    icon: "domain",
+    allowedFor: (isSuperAdmin) => isSuperAdmin,
+  },
+  {
+    href: "/users",
+    label: "Users",
+    icon: "group",
+    allowedFor: (isSuperAdmin) => isSuperAdmin,
+  },
 ];
 
-export function SidebarNav() {
+type SidebarNavProps = {
+  isSuperAdmin: boolean;
+  role: MembershipRole | null;
+};
+
+export function SidebarNav({ isSuperAdmin, role }: SidebarNavProps) {
   const pathname = usePathname();
+  const visibleItems = NAV_ITEMS.filter((item) => item.allowedFor(isSuperAdmin, role));
 
   return (
     <nav className="flex flex-col gap-1 pr-4">
-      {NAV_ITEMS.map((item) => {
+      {visibleItems.map((item) => {
         const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
         return (
           <Link
