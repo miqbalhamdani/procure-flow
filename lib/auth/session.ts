@@ -1,77 +1,87 @@
+import "server-only";
+
 import { cache } from "react";
 import { cookies } from "next/headers";
 
 import { createClient } from "@/lib/supabase/server";
+import { type MembershipRole } from "@/policies/roles";
+import { ACTIVE_MEMBERSHIP_COOKIE } from "@/features/membership-switch/constants";
 
 export type SessionUser = {
   id: string;
   email: string;
-  workspaceId: string | null;
+  workspaceId: string;
+  membershipId: string;
+  role: MembershipRole;
   isSuperAdmin: boolean;
+  isChildWorkspace: boolean;
+  accessibleWorkspaceIds: string[];
 };
 
-export function getPostLoginPath(user: SessionUser): string {
+export function getPostLoginPath(user: Pick<SessionUser, "isSuperAdmin">): string {
   return user.isSuperAdmin ? "/companies" : "/dashboard";
 }
 
 type SupabaseServerClient = ReturnType<typeof createClient>;
 
-export type CurrentWorkspaceContext = {
-  user: SessionUser;
-  workspaceId: string;
-  parentWorkspaceId: string | null;
-  isChildWorkspace: boolean;
-  accessibleWorkspaceIds: string[];
-};
-
 const getRequestSupabaseClient = cache(async (): Promise<SupabaseServerClient> => {
   return createClient(await cookies());
 });
 
-export const getCurrentUser = cache(async (
-  existingClient?: ReturnType<typeof createClient>,
-): Promise<SessionUser | null> => {
-  const supabase = existingClient ?? await getRequestSupabaseClient();
+export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
+  const supabase = await getRequestSupabaseClient();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
+  const userId = claimsData?.claims.sub;
 
-  if (userError || !user) {
+  if (claimsError || !userId) {
     return null;
   }
 
   const { data: userRecord, error: userRecordError } = await supabase
     .from("users")
-    .select("id, email, workspace_id, is_super_admin")
-    .eq("id", user.id)
+    .select("id, email, is_super_admin")
+    .eq("id", userId)
     .maybeSingle();
 
   if (userRecordError || !userRecord) {
     return null;
   }
 
-  return {
-    id: userRecord.id,
-    email: userRecord.email,
-    workspaceId: userRecord.workspace_id,
-    isSuperAdmin: userRecord.is_super_admin,
-  };
-});
+  const cookieStore = await cookies();
+  const activeMembershipId = cookieStore.get(ACTIVE_MEMBERSHIP_COOKIE)?.value;
 
-export const getCurrentWorkspaceContext = cache(async (
-  existingClient?: SupabaseServerClient,
-): Promise<CurrentWorkspaceContext | null> => {
-  const supabase = existingClient ?? await getRequestSupabaseClient();
-  const user = await getCurrentUser(existingClient);
+  // Try to use the cookie-stored active membership first
+  let membership: { id: string; workspace_id: string; role: string } | null = null;
 
-  if (!user?.workspaceId) {
+  if (activeMembershipId) {
+    const { data } = await supabase
+      .from("memberships")
+      .select("id, workspace_id, role")
+      .eq("user_id", userId)
+      .eq("id", activeMembershipId)
+      .maybeSingle();
+
+    membership = data;
+  }
+
+  // Fall back to first membership if cookie is absent or stale
+  if (!membership) {
+    const { data } = await supabase
+      .from("memberships")
+      .select("id, workspace_id, role")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    membership = data;
+  }
+
+  if (!membership) {
     return null;
   }
 
-  const workspaceId = user.workspaceId;
-  let parentWorkspaceId: string | null = null;
+  const workspaceId = membership.workspace_id;
   let isChildWorkspace = false;
   let accessibleWorkspaceIds = [workspaceId];
 
@@ -82,7 +92,6 @@ export const getCurrentWorkspaceContext = cache(async (
     .maybeSingle();
 
   if (workspace?.parent_id) {
-    parentWorkspaceId = workspace.parent_id;
     isChildWorkspace = true;
   } else if (workspace) {
     const { data: children } = await supabase
@@ -94,9 +103,12 @@ export const getCurrentWorkspaceContext = cache(async (
   }
 
   return {
-    user,
+    id: userRecord.id,
+    email: userRecord.email,
     workspaceId,
-    parentWorkspaceId,
+    membershipId: membership.id,
+    role: membership.role as MembershipRole,
+    isSuperAdmin: userRecord.is_super_admin,
     isChildWorkspace,
     accessibleWorkspaceIds,
   };

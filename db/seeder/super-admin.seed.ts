@@ -89,7 +89,6 @@ async function seed() {
     {
       id: user.id,
       email,
-      workspace_id: workspaceId,
       is_super_admin: true,
     },
     {
@@ -109,7 +108,7 @@ async function seed() {
       role: "admin",
     },
     {
-      onConflict: "user_id,workspace_id",
+      onConflict: "user_id,workspace_id,role",
     },
   );
 

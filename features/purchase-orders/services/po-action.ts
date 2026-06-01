@@ -1,12 +1,10 @@
 "use server";
 
 import * as v from "valibot";
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
-import { getCurrentUser } from "@/lib/auth/session";
-import { createClient } from "@/lib/supabase/server";
 import type { CompanyOption, SupplierOption } from "@/features/purchase-orders/types";
+import { requirePermission } from "@/policies";
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -60,44 +58,14 @@ export type UpdatePoItemInput = v.InferInput<typeof updatePoItemSchema>;
 export type ApprovePoInput = v.InferInput<typeof approvePoSchema>;
 export type RejectPoInput = v.InferInput<typeof rejectPoSchema>;
 
-// ─── RBAC helpers ─────────────────────────────────────────────────────────────
-
-type AllowedRole = "admin" | "manager" | "procurement" | "supplier" | "logistics";
-
-async function requireRole(allowedRoles: AllowedRole[]) {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
-
-  if (!user) return { error: "Unauthorized" as const, supabase: null, user: null };
-  if (!user.workspaceId) return { error: "Unauthorized" as const, supabase: null, user: null };
-
-  if (user.isSuperAdmin) return { error: null, supabase, user };
-
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("role")
-    .eq("workspace_id", user.workspaceId)
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (!membership || !allowedRoles.includes(membership.role as AllowedRole)) {
-    return { error: "Unauthorized: Insufficient role" as const, supabase: null, user: null };
-  }
-
-  return { error: null, supabase, user };
-}
-
 // ─── Purchase Order Actions ───────────────────────────────────────────────────
 
 export async function createPurchaseOrder(
   input: CreatePoInput,
 ): Promise<{ error?: string; id?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "procurement",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.create",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(createPoSchema, input);
@@ -130,11 +98,9 @@ export async function createPurchaseOrder(
 export async function updatePurchaseOrder(
   input: UpdatePoInput,
 ): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "procurement",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.edit",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(updatePoSchema, input);
@@ -172,11 +138,9 @@ export async function updatePurchaseOrder(
 }
 
 export async function deletePurchaseOrder(id: string): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "procurement",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.delete",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(uuidSchema, id);
@@ -203,11 +167,9 @@ export async function deletePurchaseOrder(id: string): Promise<{ error?: string 
 export async function addPurchaseOrderItem(
   input: CreatePoItemInput,
 ): Promise<{ error?: string; id?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "procurement",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.edit",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(poItemBaseSchema, input);
@@ -247,11 +209,9 @@ export async function addPurchaseOrderItem(
 export async function updatePurchaseOrderItem(
   input: UpdatePoItemInput,
 ): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "procurement",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.edit",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(updatePoItemSchema, input);
@@ -285,11 +245,9 @@ export async function deletePurchaseOrderItem(
   itemId: string,
   purchaseOrderId: string,
 ): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "procurement",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.edit",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const { data: po } = await supabase
@@ -316,11 +274,9 @@ export async function deletePurchaseOrderItem(
 // ─── Status Transitions ───────────────────────────────────────────────────────
 
 export async function submitPurchaseOrder(id: string): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "procurement",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.submit",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const { data: po } = await supabase
@@ -354,7 +310,9 @@ export async function submitPurchaseOrder(id: string): Promise<{ error?: string 
 }
 
 export async function approvePurchaseOrder(input: ApprovePoInput): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRole(["admin", "manager"]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.approve",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(approvePoSchema, input);
@@ -390,7 +348,9 @@ export async function approvePurchaseOrder(input: ApprovePoInput): Promise<{ err
 }
 
 export async function rejectPurchaseOrder(input: RejectPoInput): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRole(["admin", "manager"]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "purchaseOrder.reject",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(rejectPoSchema, input);
@@ -429,37 +389,23 @@ export async function fetchCompanyOptionsAction(): Promise<{
   data?: CompanyOption[];
   error?: string;
 }> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
+  const options = {};
+  const { error: authError, supabase, user, role } = await requirePermission(
+    "purchaseOrder.create",
+    options,
+  );
 
-  if (!user?.workspaceId) return { error: "Unauthorized" };
-
-  const { data: workspace } = await supabase
-    .from("workspaces")
-    .select("id, parent_id")
-    .eq("id", user.workspaceId)
-    .single();
-
-  let companyIds: string[] = [];
-
-  if (!workspace?.parent_id) {
-    const { data: children } = await supabase
-      .from("workspaces")
-      .select("id")
-      .eq("parent_id", user.workspaceId);
-    companyIds = (children ?? []).map((c) => c.id);
-  } else {
-    companyIds = [user.workspaceId];
+  if (authError || !supabase || !user || (!user.isSuperAdmin && !role)) {
+    return { error: authError ?? "Unauthorized" };
   }
 
-  if (companyIds.length === 0) return { data: [] };
-
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("workspaces")
     .select("id, name, address, country")
-    .in("id", companyIds)
+    .in("id", user.accessibleWorkspaceIds)
     .order("name", { ascending: true });
+
+  if (error) return { error: error.message };
 
   return {
     data: (data ?? []).map((w) => ({
@@ -475,11 +421,15 @@ export async function fetchSupplierOptionsAction(companyId: string): Promise<{
   data?: SupplierOption[];
   error?: string;
 }> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
+  const options = {};
+  const { error: authError, supabase, user, role } = await requirePermission(
+    "purchaseOrder.create",
+    options,
+  );
 
-  if (!user?.workspaceId) return { error: "Unauthorized" };
+  if (authError || !supabase || !user || (!user.isSuperAdmin && !role)) {
+    return { error: authError ?? "Unauthorized" };
+  }
 
   const { data } = await supabase
     .from("suppliers")

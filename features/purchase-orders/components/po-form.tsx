@@ -3,7 +3,7 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import * as v from "valibot";
 
@@ -12,7 +12,6 @@ import {
   createPurchaseOrder,
   updatePurchaseOrder,
   submitPurchaseOrder,
-  fetchCompanyOptionsAction,
   fetchSupplierOptionsAction,
 } from "@/features/purchase-orders/services/po-action";
 import { PoItemsTable } from "@/features/purchase-orders/components/po-items-table";
@@ -28,7 +27,12 @@ import type {
 const poSchema = v.object({
   companyId: v.pipe(v.string(), v.uuid("Please select a company")),
   supplierId: v.pipe(v.string(), v.uuid("Please select a supplier")),
-  poNumber: v.pipe(v.string(), v.trim(), v.minLength(1, "PO Number is required")),
+  poNumber: v.pipe(
+    v.string(),
+    v.trim(),
+    v.minLength(1, "PO Number is required"),
+    v.maxLength(100, "PO Number must be at most 100 characters"),
+  ),
 });
 
 type FormValues = v.InferInput<typeof poSchema>;
@@ -38,8 +42,6 @@ type FormValues = v.InferInput<typeof poSchema>;
 interface PoFormProps {
   po?: PurchaseOrderDetail;
   initialCompanies?: CompanyOption[];
-  isChildWorkspace?: boolean;
-  currentWorkspaceId?: string;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -47,23 +49,20 @@ interface PoFormProps {
 export function PoForm({
   po,
   initialCompanies = [],
-  isChildWorkspace = false,
-  currentWorkspaceId,
 }: PoFormProps) {
   const isEditMode = !!po;
   const router = useRouter();
 
-  const [companies, setCompanies] = useState<CompanyOption[]>(initialCompanies);
+  const initialCompanyId =
+    po?.company_id ?? (initialCompanies.length === 1 ? initialCompanies[0].id : "");
   const [suppliers, setSuppliers] = useState<SupplierOption[]>([]);
-  const [selectedCompany, setSelectedCompany] = useState<CompanyOption | null>(
-    isEditMode ? (initialCompanies.find((c) => c.id === po.company_id) ?? null) : null,
-  );
-  const [selectedSupplier, setSelectedSupplier] = useState<SupplierOption | null>(null);
-  const [loadingSuppliers, setLoadingSuppliers] = useState(false);
+  const [loadingSuppliers, setLoadingSuppliers] = useState(() => Boolean(initialCompanyId));
+  const [supplierLoadError, setSupplierLoadError] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const [savedPoId, setSavedPoId] = useState<string | null>(po?.id ?? null);
   const poId = savedPoId ?? po?.id ?? null;
   const hasItems = (po?.items.length ?? 0) > 0;
+  const createdAt = po?.created_at;
 
   const resolver = useMemo(() => valibotResolver(poSchema), []);
 
@@ -71,7 +70,6 @@ export function PoForm({
     register,
     handleSubmit,
     control,
-    watch,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
@@ -83,62 +81,96 @@ export function PoForm({
           poNumber: po.po_number,
         }
       : {
-          companyId: isChildWorkspace && currentWorkspaceId ? currentWorkspaceId : "",
+          companyId: initialCompanyId,
           supplierId: "",
           poNumber: "",
         },
   });
 
-  const watchedCompanyId = watch("companyId");
+  const watchedCompanyId = useWatch({ control, name: "companyId" });
+  const watchedSupplierId = useWatch({ control, name: "supplierId" });
+  const selectedCompany = useMemo(
+    () => initialCompanies.find((c) => c.id === watchedCompanyId) ?? null,
+    [initialCompanies, watchedCompanyId],
+  );
+  const selectedSupplier = useMemo(
+    () => suppliers.find((s) => s.id === watchedSupplierId) ?? null,
+    [suppliers, watchedSupplierId],
+  );
+  const createdDate = useMemo(() => {
+    const date = createdAt ? new Date(createdAt) : new Date();
 
-  // Load companies on mount (if not pre-loaded)
-  useEffect(() => {
-    if (initialCompanies.length === 0 && !isChildWorkspace) {
-      fetchCompanyOptionsAction().then(({ data }) => {
-        if (data) setCompanies(data);
-      });
-    }
-  }, []);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }, [createdAt]);
 
-  // Auto-load suppliers when company changes
   useEffect(() => {
-    if (!watchedCompanyId) {
-      setSuppliers([]);
-      setSelectedSupplier(null);
+    if (isEditMode || !initialCompanyId) {
       return;
     }
 
-    // Update selected company display
-    const company = companies.find((c) => c.id === watchedCompanyId);
-    setSelectedCompany(company ?? null);
+    setValue("companyId", initialCompanyId);
+  }, [initialCompanyId, isEditMode, setValue]);
 
-    setLoadingSuppliers(true);
-    fetchSupplierOptionsAction(watchedCompanyId).then(({ data }) => {
-      setSuppliers(data ?? []);
-      setLoadingSuppliers(false);
-      if (isEditMode && po.supplier_id) {
-        const supplier = (data ?? []).find((s) => s.id === po.supplier_id);
-        setSelectedSupplier(supplier ?? null);
-      }
-    });
+  // Auto-load suppliers when company changes
+  useEffect(() => {
+    let ignore = false;
+
+    if (!watchedCompanyId) {
+      return;
+    }
+
+    fetchSupplierOptionsAction(watchedCompanyId)
+      .then(({ data, error }) => {
+        if (ignore) {
+          return;
+        }
+
+        if (error) {
+          setSuppliers([]);
+          setSupplierLoadError(error);
+          return;
+        }
+
+        setSuppliers(data ?? []);
+      })
+      .catch(() => {
+        if (!ignore) {
+          setSuppliers([]);
+          setSupplierLoadError("Failed to load suppliers.");
+        }
+      })
+      .finally(() => {
+        if (!ignore) {
+          setLoadingSuppliers(false);
+        }
+      });
+
+    return () => {
+      ignore = true;
+    };
   }, [watchedCompanyId]);
 
-  // Auto-select supplier when changed
-  const watchedSupplierId = watch("supplierId");
-  useEffect(() => {
-    const supplier = suppliers.find((s) => s.id === watchedSupplierId);
-    setSelectedSupplier(supplier ?? null);
-  }, [watchedSupplierId, suppliers]);
+  const companyOptions = useMemo<ComboboxOption[]>(
+    () =>
+      initialCompanies.map((c) => ({
+        value: c.id,
+        label: c.name,
+      })),
+    [initialCompanies],
+  );
 
-  const companyOptions: ComboboxOption[] = companies.map((c) => ({
-    value: c.id,
-    label: c.name,
-  }));
-
-  const supplierOptions: ComboboxOption[] = suppliers.map((s) => ({
-    value: s.id,
-    label: s.name,
-  }));
+  const supplierOptions = useMemo<ComboboxOption[]>(
+    () =>
+      (watchedCompanyId ? suppliers : []).map((s) => ({
+        value: s.id,
+        label: s.name,
+      })),
+    [suppliers, watchedCompanyId],
+  );
 
   const onSaveDraft = handleSubmit(async (values) => {
     setServerError(null);
@@ -233,40 +265,32 @@ export function PoForm({
           <div>
             <label className={labelClass}>Created Date</label>
             <div className={readonlyClass}>
-              {new Date().toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+              {createdDate}
             </div>
           </div>
 
           {/* Company */}
           <div>
             <label className={labelClass}>Company</label>
-            {isChildWorkspace ? (
-              <div className={readonlyClass}>
-                {companies[0]?.name ?? "—"}
-              </div>
-            ) : (
-              <Controller
-                name="companyId"
-                control={control}
-                render={({ field }) => (
-                  <ComboboxSelect
-                    options={companyOptions}
-                    value={field.value}
-                    onChange={(val) => {
-                      field.onChange(val);
-                      setValue("supplierId", "");
-                      setSelectedSupplier(null);
-                    }}
-                    placeholder="Select company"
-                    hasError={!!errors.companyId}
-                  />
-                )}
-              />
-            )}
+            <Controller
+              name="companyId"
+              control={control}
+              render={({ field }) => (
+                <ComboboxSelect
+                  options={companyOptions}
+                  value={field.value}
+                  onChange={(val) => {
+                    field.onChange(val);
+                    setValue("supplierId", "");
+                    setSuppliers([]);
+                    setLoadingSuppliers(Boolean(val));
+                    setSupplierLoadError(null);
+                  }}
+                  placeholder="Select company"
+                  hasError={!!errors.companyId}
+                />
+              )}
+            />
             {errors.companyId && <p className={errorClass}>{errors.companyId.message}</p>}
           </div>
 
@@ -293,6 +317,9 @@ export function PoForm({
               )}
             />
             {errors.supplierId && <p className={errorClass}>{errors.supplierId.message}</p>}
+            {watchedCompanyId && supplierLoadError && (
+              <p className={errorClass}>{supplierLoadError}</p>
+            )}
           </div>
 
           {/* Company Country (read-only) */}

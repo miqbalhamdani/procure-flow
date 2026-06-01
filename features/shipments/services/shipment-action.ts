@@ -1,11 +1,10 @@
 "use server";
 
 import * as v from "valibot";
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
-import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { requirePermission } from "@/policies";
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -57,34 +56,6 @@ export type CreateShipmentInput = v.InferInput<typeof createShipmentSchema>;
 export type UpdateShipmentInput = v.InferInput<typeof updateShipmentSchema>;
 export type CreateShipmentItemInput = v.InferInput<typeof shipmentItemBaseSchema>;
 export type UpdateShipmentItemInput = v.InferInput<typeof updateShipmentItemSchema>;
-
-// ─── RBAC helper ──────────────────────────────────────────────────────────────
-
-type AllowedRole = "admin" | "manager" | "supplier" | "logistics";
-
-async function requireRole(allowedRoles: AllowedRole[]) {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
-
-  if (!user) return { error: "Unauthorized" as const, supabase: null, user: null };
-  if (!user.workspaceId) return { error: "Unauthorized" as const, supabase: null, user: null };
-
-  if (user.isSuperAdmin) return { error: null, supabase, user };
-
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("role")
-    .eq("workspace_id", user.workspaceId)
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (!membership || !allowedRoles.includes(membership.role as AllowedRole)) {
-    return { error: "Unauthorized: Insufficient role" as const, supabase: null, user: null };
-  }
-
-  return { error: null, supabase, user };
-}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -152,11 +123,9 @@ async function checkAndClosePO(
 export async function createShipment(
   input: CreateShipmentInput,
 ): Promise<{ error?: string; id?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "supplier",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "shipment.create",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(createShipmentSchema, input);
@@ -196,11 +165,9 @@ export async function createShipment(
 export async function updateShipment(
   input: UpdateShipmentInput,
 ): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "supplier",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "shipment.edit",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(updateShipmentSchema, input);
@@ -237,11 +204,9 @@ export async function deleteShipment(
   id: string,
   purchaseOrderId: string,
 ): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "supplier",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "shipment.delete",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const { data: existing } = await supabase
@@ -328,11 +293,9 @@ async function validateRemainingQty(
 export async function addShipmentItem(
   input: CreateShipmentItemInput,
 ): Promise<{ error?: string; id?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "supplier",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "shipment.edit",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(shipmentItemBaseSchema, input);
@@ -388,11 +351,9 @@ export async function addShipmentItem(
 export async function updateShipmentItem(
   input: UpdateShipmentItemInput,
 ): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "supplier",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "shipment.edit",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(updateShipmentItemSchema, input);
@@ -435,11 +396,9 @@ export async function deleteShipmentItem(
   itemId: string,
   shipmentId: string,
 ): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "supplier",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "shipment.edit",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const { data: shipment } = await supabase
@@ -469,11 +428,9 @@ export async function deleteShipmentItem(
 export async function submitShipment(
   input: v.InferInput<typeof submitShipmentSchema>,
 ): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "supplier",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "shipment.markInTransit",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(submitShipmentSchema, input);
@@ -524,11 +481,9 @@ export async function submitShipment(
 export async function updateInTransitTracking(
   input: v.InferInput<typeof submitShipmentSchema>,
 ): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "supplier",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "shipment.markInTransit",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(submitShipmentSchema, input);
@@ -566,11 +521,9 @@ export async function updateInTransitTracking(
 export async function markDelivered(
   input: v.InferInput<typeof markDeliveredSchema>,
 ): Promise<{ error?: string }> {
-  const { error: authError, supabase, user } = await requireRole([
-    "admin",
-    "manager",
-    "logistics",
-  ]);
+  const { error: authError, supabase, user } = await requirePermission(
+    "shipment.markDelivered",
+  );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
 
   const parsed = v.safeParse(markDeliveredSchema, input);

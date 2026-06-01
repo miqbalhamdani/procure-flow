@@ -54,8 +54,15 @@
     {
       "idx": 7,
       "version": "7",
-      "when": 1778402224133,
-      "tag": "0007_brown_rhodey",
+      "when": 1779568227194,
+      "tag": "0008_remove_workspace_id_from_users",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1779579606405,
+      "tag": "0009_memberships_role_unique",
       "breakpoints": true
     }
   ]

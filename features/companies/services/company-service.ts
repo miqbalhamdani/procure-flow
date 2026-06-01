@@ -1,22 +1,17 @@
-import { cookies } from "next/headers";
-
-import { getCurrentUser } from "@/lib/auth/session";
-import { createClient } from "@/lib/supabase/server";
 import { buildPaginated } from "@/lib/pagination";
+import { requireSuperAdmin } from "@/policies";
 import type { PaginatedWorkspaces, WorkspaceSummary } from "@/features/companies/types";
 
 export async function listWorkspacesForSuperAdmin(
   page: number = 1,
   pageSize: number = 10,
 ): Promise<PaginatedWorkspaces> {
-  const user = await getCurrentUser();
-
-  if (!user?.isSuperAdmin) {
-    throw new Error("Unauthorized");
+  const auth = await requireSuperAdmin();
+  if (auth.error || !auth.supabase) {
+    throw new Error(auth.error ?? "Unauthorized");
   }
 
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+  const { supabase } = auth;
 
   const rangeFrom = (page - 1) * pageSize;
   const rangeTo = rangeFrom + pageSize - 1;

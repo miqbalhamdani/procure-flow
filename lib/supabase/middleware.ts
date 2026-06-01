@@ -37,9 +37,13 @@ export const updateSession = async (request: NextRequest) => {
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: claimsData } = await supabase.auth.getClaims();
 
-  return { response: supabaseResponse, supabase, user };
+  supabaseResponse.headers.set("Cache-Control", "private, no-store");
+
+  return {
+    response: supabaseResponse,
+    supabase,
+    claims: claimsData?.claims ?? null,
+  };
 };

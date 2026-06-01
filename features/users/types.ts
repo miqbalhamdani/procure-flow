@@ -1,21 +1,12 @@
 import type { Paginated } from "@/lib/pagination";
+import {
+  MEMBERSHIP_ROLES,
+  type MembershipRole,
+} from "@/policies/roles";
 
-export type MembershipRole =
-  | "admin"
-  | "manager"
-  | "procurement"
-  | "logistics"
-  | "supplier"
-  | "viewer";
-
-export const MEMBERSHIP_ROLES: MembershipRole[] = [
-  "admin",
-  "manager",
-  "procurement",
-  "logistics",
-  "supplier",
-  "viewer",
-];
+export { MEMBERSHIP_ROLES };
+export type { MembershipRole };
+export type { Paginated };
 
 export type UserSummary = {
   id: string;

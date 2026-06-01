@@ -1,12 +1,19 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { cookies } from "next/headers";
 
 import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { BaseTable } from "@/components/ui/base-table";
 import { poColumns } from "@/features/purchase-orders/components/po-columns";
 import { PoListFilters } from "@/features/purchase-orders/components/po-filters";
-import { listPurchaseOrders, getCompanyOptions, getSupplierOptionsForCompany } from "@/features/purchase-orders/services/po-service";
-import { getCurrentWorkspaceContext } from "@/lib/auth/session";
+import {
+  listPurchaseOrders,
+  getCompanyOptions,
+  getSupplierOptionsForCompany,
+  getSupplierOptionsForCompanies,
+} from "@/features/purchase-orders/services/po-service";
+import { getCurrentUser } from "@/lib/auth/session";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function PurchaseOrdersPage({
   searchParams,
@@ -26,8 +33,11 @@ export default async function PurchaseOrdersPage({
     status: params.status,
   };
 
-  const workspaceContext = await getCurrentWorkspaceContext();
-  const isChildWorkspace = workspaceContext?.isChildWorkspace ?? false;
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  const user = await getCurrentUser();
+  const policyContext = { existingClient: supabase, existingUser: user };
+  const isChildWorkspace = user?.isChildWorkspace ?? false;
 
   let companies: Awaited<ReturnType<typeof getCompanyOptions>> = [];
   let suppliers: Awaited<ReturnType<typeof getSupplierOptionsForCompany>> = [];
@@ -37,21 +47,20 @@ export default async function PurchaseOrdersPage({
 
   try {
     const [poResult, companyResult] = await Promise.all([
-      listPurchaseOrders(page, filters),
-      getCompanyOptions(),
+      listPurchaseOrders(page, filters, 10, policyContext),
+      getCompanyOptions(policyContext),
     ]);
     data = poResult.data;
     meta = poResult.meta;
     companies = companyResult;
 
     if (filters.companyId) {
-      suppliers = await getSupplierOptionsForCompany(filters.companyId);
+      suppliers = await getSupplierOptionsForCompany(filters.companyId, policyContext);
     } else {
-      // Load all suppliers for filter dropdown (from all accessible companies)
-      const allSuppliers = await Promise.all(
-        companyResult.map((c) => getSupplierOptionsForCompany(c.id)),
+      suppliers = await getSupplierOptionsForCompanies(
+        companyResult.map((c) => c.id),
+        policyContext,
       );
-      suppliers = allSuppliers.flat();
     }
   } catch (error) {
     pageError = error instanceof Error ? error.message : "Failed to load purchase orders.";

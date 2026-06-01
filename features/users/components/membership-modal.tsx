@@ -27,10 +27,7 @@ const ROLE_LABELS: Record<string, string> = {
 
 const membershipSchema = v.object({
   workspaceId: v.pipe(v.string(), v.minLength(1, "Company is required")),
-  role: v.picklist(
-    ["admin", "manager", "procurement", "logistics", "supplier", "viewer"],
-    "Role is required",
-  ),
+  role: v.picklist(MEMBERSHIP_ROLES, "Role is required"),
 });
 
 type FormValues = v.InferInput<typeof membershipSchema>;

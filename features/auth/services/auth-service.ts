@@ -1,11 +1,14 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 import * as v from "valibot";
 
 import type { LoginCredentials, SignInResult, SignOutResult } from "@/features/auth/types";
 import { getPostLoginPath } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { ACTIVE_MEMBERSHIP_COOKIE } from "@/features/membership-switch";
+import { setActiveMembershipCookie } from "@/features/membership-switch/cookies";
 
 const signInSchema = v.object({
   email: v.pipe(v.string(), v.trim(), v.email("Please enter a valid email")),
@@ -42,7 +45,7 @@ export async function signInWithPassword(values: LoginCredentials): Promise<Sign
 
   const { data: userRecord, error: userRecordError } = await supabase
     .from("users")
-    .select("id, email, workspace_id, is_super_admin")
+    .select("id, is_super_admin")
     .eq("id", data.user.id)
     .maybeSingle();
 
@@ -52,17 +55,22 @@ export async function signInWithPassword(values: LoginCredentials): Promise<Sign
     };
   }
 
-  if (!userRecord.workspace_id) {
-    return {
-      error: "Workspace membership is required for this account.",
-    };
+  const { data: membership } = await supabase
+    .from("memberships")
+    .select("id, workspace_id, role")
+    .eq("user_id", userRecord.id)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (membership?.id) {
+    setActiveMembershipCookie(cookieStore, membership.id);
   }
+
+  revalidatePath("/", "layout");
 
   return {
     redirectTo: getPostLoginPath({
-      id: userRecord.id,
-      email: userRecord.email,
-      workspaceId: userRecord.workspace_id,
       isSuperAdmin: userRecord.is_super_admin,
     }),
   };
@@ -79,6 +87,9 @@ export async function signOut(): Promise<SignOutResult> {
       error: error.message,
     };
   }
+
+  cookieStore.delete(ACTIVE_MEMBERSHIP_COOKIE);
+  revalidatePath("/", "layout");
 
   return {};
 }

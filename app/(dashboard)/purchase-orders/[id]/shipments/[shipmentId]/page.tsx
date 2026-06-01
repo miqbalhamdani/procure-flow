@@ -16,6 +16,7 @@ import { getPurchaseOrderById } from "@/features/purchase-orders/services/po-ser
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
+import { requirePermission } from "@/policies";
 
 interface Props {
   params: Promise<{ id: string; shipmentId: string }>;
@@ -27,12 +28,13 @@ export default async function ShipmentPage({ params }: Props) {
 
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
+  const user = await getCurrentUser();
+  const policyContext = { existingClient: supabase, existingUser: user };
 
   if (!user?.workspaceId) redirect("/login");
 
   // Fetch PO to verify it exists and is accessible
-  const po = await getPurchaseOrderById(poId);
+  const po = await getPurchaseOrderById(poId, policyContext);
   if (!po) {
     redirect(`/purchase-orders`);
   }
@@ -45,7 +47,7 @@ export default async function ShipmentPage({ params }: Props) {
   let shipment: Awaited<ReturnType<typeof getShipmentById>> = null;
 
   if (!isNew) {
-    shipment = await getShipmentById(shipmentId);
+    shipment = await getShipmentById(shipmentId, policyContext);
     if (!shipment) notFound();
     if (shipment.purchase_order_id !== poId) notFound();
   }
@@ -58,24 +60,16 @@ export default async function ShipmentPage({ params }: Props) {
   const remainingQuantities = await getRemainingQuantities(
     poId,
     isNew ? undefined : shipmentId,
+    policyContext,
   );
 
-  // RBAC for action buttons
-  let canTransit = user.isSuperAdmin;
-  let canDeliver = user.isSuperAdmin;
+  const [transitAccess, deliveryAccess] = await Promise.all([
+    requirePermission("shipment.markInTransit", policyContext),
+    requirePermission("shipment.markDelivered", policyContext),
+  ]);
 
-  if (!user.isSuperAdmin && user.workspaceId) {
-    const { data: membership } = await supabase
-      .from("memberships")
-      .select("role")
-      .eq("workspace_id", user.workspaceId)
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    const role = membership?.role ?? "";
-    canTransit = ["admin", "manager", "supplier"].includes(role);
-    canDeliver = ["admin", "manager", "logistics"].includes(role);
-  }
+  const canTransit = !transitAccess.error;
+  const canDeliver = !deliveryAccess.error;
 
   const shipmentListUrl = `/purchase-orders/${poId}/manage?tab=shipments`;
 

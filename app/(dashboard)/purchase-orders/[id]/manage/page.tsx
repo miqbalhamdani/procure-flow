@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { cookies } from "next/headers";
 
 import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -12,6 +13,7 @@ import {
 } from "@/features/purchase-orders/services/po-service";
 import { listShipments } from "@/features/shipments/services/shipment-service";
 import { getCurrentUser } from "@/lib/auth/session";
+import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 
 interface Props {
@@ -23,11 +25,14 @@ export default async function PurchaseOrderManagePage({ params, searchParams }: 
   const { id } = await params;
   const { tab = "details" } = await searchParams;
 
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
   const user = await getCurrentUser();
+  const policyContext = { existingClient: supabase, existingUser: user };
 
   if (!user?.workspaceId) redirect("/login");
 
-  const po = await getPurchaseOrderById(id);
+  const po = await getPurchaseOrderById(id, policyContext);
   if (!po) {
     redirect(`/purchase-orders`);
   }
@@ -37,7 +42,7 @@ export default async function PurchaseOrderManagePage({ params, searchParams }: 
     redirect(`/purchase-orders/${id}`);
   }
 
-  const canApprove = await canCurrentUserApprovePurchaseOrders();
+  const canApprove = await canCurrentUserApprovePurchaseOrders(policyContext);
 
   const activeTab = tab === "shipments" ? "shipments" : "details";
 
@@ -45,7 +50,7 @@ export default async function PurchaseOrderManagePage({ params, searchParams }: 
     activeTab === "shipments"
       ? await (async () => {
           try {
-            return await listShipments(id, 1);
+            return await listShipments(id, 1, 10, policyContext);
           } catch {
             return null;
           }

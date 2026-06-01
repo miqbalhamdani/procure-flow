@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { ActionsCell } from "@/components/ui/actions-cell";
+import { TablePagination } from "@/components/ui/table-pagination";
 import type { UserMembership } from "@/features/users/types";
 import { deleteMembership } from "@/features/users/services/user-action";
 import { MembershipModal } from "@/features/users/components/membership-modal";
@@ -33,6 +34,13 @@ export function MembershipsColumn({
   memberships: UserMembership[];
 }) {
   const [addOpen, setAddOpen] = useState(false);
+  const [pageIndex, setPageIndex] = useState(0);
+  const PAGE_SIZE = 5;
+
+  const pageCount = Math.ceil(memberships.length / PAGE_SIZE);
+  const from = memberships.length === 0 ? 0 : pageIndex * PAGE_SIZE + 1;
+  const to = Math.min((pageIndex + 1) * PAGE_SIZE, memberships.length);
+  const paginated = memberships.slice(pageIndex * PAGE_SIZE, (pageIndex + 1) * PAGE_SIZE);
 
   return (
     <section className="flex min-h-full flex-col overflow-hidden rounded-2xl border border-outline-variant/10 bg-surface-container-lowest shadow-sm">
@@ -66,7 +74,7 @@ export function MembershipsColumn({
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="flex-1 overflow-x-auto">
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="border-b border-outline-variant/5 bg-surface-container-low/50 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
@@ -76,7 +84,7 @@ export function MembershipsColumn({
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant/5">
-              {memberships.map((m) => {
+              {paginated.map((m) => {
                 const initials = m.workspace_name
                   .split(/\s+/)
                   .slice(0, 2)
@@ -137,6 +145,21 @@ export function MembershipsColumn({
             </tbody>
           </table>
         </div>
+      )}
+
+      {memberships.length > PAGE_SIZE && (
+        <TablePagination
+          from={from}
+          to={to}
+          total={memberships.length}
+          pageIndex={pageIndex}
+          pageCount={pageCount}
+          canPreviousPage={pageIndex > 0}
+          canNextPage={pageIndex < pageCount - 1}
+          onPreviousPage={() => setPageIndex((p) => p - 1)}
+          onNextPage={() => setPageIndex((p) => p + 1)}
+          onPageClick={setPageIndex}
+        />
       )}
 
       <MembershipModal
