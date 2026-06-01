@@ -1,5 +1,5 @@
 import { buildPaginated } from "@/lib/pagination";
-import { isOperationalRole, requirePermission } from "@/policies";
+import { isOperationalRole, requirePermission, type PolicyContextOptions } from "@/policies";
 import type {
   PaginatedShipments,
   ShipmentDetail,
@@ -15,9 +15,11 @@ export async function listShipments(
   purchaseOrderId: string,
   page: number = 1,
   pageSize: number = 10,
+  options: PolicyContextOptions = {},
 ): Promise<PaginatedShipments> {
   const { error: authError, supabase, user, role } = await requirePermission(
     "shipment.view",
+    options,
   );
   if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
 
@@ -75,9 +77,13 @@ export async function listShipments(
 
 // ─── Get Shipment Detail ──────────────────────────────────────────────────────
 
-export async function getShipmentById(id: string): Promise<ShipmentDetail | null> {
+export async function getShipmentById(
+  id: string,
+  options: PolicyContextOptions = {},
+): Promise<ShipmentDetail | null> {
   const { error: authError, supabase, user } = await requirePermission(
     "shipment.view",
+    options,
   );
   if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
 
@@ -170,9 +176,11 @@ export async function getShipmentById(id: string): Promise<ShipmentDetail | null
 export async function getRemainingQuantities(
   purchaseOrderId: string,
   excludeShipmentId?: string,
+  options: PolicyContextOptions = {},
 ): Promise<RemainingQuantity[]> {
   const { error: authError, supabase, user } = await requirePermission(
     "shipment.create",
+    options,
   );
   if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
 

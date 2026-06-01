@@ -142,7 +142,7 @@ export async function fetchCompanyOptionsAction(): Promise<{
   try {
     const cookieStore = await cookies();
     const supabase = createClient(cookieStore);
-    const user = await getCurrentUser(supabase);
+    const user = await getCurrentUser();
 
     if (!user?.workspaceId) return { data: [], error: "Unauthorized" };
 

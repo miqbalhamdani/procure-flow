@@ -1,10 +1,8 @@
 import type { ReactNode } from "react";
-import { cookies } from "next/headers";
 
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { getCurrentUser } from "@/lib/auth/session";
-import { createClient } from "@/lib/supabase/server";
 import { getMembershipsWithWorkspaces } from "@/features/membership-switch";
 
 type DashboardLayoutProps = {
@@ -12,8 +10,7 @@ type DashboardLayoutProps = {
 };
 
 export default async function DashboardLayout({ children }: DashboardLayoutProps) {
-  const supabase = createClient(await cookies());
-  const user = await getCurrentUser(supabase);
+  const user = await getCurrentUser();
 
   const memberships = user && !user.isSuperAdmin
     ? await getMembershipsWithWorkspaces(user.id)

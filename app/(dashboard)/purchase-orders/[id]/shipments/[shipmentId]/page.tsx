@@ -28,12 +28,13 @@ export default async function ShipmentPage({ params }: Props) {
 
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
+  const user = await getCurrentUser();
+  const policyContext = { existingClient: supabase, existingUser: user };
 
   if (!user?.workspaceId) redirect("/login");
 
   // Fetch PO to verify it exists and is accessible
-  const po = await getPurchaseOrderById(poId);
+  const po = await getPurchaseOrderById(poId, policyContext);
   if (!po) {
     redirect(`/purchase-orders`);
   }
@@ -46,7 +47,7 @@ export default async function ShipmentPage({ params }: Props) {
   let shipment: Awaited<ReturnType<typeof getShipmentById>> = null;
 
   if (!isNew) {
-    shipment = await getShipmentById(shipmentId);
+    shipment = await getShipmentById(shipmentId, policyContext);
     if (!shipment) notFound();
     if (shipment.purchase_order_id !== poId) notFound();
   }
@@ -59,17 +60,12 @@ export default async function ShipmentPage({ params }: Props) {
   const remainingQuantities = await getRemainingQuantities(
     poId,
     isNew ? undefined : shipmentId,
+    policyContext,
   );
 
   const [transitAccess, deliveryAccess] = await Promise.all([
-    requirePermission("shipment.markInTransit", {
-      existingClient: supabase,
-      existingUser: user,
-    }),
-    requirePermission("shipment.markDelivered", {
-      existingClient: supabase,
-      existingUser: user,
-    }),
+    requirePermission("shipment.markInTransit", policyContext),
+    requirePermission("shipment.markDelivered", policyContext),
   ]);
 
   const canTransit = !transitAccess.error;

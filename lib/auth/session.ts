@@ -1,3 +1,5 @@
+import "server-only";
+
 import { cache } from "react";
 import { cookies } from "next/headers";
 
@@ -26,24 +28,20 @@ const getRequestSupabaseClient = cache(async (): Promise<SupabaseServerClient> =
   return createClient(await cookies());
 });
 
-export const getCurrentUser = cache(async (
-  existingClient?: SupabaseServerClient,
-): Promise<SessionUser | null> => {
-  const supabase = existingClient ?? await getRequestSupabaseClient();
+export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
+  const supabase = await getRequestSupabaseClient();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
+  const userId = claimsData?.claims.sub;
 
-  if (userError || !user) {
+  if (claimsError || !userId) {
     return null;
   }
 
   const { data: userRecord, error: userRecordError } = await supabase
     .from("users")
     .select("id, email, is_super_admin")
-    .eq("id", user.id)
+    .eq("id", userId)
     .maybeSingle();
 
   if (userRecordError || !userRecord) {
@@ -60,7 +58,7 @@ export const getCurrentUser = cache(async (
     const { data } = await supabase
       .from("memberships")
       .select("id, workspace_id, role")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("id", activeMembershipId)
       .maybeSingle();
 
@@ -72,7 +70,7 @@ export const getCurrentUser = cache(async (
     const { data } = await supabase
       .from("memberships")
       .select("id, workspace_id, role")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .order("created_at", { ascending: true })
       .limit(1)
       .maybeSingle();

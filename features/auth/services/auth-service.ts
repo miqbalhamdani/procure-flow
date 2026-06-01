@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 import * as v from "valibot";
 
 import type { LoginCredentials, SignInResult, SignOutResult } from "@/features/auth/types";
@@ -66,6 +67,8 @@ export async function signInWithPassword(values: LoginCredentials): Promise<Sign
     setActiveMembershipCookie(cookieStore, membership.id);
   }
 
+  revalidatePath("/", "layout");
+
   return {
     redirectTo: getPostLoginPath({
       isSuperAdmin: userRecord.is_super_admin,
@@ -86,6 +89,7 @@ export async function signOut(): Promise<SignOutResult> {
   }
 
   cookieStore.delete(ACTIVE_MEMBERSHIP_COOKIE);
+  revalidatePath("/", "layout");
 
   return {};
 }

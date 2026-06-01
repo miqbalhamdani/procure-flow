@@ -1,11 +1,8 @@
 "use server";
 
 import * as v from "valibot";
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
-import { getCurrentUser } from "@/lib/auth/session";
-import { createClient } from "@/lib/supabase/server";
 import type { CompanyOption, SupplierOption } from "@/features/purchase-orders/types";
 import { requirePermission } from "@/policies";
 
@@ -392,11 +389,15 @@ export async function fetchCompanyOptionsAction(): Promise<{
   data?: CompanyOption[];
   error?: string;
 }> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
+  const options = {};
+  const { error: authError, supabase, user, role } = await requirePermission(
+    "purchaseOrder.create",
+    options,
+  );
 
-  if (!user?.membershipId) return { error: "Unauthorized" };
+  if (authError || !supabase || !user || (!user.isSuperAdmin && !role)) {
+    return { error: authError ?? "Unauthorized" };
+  }
 
   const { data, error } = await supabase
     .from("workspaces")
@@ -420,11 +421,15 @@ export async function fetchSupplierOptionsAction(companyId: string): Promise<{
   data?: SupplierOption[];
   error?: string;
 }> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
+  const options = {};
+  const { error: authError, supabase, user, role } = await requirePermission(
+    "purchaseOrder.create",
+    options,
+  );
 
-  if (!user?.workspaceId) return { error: "Unauthorized" };
+  if (authError || !supabase || !user || (!user.isSuperAdmin && !role)) {
+    return { error: authError ?? "Unauthorized" };
+  }
 
   const { data } = await supabase
     .from("suppliers")

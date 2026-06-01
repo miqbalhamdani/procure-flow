@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
 import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { PoForm } from "@/features/purchase-orders/components/po-form";
 import { getPurchaseOrderById, getCompanyOptions } from "@/features/purchase-orders/services/po-service";
 import { getCurrentUser } from "@/lib/auth/session";
+import { createClient } from "@/lib/supabase/server";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -14,14 +16,17 @@ export default async function PurchaseOrderFormPage({ params }: Props) {
   const { id } = await params;
   const isNew = id === "new";
 
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
   const user = await getCurrentUser();
+  const policyContext = { existingClient: supabase, existingUser: user };
 
   if (!user) redirect("/login");
 
   let po: Awaited<ReturnType<typeof getPurchaseOrderById>> = null;
 
   if (!isNew) {
-    po = await getPurchaseOrderById(id);
+    po = await getPurchaseOrderById(id, policyContext);
 
     if (!po) {
       redirect(`/purchase-orders`);
@@ -32,7 +37,7 @@ export default async function PurchaseOrderFormPage({ params }: Props) {
     }
   }
 
-  const companies = await getCompanyOptions();
+  const companies = await getCompanyOptions(policyContext);
 
   const breadcrumbItems = [
     { label: "Dashboard", href: "/dashboard" },

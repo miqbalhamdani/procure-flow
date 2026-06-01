@@ -8,10 +8,10 @@ import {
   type Permission,
 } from "@/policies/roles";
 
-type SupabaseServerClient = ReturnType<typeof createClient>;
+export type SupabaseServerClient = ReturnType<typeof createClient>;
 type WorkspaceSessionUser = SessionUser & { workspaceId: string };
 
-type PolicyContextOptions = {
+export type PolicyContextOptions = {
   existingClient?: SupabaseServerClient;
   existingUser?: SessionUser | null;
 };
@@ -48,7 +48,7 @@ async function getPolicyContext(
   const supabase = options.existingClient ?? createClient(await cookies());
   const user =
     options.existingUser === undefined
-      ? await getCurrentUser(supabase)
+      ? await getCurrentUser()
       : options.existingUser;
 
   return { supabase, user };

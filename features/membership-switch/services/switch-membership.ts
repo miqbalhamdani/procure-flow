@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 import { getCurrentUser } from "@/lib/auth/session";
 import { isMembershipRole } from "@/policies/roles";
@@ -45,7 +46,7 @@ export async function getMembershipsWithWorkspaces(
 export async function switchMembership(membershipId: string): Promise<SwitchMembershipResult> {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
-  const user = await getCurrentUser(supabase);
+  const user = await getCurrentUser();
 
   if (!user) {
     return { error: "Unauthorized" };
@@ -64,6 +65,7 @@ export async function switchMembership(membershipId: string): Promise<SwitchMemb
   }
 
   setActiveMembershipCookie(cookieStore, membershipId);
+  revalidatePath("/", "layout");
 
   return {};
 }

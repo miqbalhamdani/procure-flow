@@ -1,5 +1,5 @@
 import { buildPaginated } from "@/lib/pagination";
-import { isOperationalRole, requirePermission } from "@/policies";
+import { isOperationalRole, requirePermission, type PolicyContextOptions } from "@/policies";
 import type {
   PaginatedPurchaseOrders,
   PurchaseOrderDetail,
@@ -16,9 +16,11 @@ export async function listPurchaseOrders(
   page: number = 1,
   filters: PurchaseOrderFilters = {},
   pageSize: number = 10,
+  options: PolicyContextOptions = {},
 ): Promise<PaginatedPurchaseOrders> {
   const { error: authError, supabase, user, role } = await requirePermission(
     "purchaseOrder.view",
+    options,
   );
   if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
 
@@ -83,9 +85,13 @@ export async function listPurchaseOrders(
 
 // ─── Get Purchase Order Detail ────────────────────────────────────────────────
 
-export async function getPurchaseOrderById(id: string): Promise<PurchaseOrderDetail | null> {
+export async function getPurchaseOrderById(
+  id: string,
+  options: PolicyContextOptions = {},
+): Promise<PurchaseOrderDetail | null> {
   const { error: authError, supabase, user, role } = await requirePermission(
     "purchaseOrder.view",
+    options,
   );
   if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
 
@@ -188,16 +194,21 @@ export async function getPurchaseOrderById(id: string): Promise<PurchaseOrderDet
   };
 }
 
-export async function canCurrentUserApprovePurchaseOrders(): Promise<boolean> {
-  const { error } = await requirePermission("purchaseOrder.approve");
+export async function canCurrentUserApprovePurchaseOrders(
+  options: PolicyContextOptions = {},
+): Promise<boolean> {
+  const { error } = await requirePermission("purchaseOrder.approve", options);
   return error == null;
 }
 
 // ─── Company Options ──────────────────────────────────────────────────────────
 
-export async function getCompanyOptions(): Promise<CompanyOption[]> {
+export async function getCompanyOptions(
+  options: PolicyContextOptions = {},
+): Promise<CompanyOption[]> {
   const { error: authError, supabase, user } = await requirePermission(
     "purchaseOrder.view",
+    options,
   );
   if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
 
@@ -217,16 +228,30 @@ export async function getCompanyOptions(): Promise<CompanyOption[]> {
 
 // ─── Supplier Options (filtered by company) ───────────────────────────────────
 
-export async function getSupplierOptionsForCompany(companyId: string): Promise<SupplierOption[]> {
+export async function getSupplierOptionsForCompany(
+  companyId: string,
+  options: PolicyContextOptions = {},
+): Promise<SupplierOption[]> {
+  return getSupplierOptionsForCompanies([companyId], options);
+}
+
+export async function getSupplierOptionsForCompanies(
+  companyIds: string[],
+  options: PolicyContextOptions = {},
+): Promise<SupplierOption[]> {
   const { error: authError, supabase, user } = await requirePermission(
     "purchaseOrder.view",
+    options,
   );
   if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
+
+  const uniqueCompanyIds = [...new Set(companyIds)].filter(Boolean);
+  if (uniqueCompanyIds.length === 0) return [];
 
   const { data } = await supabase
     .from("suppliers")
     .select("id, name, address, country")
-    .eq("company_id", companyId)
+    .in("company_id", uniqueCompanyIds)
     .order("name", { ascending: true });
 
   return (data ?? []).map((s) => ({
