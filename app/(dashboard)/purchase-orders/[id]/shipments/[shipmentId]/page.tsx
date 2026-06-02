@@ -16,7 +16,7 @@ import { getPurchaseOrderById } from "@/features/purchase-orders/services/po-ser
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
-import { hasPermission, requirePermission } from "@/policies";
+import { can, requirePermission } from "@/policies";
 
 interface Props {
   params: Promise<{ id: string; shipmentId: string }>;
@@ -43,11 +43,9 @@ export default async function ShipmentPage({ params }: Props) {
     redirect(`/purchase-orders/${poId}/manage`);
   }
 
-  const canCreateShipment =
-    user.isSuperAdmin || hasPermission(user.role, "shipment.create");
-  const canViewShipment =
-    user.isSuperAdmin || hasPermission(user.role, "shipment.view");
-  const canEditShipment = user.isSuperAdmin || hasPermission(user.role, "shipment.edit");
+  const canCreateShipment = can(user.isSuperAdmin, user.role, "shipment.create");
+  const canViewShipment = can(user.isSuperAdmin, user.role, "shipment.view");
+  const canEditShipment = can(user.isSuperAdmin, user.role, "shipment.edit");
 
   console.log({ canCreateShipment, canViewShipment, canEditShipment });
 

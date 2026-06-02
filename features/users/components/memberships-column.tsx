@@ -7,6 +7,7 @@ import { TablePagination } from "@/components/ui/table-pagination";
 import type { UserMembership } from "@/features/users/types";
 import { deleteMembership } from "@/features/users/services/user-action";
 import { MembershipModal } from "@/features/users/components/membership-modal";
+import { ROLE_LABELS } from "@/policies/roles";
 
 const ROLE_BADGE_CLASSES: Record<string, string> = {
   admin: "border border-primary/10 bg-primary-fixed text-on-primary-fixed shadow-[0_10px_24px_rgba(113,42,226,0.16)]",
@@ -15,15 +16,6 @@ const ROLE_BADGE_CLASSES: Record<string, string> = {
   logistics: "border border-tertiary/10 bg-tertiary-fixed text-on-tertiary-fixed shadow-[0_10px_24px_rgba(181,93,0,0.18)]",
   supplier: "border border-error/10 bg-error-container text-on-error-container shadow-[0_10px_24px_rgba(186,26,26,0.16)]",
   viewer: "border border-outline-variant/60 bg-surface-container-highest text-on-surface shadow-[0_10px_24px_rgba(70,69,84,0.12)]",
-};
-
-const ROLE_LABELS: Record<string, string> = {
-  admin: "Admin",
-  manager: "Manager",
-  procurement: "Procurement",
-  logistics: "Logistics",
-  supplier: "Supplier",
-  viewer: "Viewer",
 };
 
 export function MembershipsColumn({

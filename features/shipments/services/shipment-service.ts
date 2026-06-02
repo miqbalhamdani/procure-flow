@@ -36,7 +36,7 @@ export async function listShipments(
     .order("created_at", { ascending: false })
     .range(rangeFrom, rangeTo);
 
-  if (!user.isSuperAdmin && !canViewPendingShipment(role)) {
+  if (!canViewPendingShipment(user.isSuperAdmin, role)) {
     query = query.neq("status", "pending");
   }
 
@@ -96,7 +96,7 @@ export async function getShipmentById(
   if (error) throw new Error(error.message);
   if (!shipment) return null;
 
-  if (!user.isSuperAdmin && shipment.status === "pending" && !canViewPendingShipment(user.role)) {
+  if (shipment.status === "pending" && !canViewPendingShipment(user.isSuperAdmin, user.role)) {
     return null;
   }
 

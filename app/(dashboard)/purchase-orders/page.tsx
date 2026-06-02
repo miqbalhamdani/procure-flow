@@ -13,7 +13,7 @@ import {
 } from "@/features/purchase-orders/services/po-service";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import { hasPermission } from "@/policies";
+import { can } from "@/policies";
 import { redirect } from "next/navigation";
 
 export default async function PurchaseOrdersPage({
@@ -42,18 +42,15 @@ export default async function PurchaseOrdersPage({
     redirect("/login");
   }
 
-  if (!user.isSuperAdmin && !hasPermission(user.role, "purchaseOrder.view")) {
+  if (!can(user.isSuperAdmin, user.role, "purchaseOrder.view")) {
     redirect("/dashboard");
   }
 
   const policyContext = { existingClient: supabase, existingUser: user };
   const isChildWorkspace = user?.isChildWorkspace ?? false;
-  const canCreatePurchaseOrder =
-    user.isSuperAdmin || hasPermission(user.role, "purchaseOrder.create");
-  const canEditPurchaseOrder =
-    user.isSuperAdmin || hasPermission(user.role, "purchaseOrder.edit");
-  const canDeletePurchaseOrder =
-    user.isSuperAdmin || hasPermission(user.role, "purchaseOrder.delete");
+  const canCreatePurchaseOrder = can(user.isSuperAdmin, user.role, "purchaseOrder.create");
+  const canEditPurchaseOrder = can(user.isSuperAdmin, user.role, "purchaseOrder.edit");
+  const canDeletePurchaseOrder = can(user.isSuperAdmin, user.role, "purchaseOrder.delete");
 
   let companies: Awaited<ReturnType<typeof getCompanyOptions>> = [];
   let suppliers: Awaited<ReturnType<typeof getSupplierOptionsForCompany>> = [];

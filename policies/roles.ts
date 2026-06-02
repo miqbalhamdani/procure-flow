@@ -90,6 +90,17 @@ const ROLE_PERMISSIONS: Record<MembershipRole, Permission[]> = {
   ],
 };
 
+// ─── Role Display Labels ──────────────────────────────────────────────────────
+
+export const ROLE_LABELS: Record<MembershipRole, string> = {
+  admin: "Admin",
+  manager: "Manager",
+  procurement: "Procurement",
+  logistics: "Logistics",
+  supplier: "Supplier",
+  viewer: "Viewer",
+};
+
 // ─── Permission Helpers ───────────────────────────────────────────────────────
 
 export function hasPermission(
@@ -99,12 +110,27 @@ export function hasPermission(
   return role != null && (ROLE_PERMISSIONS[role]?.includes(permission) ?? false);
 }
 
+/**
+ * Unified permission check that accounts for Super Admin bypass.
+ * Use this in pages/components instead of `isSuperAdmin || hasPermission(role, permission)`.
+ */
+export function can(
+  isSuperAdmin: boolean,
+  role: MembershipRole | null | undefined,
+  permission: Permission,
+): boolean {
+  return isSuperAdmin || hasPermission(role, permission);
+}
+
 export function isOperationalRole(role: MembershipRole | null | undefined): boolean {
   return role != null && OPERATIONAL_ROLES.includes(role);
 }
 
-export function canViewPendingShipment(role: MembershipRole | null | undefined): boolean {
-  return role === "admin" || role === "supplier" || role === "viewer";
+export function canViewPendingShipment(
+  isSuperAdmin: boolean,
+  role: MembershipRole | null | undefined,
+): boolean {
+  return isSuperAdmin || role === "admin" || role === "supplier" || role === "viewer";
 }
 
 export function isMembershipRole(value: string): value is MembershipRole {

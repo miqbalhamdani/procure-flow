@@ -7,7 +7,7 @@ import { SupplierModal } from "@/features/suppliers/components/supplier-modal";
 import { SupplierSearch } from "@/features/suppliers/components/supplier-search";
 import { listSuppliers } from "@/features/suppliers/services/supplier-service";
 import { getCurrentUser } from "@/lib/auth/session";
-import { hasPermission } from "@/policies";
+import { can } from "@/policies";
 
 export default async function SuppliersPage({
   searchParams,
@@ -20,15 +20,15 @@ export default async function SuppliersPage({
     redirect("/login");
   }
 
-  if (!user.isSuperAdmin && !hasPermission(user.role, "supplier.view")) {
+  if (!can(user.isSuperAdmin, user.role, "supplier.view")) {
     redirect("/dashboard");
   }
 
   const { page: pageParam, search = "" } = await searchParams;
   const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
-  const canCreateSupplier = user.isSuperAdmin || hasPermission(user.role, "supplier.create");
-  const canEditSupplier = user.isSuperAdmin || hasPermission(user.role, "supplier.edit");
-  const canDeleteSupplier = user.isSuperAdmin || hasPermission(user.role, "supplier.delete");
+  const canCreateSupplier = can(user.isSuperAdmin, user.role, "supplier.create");
+  const canEditSupplier = can(user.isSuperAdmin, user.role, "supplier.edit");
+  const canDeleteSupplier = can(user.isSuperAdmin, user.role, "supplier.delete");
 
   let data: Awaited<ReturnType<typeof listSuppliers>>["data"] = [];
   let meta: Awaited<ReturnType<typeof listSuppliers>>["meta"] | null = null;
