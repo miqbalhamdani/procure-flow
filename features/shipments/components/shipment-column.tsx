@@ -15,16 +15,18 @@ import { formatDate } from "@/lib/utils";
 function ShipmentActionsCell({
   shipment,
   purchaseOrderId,
+  canEditShipment,
+  canDeleteShipment,
 }: {
   shipment: ShipmentSummary;
   purchaseOrderId: string;
+  canEditShipment: boolean;
+  canDeleteShipment: boolean;
 }) {
   const isPending = shipment.status === "pending";
-  const isManageOnly =
-    shipment.status === "in_transit" || shipment.status === "delivered";
   const href = `/purchase-orders/${purchaseOrderId}/shipments/${shipment.id}`;
 
-  if (!isPending && !isManageOnly) {
+  if (!isPending && shipment.status !== "in_transit" && shipment.status !== "delivered") {
     return null;
   }
 
@@ -32,11 +34,13 @@ function ShipmentActionsCell({
     <ActionsCell
       editAction={
         isPending
-          ? { type: "link", href }
+          ? canEditShipment
+            ? { type: "link", href }
+            : { type: "link", href, label: "View", icon: "visibility" }
           : { type: "link", href, label: "Manage", icon: "tune" }
       }
       deleteAction={
-        isPending
+        isPending && canDeleteShipment
           ? {
               resourceName: "Shipment",
               itemName: shipment.shipment_number,
@@ -48,8 +52,12 @@ function ShipmentActionsCell({
   );
 }
 
-function shipmentColumns(purchaseOrderId: string): ColumnDef<ShipmentSummary>[] {
-  return [
+function shipmentColumns(
+  purchaseOrderId: string,
+  canEditShipment: boolean,
+  canDeleteShipment: boolean,
+): ColumnDef<ShipmentSummary>[] {
+  const columns: ColumnDef<ShipmentSummary>[] = [
     {
       accessorKey: "shipment_number",
       header: "Shipment Number",
@@ -102,14 +110,24 @@ function shipmentColumns(purchaseOrderId: string): ColumnDef<ShipmentSummary>[] 
         );
       },
     },
-    {
+  ];
+
+  if (canEditShipment || canDeleteShipment) {
+    columns.push({
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <ShipmentActionsCell shipment={row.original} purchaseOrderId={purchaseOrderId} />
+        <ShipmentActionsCell
+          shipment={row.original}
+          purchaseOrderId={purchaseOrderId}
+          canEditShipment={canEditShipment}
+          canDeleteShipment={canDeleteShipment}
+        />
       ),
-    },
-  ];
+    });
+  }
+
+  return columns;
 }
 
 interface ShipmentListTableProps {
@@ -117,6 +135,8 @@ interface ShipmentListTableProps {
   shipments: ShipmentSummary[];
   pagination: PaginationMeta | null;
   canCreateShipment: boolean;
+  canEditShipment: boolean;
+  canDeleteShipment: boolean;
 }
 
 export function ShipmentListTable({
@@ -124,10 +144,12 @@ export function ShipmentListTable({
   shipments,
   pagination,
   canCreateShipment,
+  canEditShipment,
+  canDeleteShipment,
 }: ShipmentListTableProps) {
   const columns = useMemo(
-    () => shipmentColumns(purchaseOrderId),
-    [purchaseOrderId],
+    () => shipmentColumns(purchaseOrderId, canEditShipment, canDeleteShipment),
+    [purchaseOrderId, canEditShipment, canDeleteShipment],
   );
 
   return (

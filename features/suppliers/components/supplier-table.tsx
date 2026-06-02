@@ -3,11 +3,18 @@
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { ActionsCell } from "@/components/ui/actions-cell";
+import { BaseTable } from "@/components/ui/base-table";
 import { SupplierModal } from "@/features/suppliers/components/supplier-modal";
 import { deleteSupplier } from "@/features/suppliers/services/supplier-action";
 import type { SupplierSummary } from "@/features/suppliers/types";
 import { findCountryByName, flagUrl } from "@/lib/countries";
+import type { PaginationMeta } from "@/lib/pagination";
 import { getInitials } from "@/lib/utils";
+
+type SupplierColumnsOptions = {
+  canEditSupplier: boolean;
+  canDeleteSupplier: boolean;
+};
 
 const AVATAR_COLORS = [
   "bg-primary/10 text-primary",
@@ -21,8 +28,12 @@ function avatarColor(id: string): string {
   return AVATAR_COLORS[idx];
 }
 
-export const columns: ColumnDef<SupplierSummary>[] = [
-  {
+export function supplierColumns({
+  canEditSupplier,
+  canDeleteSupplier,
+}: SupplierColumnsOptions): ColumnDef<SupplierSummary>[] {
+  const columns: ColumnDef<SupplierSummary>[] = [
+    {
     accessorKey: "name",
     header: "Supplier Name",
     cell: ({ row }) => {
@@ -39,8 +50,8 @@ export const columns: ColumnDef<SupplierSummary>[] = [
         </div>
       );
     },
-  },
-  {
+    },
+    {
     accessorKey: "company_name",
     header: "Company",
     cell: ({ row }) => (
@@ -50,8 +61,8 @@ export const columns: ColumnDef<SupplierSummary>[] = [
         )}
       </span>
     ),
-  },
-  {
+    },
+    {
     accessorKey: "address",
     header: "Address",
     cell: ({ row }) => (
@@ -61,8 +72,8 @@ export const columns: ColumnDef<SupplierSummary>[] = [
         )}
       </span>
     ),
-  },
-  {
+    },
+    {
     accessorKey: "country",
     header: "Country",
     cell: ({ row }) => {
@@ -84,25 +95,72 @@ export const columns: ColumnDef<SupplierSummary>[] = [
         </span>
       );
     },
-  },
-  {
-    id: "actions",
-    header: "Actions",
-    cell: ({ row }) => {
-      const supplier = row.original;
-      return (
-        <ActionsCell
-          editAction={{
-            type: "modal",
-            render: (props) => <SupplierModal supplier={supplier} {...props} />,
-          }}
-          deleteAction={{
-            resourceName: "Supplier",
-            itemName: supplier.name,
-            onConfirm: () => deleteSupplier(supplier.id),
-          }}
-        />
-      );
     },
-  },
-];
+  ];
+
+  if (canEditSupplier || canDeleteSupplier) {
+    columns.push({
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const supplier = row.original;
+        return (
+          <ActionsCell
+            editAction={
+              canEditSupplier
+                ? {
+                    type: "modal",
+                    render: (props) => <SupplierModal supplier={supplier} {...props} />,
+                  }
+                : undefined
+            }
+            deleteAction={
+              canDeleteSupplier
+                ? {
+                    resourceName: "Supplier",
+                    itemName: supplier.name,
+                    onConfirm: () => deleteSupplier(supplier.id),
+                  }
+                : undefined
+            }
+          />
+        );
+      },
+    });
+  }
+
+  return columns;
+}
+
+type SupplierTableProps = {
+  data: SupplierSummary[];
+  pagination: PaginationMeta | null;
+  search: string;
+  canEditSupplier: boolean;
+  canDeleteSupplier: boolean;
+};
+
+export function SupplierTable({
+  data,
+  pagination,
+  search,
+  canEditSupplier,
+  canDeleteSupplier,
+}: SupplierTableProps) {
+  return (
+    <BaseTable
+      columns={supplierColumns({
+        canEditSupplier,
+        canDeleteSupplier,
+      })}
+      data={data}
+      emptyMessage="No suppliers found."
+      emptyDescription={
+        search
+          ? `No suppliers match "${search}". Try a different search.`
+          : "Add your first supplier to get started."
+      }
+      pagination={pagination}
+    />
+  );
+}

@@ -103,6 +103,10 @@ export function isOperationalRole(role: MembershipRole | null | undefined): bool
   return role != null && OPERATIONAL_ROLES.includes(role);
 }
 
+export function canViewPendingShipment(role: MembershipRole | null | undefined): boolean {
+  return role === "admin" || role === "supplier" || role === "viewer";
+}
+
 export function isMembershipRole(value: string): value is MembershipRole {
   return MEMBERSHIP_ROLES.includes(value as MembershipRole);
 }

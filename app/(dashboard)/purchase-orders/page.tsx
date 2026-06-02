@@ -3,9 +3,8 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 
 import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
-import { BaseTable } from "@/components/ui/base-table";
-import { poColumns } from "@/features/purchase-orders/components/po-columns";
 import { PoListFilters } from "@/features/purchase-orders/components/po-filters";
+import { PoListTable } from "@/features/purchase-orders/components/po-table";
 import {
   listPurchaseOrders,
   getCompanyOptions,
@@ -14,6 +13,8 @@ import {
 } from "@/features/purchase-orders/services/po-service";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { hasPermission } from "@/policies";
+import { redirect } from "next/navigation";
 
 export default async function PurchaseOrdersPage({
   searchParams,
@@ -36,8 +37,23 @@ export default async function PurchaseOrdersPage({
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
   const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  if (!user.isSuperAdmin && !hasPermission(user.role, "purchaseOrder.view")) {
+    redirect("/dashboard");
+  }
+
   const policyContext = { existingClient: supabase, existingUser: user };
   const isChildWorkspace = user?.isChildWorkspace ?? false;
+  const canCreatePurchaseOrder =
+    user.isSuperAdmin || hasPermission(user.role, "purchaseOrder.create");
+  const canEditPurchaseOrder =
+    user.isSuperAdmin || hasPermission(user.role, "purchaseOrder.edit");
+  const canDeletePurchaseOrder =
+    user.isSuperAdmin || hasPermission(user.role, "purchaseOrder.delete");
 
   let companies: Awaited<ReturnType<typeof getCompanyOptions>> = [];
   let suppliers: Awaited<ReturnType<typeof getSupplierOptionsForCompany>> = [];
@@ -85,13 +101,15 @@ export default async function PurchaseOrdersPage({
             Create and manage purchase orders across your workspace.
           </p>
         </div>
-        <Link
-          href="/purchase-orders/new"
-          className="flex items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-container px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95"
-        >
-          <span className="material-symbols-outlined text-[18px] leading-none">add</span>
-          New Purchase Order
-        </Link>
+        {canCreatePurchaseOrder ? (
+          <Link
+            href="/purchase-orders/new"
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-container px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95"
+          >
+            <span className="material-symbols-outlined text-[18px] leading-none">add</span>
+            New Purchase Order
+          </Link>
+        ) : null}
       </div>
 
       {pageError && (
@@ -113,12 +131,11 @@ export default async function PurchaseOrdersPage({
               isChildWorkspace={isChildWorkspace}
             />
           </div>
-          <BaseTable
-            columns={poColumns}
+          <PoListTable
             data={data}
-            emptyMessage="No purchase orders found."
-            emptyDescription="Create your first purchase order to get started."
             pagination={meta}
+            canEditPurchaseOrder={canEditPurchaseOrder}
+            canDeletePurchaseOrder={canDeletePurchaseOrder}
           />
         </div>
       </Suspense>

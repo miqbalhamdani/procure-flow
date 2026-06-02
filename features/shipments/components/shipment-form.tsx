@@ -38,6 +38,7 @@ interface ShipmentFormProps {
   purchaseOrderId: string;
   shipment?: ShipmentDetail;
   remainingQuantities: RemainingQuantity[];
+  canEditShipment: boolean;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -46,6 +47,7 @@ export function ShipmentForm({
   purchaseOrderId,
   shipment,
   remainingQuantities,
+  canEditShipment,
 }: ShipmentFormProps) {
   const router = useRouter();
 
@@ -60,8 +62,10 @@ export function ShipmentForm({
 
   const shipmentId = savedShipmentId ?? shipment?.id ?? null;
   const isShipmentCreated = !!shipmentId;
+  const isPendingShipment = !shipment || shipment.status === "pending";
+  const canManageShipmentItems = canEditShipment && isShipmentCreated && isPendingShipment;
   const hasShipmentItems = (shipment?.items.length ?? 0) > 0;
-  const canSubmitShipment = isShipmentCreated && hasShipmentItems;
+  const canSubmitShipment = canEditShipment && isShipmentCreated && hasShipmentItems;
 
   const {
     control,
@@ -72,14 +76,19 @@ export function ShipmentForm({
     resolver,
     defaultValues: shipment
       ? {
-          shipmentNumber: shipment.shipment_number,
-          shipmentDate: shipment.shipment_date ?? "",
-        }
+        shipmentNumber: shipment.shipment_number,
+        shipmentDate: shipment.shipment_date ?? "",
+      }
       : { shipmentNumber: "", shipmentDate: "" },
   });
 
   const onSaveDraft = handleSubmit(async (values) => {
     setServerError(null);
+
+    if (!canEditShipment) {
+      setServerError("You do not have permission to edit this shipment.");
+      return;
+    }
 
     if (shipmentId) {
       const result = await updateShipment({
@@ -109,6 +118,11 @@ export function ShipmentForm({
 
   const onSubmitShipment = handleSubmit(async (values) => {
     setServerError(null);
+
+    if (!canEditShipment) {
+      setServerError("You do not have permission to submit this shipment.");
+      return;
+    }
 
     if (!shipmentId) {
       setServerError("Save this shipment as a draft before submitting it.");
@@ -143,6 +157,10 @@ export function ShipmentForm({
     purchaseOrderItemId: string;
     quantity: number;
   }) => {
+    if (!canEditShipment) {
+      return { error: "You do not have permission to edit shipment items." };
+    }
+
     if (!shipmentId) {
       return { error: "Save this shipment as a draft before adding items." };
     }
@@ -185,6 +203,7 @@ export function ShipmentForm({
               {...register("shipmentNumber")}
               className={inputClass}
               placeholder="e.g. SHP-2026-001"
+              disabled={!canEditShipment}
             />
             {errors.shipmentNumber && (
               <p className={errorClass}>{errors.shipmentNumber.message}</p>
@@ -202,10 +221,11 @@ export function ShipmentForm({
                   <DatePicker
                     id={shipmentDateFieldId}
                     value={field.value}
-                    onChange={field.onChange}
+                    onChange={canEditShipment ? field.onChange : undefined}
                     errorId={`${shipmentDateFieldId}-error`}
                     hasError={!!fieldState.error}
                     triggerClassName="h-[46px] rounded-xl border-0 bg-surface-container-low px-4 text-on-background shadow-none ring-1 ring-transparent hover:bg-surface-container-low hover:text-on-background focus-visible:ring-2 focus-visible:ring-primary/30 data-[empty=true]:text-on-surface-variant/70"
+                    disabled={!canEditShipment}
                   />
                 );
               }}
@@ -225,7 +245,7 @@ export function ShipmentForm({
           <h3 className="font-headline text-base font-bold tracking-tight text-on-background">
             Shipment Items
           </h3>
-          {isShipmentCreated && (
+          {canManageShipmentItems && (
             <ShipmentItemModal
               remainingQuantities={remainingQuantities}
               onSubmit={handleAddItem}
@@ -247,11 +267,12 @@ export function ShipmentForm({
           items={shipment?.items ?? []}
           shipmentId={shipmentId ?? ""}
           remainingQuantities={remainingQuantities}
-          isEditable={isShipmentCreated}
+          isEditable={canManageShipmentItems}
         />
       </section>
 
       {/* Actions */}
+
       <section className="rounded-2xl bg-surface-container-lowest p-6 shadow-sm">
         <div className="flex items-center justify-between gap-4">
           <div>
@@ -266,30 +287,31 @@ export function ShipmentForm({
               Submitted shipments will move into the In Transit status.
             </p>
           </div>
-          <div className="flex shrink-0 items-center gap-3">
-            <button
-              type="button"
-              onClick={onSaveDraft}
-              disabled={isSubmitting}
-              className="flex items-center gap-2 rounded-xl bg-surface-container-high px-5 py-2.5 text-sm font-bold text-primary hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 transition-all"
-            >
-              <span className="material-symbols-outlined text-[16px] leading-none">
-                save
-              </span>
-              {isSubmitting ? "Saving…" : "Save as Draft"}
-            </button>
-            <button
-              type="button"
-              onClick={onSubmitShipment}
-              disabled={isSubmitting || !canSubmitShipment}
-              className="flex items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-container px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:scale-100 disabled:opacity-60"
-            >
-              <span className="material-symbols-outlined text-[16px] leading-none">
-                send
-              </span>
-              {isSubmitting ? "Submitting…" : "Submit Shipment"}
-            </button>
-          </div>
+          {canEditShipment && (
+            <div className="flex shrink-0 items-center gap-3">
+              <button
+                type="button"
+                onClick={onSaveDraft}
+                disabled={isSubmitting}
+                className="flex items-center gap-2 rounded-xl bg-surface-container-high px-5 py-2.5 text-sm font-bold text-primary hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 transition-all"
+              >
+                <span className="material-symbols-outlined text-[16px] leading-none">
+                  save
+                </span>
+                {isSubmitting ? "Saving…" : "Save as Draft"}
+              </button>
+              <button
+                type="button"
+                onClick={onSubmitShipment}
+                disabled={isSubmitting || !canSubmitShipment}
+                className="flex items-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-container px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:scale-100 disabled:opacity-60"
+              >
+                <span className="material-symbols-outlined text-[16px] leading-none">
+                  send
+                </span>
+                {isSubmitting ? "Submitting…" : "Submit Shipment"}
+              </button>
+            </div>)}
         </div>
       </section>
     </div>

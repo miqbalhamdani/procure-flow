@@ -7,6 +7,7 @@ import { PoForm } from "@/features/purchase-orders/components/po-form";
 import { getPurchaseOrderById, getCompanyOptions } from "@/features/purchase-orders/services/po-service";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { hasPermission } from "@/policies";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -23,9 +24,22 @@ export default async function PurchaseOrderFormPage({ params }: Props) {
 
   if (!user) redirect("/login");
 
+  const canCreatePurchaseOrder =
+    user.isSuperAdmin || hasPermission(user.role, "purchaseOrder.create");
+  const canEditPurchaseOrder =
+    user.isSuperAdmin || hasPermission(user.role, "purchaseOrder.edit");
+
+  if (isNew && !canCreatePurchaseOrder) {
+    redirect("/purchase-orders");
+  }
+
   let po: Awaited<ReturnType<typeof getPurchaseOrderById>> = null;
 
   if (!isNew) {
+    if (!canEditPurchaseOrder) {
+      redirect(`/purchase-orders/${id}/manage`);
+    }
+
     po = await getPurchaseOrderById(id, policyContext);
 
     if (!po) {
