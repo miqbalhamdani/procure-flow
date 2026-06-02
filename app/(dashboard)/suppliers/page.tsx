@@ -1,19 +1,34 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 
 import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
-import { BaseTable } from "@/components/ui/base-table";
-import { columns } from "@/features/suppliers/components/columns";
+import { SupplierTable } from "@/features/suppliers/components/supplier-table";
 import { SupplierModal } from "@/features/suppliers/components/supplier-modal";
 import { SupplierSearch } from "@/features/suppliers/components/supplier-search";
 import { listSuppliers } from "@/features/suppliers/services/supplier-service";
+import { getCurrentUser } from "@/lib/auth/session";
+import { can } from "@/policies";
 
 export default async function SuppliersPage({
   searchParams,
 }: {
   searchParams: Promise<{ page?: string; search?: string }>;
 }) {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  if (!can(user.isSuperAdmin, user.role, "supplier.view")) {
+    redirect("/dashboard");
+  }
+
   const { page: pageParam, search = "" } = await searchParams;
   const page = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
+  const canCreateSupplier = can(user.isSuperAdmin, user.role, "supplier.create");
+  const canEditSupplier = can(user.isSuperAdmin, user.role, "supplier.edit");
+  const canDeleteSupplier = can(user.isSuperAdmin, user.role, "supplier.delete");
 
   let data: Awaited<ReturnType<typeof listSuppliers>>["data"] = [];
   let meta: Awaited<ReturnType<typeof listSuppliers>>["meta"] | null = null;
@@ -49,7 +64,7 @@ export default async function SuppliersPage({
           </p>
         </div>
         <Suspense>
-          <SupplierModal />
+          {canCreateSupplier ? <SupplierModal /> : null}
         </Suspense>
       </div>
 
@@ -67,16 +82,12 @@ export default async function SuppliersPage({
             <SupplierSearch defaultValue={search} />
           </div>
 
-          <BaseTable
-            columns={columns}
+          <SupplierTable
             data={data}
-            emptyMessage="No suppliers found."
-            emptyDescription={
-                search
-                ? `No suppliers match "${search}". Try a different search.`
-                : "Add your first supplier to get started."
-            }
             pagination={meta}
+            search={search}
+            canEditSupplier={canEditSupplier}
+            canDeleteSupplier={canDeleteSupplier}
           />
         </div>
       </Suspense>

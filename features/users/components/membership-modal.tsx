@@ -15,15 +15,7 @@ import {
 } from "@/features/users/services/user-action";
 import { ComboboxSelect, type ComboboxOption } from "@/components/ui/combobox-select";
 import { MEMBERSHIP_ROLES, type UserMembership, type WorkspaceOption } from "@/features/users/types";
-
-const ROLE_LABELS: Record<string, string> = {
-  admin: "Admin",
-  manager: "Manager",
-  procurement: "Procurement",
-  logistics: "Logistics",
-  supplier: "Supplier",
-  viewer: "Viewer",
-};
+import { ROLE_LABELS } from "@/policies/roles";
 
 const membershipSchema = v.object({
   workspaceId: v.pipe(v.string(), v.minLength(1, "Company is required")),

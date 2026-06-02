@@ -15,6 +15,7 @@ import { listShipments } from "@/features/shipments/services/shipment-service";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
+import { can } from "@/policies";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -37,8 +38,13 @@ export default async function PurchaseOrderManagePage({ params, searchParams }: 
     redirect(`/purchase-orders`);
   }
 
+  const canEditPurchaseOrder = can(user.isSuperAdmin, user.role, "purchaseOrder.edit");
+  const canCreateShipment = can(user.isSuperAdmin, user.role, "shipment.create");
+  const canEditShipment = can(user.isSuperAdmin, user.role, "shipment.edit");
+  const canDeleteShipment = can(user.isSuperAdmin, user.role, "shipment.delete");
+
   // Draft POs go to edit page
-  if (po.status === "draft") {
+  if (po.status === "draft" && canEditPurchaseOrder) {
     redirect(`/purchase-orders/${id}`);
   }
 
@@ -127,7 +133,9 @@ export default async function PurchaseOrderManagePage({ params, searchParams }: 
           purchaseOrderId={id}
           shipments={shipments?.data ?? []}
           pagination={shipments?.meta ?? null}
-          canCreateShipment={po.status === "in_progress"}
+          canCreateShipment={po.status === "in_progress" && canCreateShipment}
+          canEditShipment={canEditShipment}
+          canDeleteShipment={canDeleteShipment}
         />
       )}
     </div>

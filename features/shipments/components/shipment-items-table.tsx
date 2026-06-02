@@ -59,7 +59,7 @@ export function ShipmentItemsTable({
     return result;
   };
 
-  const columns: ColumnDef<ShipmentItem>[] = [
+  const baseColumns: ColumnDef<ShipmentItem>[] = [
     {
       accessorKey: "sku",
       header: "SKU",
@@ -94,33 +94,39 @@ export function ShipmentItemsTable({
         </span>
       ),
     },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }) => (
-        <ActionsCell
-          editAction={{
-            type: "modal",
-            render: ({ open, onOpenChange }) => (
-              <ShipmentItemModal
-                item={row.original}
-                open={open}
-                onOpenChange={onOpenChange}
-                remainingQuantities={remainingQuantities}
-                onSubmit={(values) => handleEdit(row.original, values)}
-              />
-            ),
-          }}
-          deleteAction={{
-            resourceName: "Item",
-            itemName: row.original.name,
-            successMessage: "Item deleted.",
-            onConfirm: async () => deleteShipmentItem(row.original.id, shipmentId),
-          }}
-        />
-      ),
-    }
   ];
+
+  const columns: ColumnDef<ShipmentItem>[] = isEditable
+    ? [
+        ...baseColumns,
+        {
+          id: "actions",
+          header: "Actions",
+          cell: ({ row }) => (
+            <ActionsCell
+              editAction={{
+                type: "modal",
+                render: ({ open, onOpenChange }) => (
+                  <ShipmentItemModal
+                    item={row.original}
+                    open={open}
+                    onOpenChange={onOpenChange}
+                    remainingQuantities={remainingQuantities}
+                    onSubmit={(values) => handleEdit(row.original, values)}
+                  />
+                ),
+              }}
+              deleteAction={{
+                resourceName: "Item",
+                itemName: row.original.name,
+                successMessage: "Item deleted.",
+                onConfirm: async () => deleteShipmentItem(row.original.id, shipmentId),
+              }}
+            />
+          ),
+        },
+      ]
+    : baseColumns;
 
   return (
     <BaseTable

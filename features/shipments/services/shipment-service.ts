@@ -1,5 +1,6 @@
 import { buildPaginated } from "@/lib/pagination";
-import { isOperationalRole, requirePermission, type PolicyContextOptions } from "@/policies";
+import { requirePermission, type PolicyContextOptions } from "@/policies";
+import { canViewPendingShipment } from "@/policies/roles";
 import type {
   PaginatedShipments,
   ShipmentDetail,
@@ -35,9 +36,8 @@ export async function listShipments(
     .order("created_at", { ascending: false })
     .range(rangeFrom, rangeTo);
 
-  // Operational roles only need shipments from their workspace.
-  if (isOperationalRole(role)) {
-    query = query.eq("workspace_id", user.workspaceId);
+  if (!canViewPendingShipment(user.isSuperAdmin, role)) {
+    query = query.neq("status", "pending");
   }
 
   const { data, error, count } = await query;
@@ -95,6 +95,10 @@ export async function getShipmentById(
 
   if (error) throw new Error(error.message);
   if (!shipment) return null;
+
+  if (shipment.status === "pending" && !canViewPendingShipment(user.isSuperAdmin, user.role)) {
+    return null;
+  }
 
   // Fetch shipment items with PO item details
   const { data: rawItems } = await supabase
@@ -179,9 +183,10 @@ export async function getRemainingQuantities(
   options: PolicyContextOptions = {},
 ): Promise<RemainingQuantity[]> {
   const { error: authError, supabase, user } = await requirePermission(
-    "shipment.create",
+    "shipment.view",
     options,
   );
+
   if (authError || !supabase || !user) throw new Error(authError ?? "Unauthorized");
 
   // Get PO items

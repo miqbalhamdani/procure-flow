@@ -16,7 +16,7 @@ import { getPurchaseOrderById } from "@/features/purchase-orders/services/po-ser
 import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
-import { requirePermission } from "@/policies";
+import { can, requirePermission } from "@/policies";
 
 interface Props {
   params: Promise<{ id: string; shipmentId: string }>;
@@ -43,13 +43,31 @@ export default async function ShipmentPage({ params }: Props) {
     redirect(`/purchase-orders/${poId}/manage`);
   }
 
+  const canCreateShipment = can(user.isSuperAdmin, user.role, "shipment.create");
+  const canViewShipment = can(user.isSuperAdmin, user.role, "shipment.view");
+  const canEditShipment = can(user.isSuperAdmin, user.role, "shipment.edit");
+
+  console.log({ canCreateShipment, canViewShipment, canEditShipment });
+
+  if (isNew && !canCreateShipment) {
+    redirect(`/purchase-orders/${poId}/manage?tab=shipments`);
+  }
+
+  console.log("isNew:", isNew);
+
   // Fetch shipment if not new
   let shipment: Awaited<ReturnType<typeof getShipmentById>> = null;
 
   if (!isNew) {
     shipment = await getShipmentById(shipmentId, policyContext);
+
+    console.log("Fetched shipment for page:", shipment);
     if (!shipment) notFound();
     if (shipment.purchase_order_id !== poId) notFound();
+
+    if (!canViewShipment) {
+      redirect(`/purchase-orders/${poId}/manage?tab=shipments`);
+    }
   }
 
   // Determine page mode
@@ -70,6 +88,8 @@ export default async function ShipmentPage({ params }: Props) {
 
   const canTransit = !transitAccess.error;
   const canDeliver = !deliveryAccess.error;
+  const canShowShipmentActions =
+    !!shipment && shipment.status !== "delivered" && (canTransit || canDeliver);
 
   const shipmentListUrl = `/purchase-orders/${poId}/manage?tab=shipments`;
 
@@ -164,7 +184,7 @@ export default async function ShipmentPage({ params }: Props) {
 
           {/* Right: Actions + Timeline */}
           <div className="space-y-6">
-            {shipment.status != "delivered" && (  
+            {canShowShipmentActions && (
               <section className="rounded-2xl bg-surface-container-lowest p-6 shadow-sm">
                 <h3 className="mb-4 font-headline text-base font-bold tracking-tight text-on-background">
                   Shipment Actions
@@ -191,6 +211,7 @@ export default async function ShipmentPage({ params }: Props) {
             purchaseOrderId={poId}
             shipment={shipment ?? undefined}
             remainingQuantities={remainingQuantities}
+            canEditShipment={canEditShipment}
           />
       )}
     </div>
