@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 
 import { createClient } from "@/lib/supabase/server";
 import { requirePermission } from "@/policies";
+import { isSettingEnabled } from "@/features/company-settings";
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -485,6 +486,17 @@ export async function updateInTransitTracking(
     "shipment.markInTransit",
   );
   if (authError || !supabase || !user) return { error: authError ?? "Unauthorized" };
+
+  const skipTransit = await isSettingEnabled(
+    supabase,
+    user.workspaceId!,
+    "shipment",
+    "skip_transit",
+  );
+
+  if (skipTransit) {
+    return { error: "Tracking updates are managed by logistics for this workspace." };
+  }
 
   const parsed = v.safeParse(submitShipmentSchema, input);
   if (!parsed.success) return { error: parsed.issues[0].message };

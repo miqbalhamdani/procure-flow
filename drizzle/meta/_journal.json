@@ -64,6 +64,13 @@
       "when": 1779579606405,
       "tag": "0009_memberships_role_unique",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1780475370018,
+      "tag": "0009_company_settings",
+      "breakpoints": true
     }
   ]
 }

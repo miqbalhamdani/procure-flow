@@ -10,7 +10,7 @@
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:seed": "tsx db/seeder/super-admin.seed.ts"
+    "db:seed": "tsx db/seeder/run-all.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

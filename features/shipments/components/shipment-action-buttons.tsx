@@ -15,12 +15,14 @@ interface ShipmentActionButtonsProps {
   shipment: ShipmentDetail;
   canTransit: boolean;
   canDeliver: boolean;
+  skipTransit?: boolean;
 }
 
 export function ShipmentActionButtons({
   shipment,
   canTransit,
   canDeliver,
+  skipTransit = false,
 }: ShipmentActionButtonsProps) {
   const router = useRouter();
   const [submitOpen, setSubmitOpen] = useState(false);
@@ -69,11 +71,13 @@ export function ShipmentActionButtons({
     "block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1.5";
   const footerNote =
     "mt-4 rounded-xl bg-surface-container-low/60 px-4 py-2.5 text-xs text-on-surface-variant";
+  const canShowMarkInTransit = shipment.status === "in_transit" && canTransit && !skipTransit;
+  const canShowMarkDelivered = shipment.status === "in_transit" && canDeliver;
 
   return (
     <div className="space-y-3">
       {/* Mark In Transit */}
-      {shipment.status === "in_transit" && canTransit && (
+      {canShowMarkInTransit && (
         <Dialog.Root
           open={submitOpen}
           onOpenChange={(open) => {
@@ -172,7 +176,7 @@ export function ShipmentActionButtons({
       )}
 
       {/* Mark Delivered */}
-      {shipment.status === "in_transit" && canDeliver && (
+      {canShowMarkDelivered && (
         <Dialog.Root
           open={deliverOpen}
           onOpenChange={(open) => {

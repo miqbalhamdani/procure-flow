@@ -122,6 +122,42 @@ npm run lint     # Lint code
 
 ---
 
+## 🌱 Database Seeding
+
+The project uses a dynamic seeder runner at `db/seeder/run-all.ts`.
+
+Seeder files must use this naming format:
+
+```bash
+*.seed.ts
+```
+
+### Run all seeders
+
+```bash
+npm run db:seed
+```
+
+### Run specific seeder by file name
+
+```bash
+npm run db:seed -- super-admin
+npm run db:seed -- super-admin.seed.ts
+```
+
+### Run multiple seeders
+
+```bash
+npm run db:seed -- super-admin company-settings
+```
+
+Notes:
+
+* Arguments can be passed with or without `.seed.ts`
+* New seeder files in `db/seeder` are picked up automatically
+
+---
+
 ## 📌 Notes
 
 * All business rules and AI context are defined in `.github/copilot-instructions.md`

@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 
 import type { CompanyOption, SupplierOption } from "@/features/purchase-orders/types";
 import { requirePermission } from "@/policies";
+import { isSettingEnabled } from "@/features/company-settings";
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -296,9 +297,20 @@ export async function submitPurchaseOrder(id: string): Promise<{ error?: string 
 
   if (!count || count === 0) return { error: "PO must have at least one item before submitting." };
 
+  const skipApproval = await isSettingEnabled(
+    supabase,
+    user.workspaceId!,
+    "purchase-order",
+    "skip_approval",
+  );
+
   const { error } = await supabase
     .from("purchase_orders")
-    .update({ status: "submitted", updated_at: new Date().toISOString() })
+    .update(
+      skipApproval
+        ? { status: "in_progress" }
+        : { status: "submitted", updated_at: new Date().toISOString() },
+    )
     .eq("id", id);
 
   if (error) return { error: error.message };

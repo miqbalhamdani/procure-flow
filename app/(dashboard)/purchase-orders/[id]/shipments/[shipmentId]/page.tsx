@@ -17,6 +17,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { can, requirePermission } from "@/policies";
+import { isSettingEnabled } from "@/features/company-settings";
 
 interface Props {
   params: Promise<{ id: string; shipmentId: string }>;
@@ -81,9 +82,10 @@ export default async function ShipmentPage({ params }: Props) {
     policyContext,
   );
 
-  const [transitAccess, deliveryAccess] = await Promise.all([
+  const [transitAccess, deliveryAccess, skipTransit] = await Promise.all([
     requirePermission("shipment.markInTransit", policyContext),
     requirePermission("shipment.markDelivered", policyContext),
+    isSettingEnabled(supabase, user.workspaceId!, "shipment", "skip_transit"),
   ]);
 
   const canTransit = !transitAccess.error;
@@ -193,16 +195,19 @@ export default async function ShipmentPage({ params }: Props) {
                   shipment={shipment}
                   canTransit={canTransit}
                   canDeliver={canDeliver}
+                  skipTransit={skipTransit}
                 />
               </section>
             )}
 
-            <section className="rounded-2xl bg-surface-container-lowest p-6 shadow-sm">
-              <h3 className="mb-4 font-headline text-base font-bold tracking-tight text-on-background">
-                Tracking Timeline
-              </h3>
-              <ShipmentTrackingTimeline events={shipment.tracking} />
-            </section>
+            {!skipTransit && (
+              <section className="rounded-2xl bg-surface-container-lowest p-6 shadow-sm">
+                <h3 className="mb-4 font-headline text-base font-bold tracking-tight text-on-background">
+                  Tracking Timeline
+                </h3>
+                <ShipmentTrackingTimeline events={shipment.tracking} />
+              </section>
+            )}
           </div>
         </div>
       ) : (
