@@ -221,7 +221,10 @@ export function ShipmentForm({
                   <DatePicker
                     id={shipmentDateFieldId}
                     value={field.value}
-                    onChange={canEditShipment ? field.onChange : undefined}
+                    onChange={(value) => {
+                      if (!canEditShipment) return;
+                      field.onChange(value);
+                    }}
                     errorId={`${shipmentDateFieldId}-error`}
                     hasError={!!fieldState.error}
                     triggerClassName="h-[46px] rounded-xl border-0 bg-surface-container-low px-4 text-on-background shadow-none ring-1 ring-transparent hover:bg-surface-container-low hover:text-on-background focus-visible:ring-2 focus-visible:ring-primary/30 data-[empty=true]:text-on-surface-variant/70"

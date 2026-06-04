@@ -48,15 +48,29 @@ async function seed() {
   });
 
   // Verify workspace exists
-  const { data: workspace, error: wsError } = await supabase
+  const { data: workspaces, error: wsError } = await supabase
     .from("workspaces")
     .select("id, name")
     .in("id", SETTINGS.map((s) => s.workspaceId));
 
   if (wsError) throw new Error(wsError.message);
-  if (!workspace) throw new Error(`Workspace not found: ${SETTINGS.map((s) => s.workspaceId).join(", ")}`);
+  if (!workspaces || workspaces.length === 0) {
+    throw new Error(`Workspace not found: ${SETTINGS.map((s) => s.workspaceId).join(", ")}`);
+  }
 
-  console.log(`Seeding workspace settings for workspace: "${workspace.name}" (${workspace.id})`);
+  const foundIds = new Set(workspaces.map((workspace) => workspace.id));
+  const missingWorkspaceIds = SETTINGS.map((s) => s.workspaceId).filter(
+    (workspaceId) => !foundIds.has(workspaceId),
+  );
+
+  if (missingWorkspaceIds.length > 0) {
+    throw new Error(`Workspace not found: ${missingWorkspaceIds.join(", ")}`);
+  }
+
+  console.log(`Seeding workspace settings for ${workspaces.length} workspace(s):`);
+  for (const workspace of workspaces) {
+    console.log(`  - "${workspace.name}" (${workspace.id})`);
+  }
 
   for (const setting of SETTINGS) {
     const { error } = await supabase.from("workspace_settings").upsert(
