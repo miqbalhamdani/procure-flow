@@ -7,8 +7,13 @@ import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as v from "valibot";
 
-// Update the import path below to the correct relative path if the alias does not resolve
+import { ComboboxSelect } from "@/components/ui/combobox-select";
 import { signInWithPassword } from "../services/auth-service";
+
+const DEMO_USERS = [
+  { label: "Admin Demo Company", email: "admin.demo@procureflow.com", password: "adminpassword" },
+  { label: "Admin X&Y Company", email: "admin@xy.com", password: "admin xy" },
+] as const;
 
 const loginSchema = v.object({
   email: v.pipe(v.string(), v.email("Please enter a valid email")),
@@ -21,11 +26,13 @@ export function LoginForm() {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [selectedDemoUser, setSelectedDemoUser] = useState("");
 
   const resolver = useMemo(() => valibotResolver(loginSchema), []);
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver,
@@ -46,8 +53,28 @@ export function LoginForm() {
     }
 
     router.replace(result.redirectTo);
-    // router.refresh();
   });
+
+  const handleDemoSelect = (email: string) => {
+    const selected = DEMO_USERS.find((u) => u.email === email);
+    if (!selected) return;
+    setSelectedDemoUser(email);
+    setValue("email", selected.email, { shouldValidate: true });
+    setValue("password", selected.password, { shouldValidate: true });
+    setErrorMessage(null);
+    // auto-submit after a short tick so RHF state is flushed
+    setTimeout(() => {
+      void handleSubmit(async (values) => {
+        setErrorMessage(null);
+        const result = await signInWithPassword(values);
+        if (result.error || !result.redirectTo) {
+          setErrorMessage(result.error ?? "Login failed. Please try again.");
+          return;
+        }
+        router.replace(result.redirectTo);
+      })();
+    }, 0);
+  };
 
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-[#faf8ff] px-6 py-12">
@@ -71,6 +98,30 @@ export function LoginForm() {
         </div>
 
         <form className="space-y-6" onSubmit={onSubmit} noValidate>
+          {/* Demo user selector */}
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold tracking-wider text-[#464554] uppercase">
+              Quick demo login
+            </label>
+            <ComboboxSelect
+              value={selectedDemoUser}
+              onChange={handleDemoSelect}
+              options={DEMO_USERS.map((u) => ({
+                value: u.email,
+                label: `${u.label} - ${u.email}`,
+              }))}
+              placeholder="Select a demo user..."
+              searchPlaceholder="Search demo user..."
+              emptyMessage="No demo user found."
+            />
+          </div>
+
+          <div className="relative flex items-center">
+            <div className="flex-1 border-t border-[#e5e2f0]" />
+            <span className="mx-3 text-xs text-[#9692a8]">or enter manually</span>
+            <div className="flex-1 border-t border-[#e5e2f0]" />
+          </div>
+
           <div className="space-y-2">
             <label
               htmlFor="email"
