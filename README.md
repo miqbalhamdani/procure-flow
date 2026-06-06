@@ -14,7 +14,6 @@ It enables companies to streamline purchase orders, approvals, and shipment trac
 * Purchase order management (Draft → Approved)
 * Shipment tracking (Pending → Delivered)
 * Supplier portal (limited access)
-* Usage-based billing (Free vs Pro plan)
 
 ---
 

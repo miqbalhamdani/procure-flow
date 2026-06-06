@@ -3,6 +3,10 @@ import { Geist_Mono, Inter, Manrope } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import {
+  NavigationProgressBar,
+  NavigationProgressProvider,
+} from "@/components/layout/navigation-progress";
 import { Toaster } from "@/components/shadcn-ui/sonner";
 
 const manrope = Manrope({
@@ -51,8 +55,11 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col font-body bg-surface text-on-surface">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          {children}
-          <Toaster />
+          <NavigationProgressProvider>
+            <NavigationProgressBar placement="global" />
+            {children}
+            <Toaster />
+          </NavigationProgressProvider>
         </ThemeProvider>
       </body>
     </html>
